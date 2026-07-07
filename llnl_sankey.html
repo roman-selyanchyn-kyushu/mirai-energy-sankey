@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Energy Flow — LLNL Style</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:       #141414;
+  --ink-2:     #444;
+  --ink-3:     #888;
+  --ink-4:     #bbb;
+  --rule:      #e4e1dc;
+  --bg:        #ffffff;
+  --bg-2:      #f8f6f3;
+  --bg-3:      #f0ede8;
+
+  --se: #0057A8;
+  --jp: #C0392B;
+
+  --coal:    #4a4a4a;
+  --oil:     #8B4513;
+  --gas:     #d97706;
+  --nuclear: #7c3aed;
+  --hydro:   #0ea5e9;
+  --wind:    #16a34a;
+  --solar:   #ca8a04;
+  --biomass: #5a7c2f;
+  --renew:   #15803d;
+  --elec:    #ea580c;
+  --heat:    #dc2626;
+  --svc:     #059669;
+  --rej:     #9ca3af;
+  --loss:    #d1d5db;
+
+  --ff-display: 'DM Serif Display', Georgia, serif;
+  --ff-mono:    'IBM Plex Mono', monospace;
+  --ff-body:    'DM Sans', sans-serif;
+
+  --r: 3px;
+  --trans: all 0.18s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body { background: var(--bg); color: var(--ink); font-family: var(--ff-body); }
+
+/* ── HEADER ── */
+.hdr {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 26px 48px 20px;
+  border-bottom: 2px solid var(--ink);
+}
+.hdr-title { font-family: var(--ff-display); font-size: 2rem; line-height: 1.1; letter-spacing: -0.02em; }
+.hdr-title em { font-style: italic; color: var(--ink-3); }
+.hdr-meta { font-family: var(--ff-mono); font-size: 0.68rem; color: var(--ink-3); text-align: right; line-height: 1.9; letter-spacing: 0.04em; }
+.hdr-meta .warn { color: var(--jp); font-size: 0.63rem; }
+
+/* ── TABS ── */
+.tabs { display: flex; padding: 0 48px; border-bottom: 1.5px solid var(--rule); gap: 0; }
+.tab {
+  font-family: var(--ff-mono); font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  padding: 14px 26px; border: none; background: none; cursor: pointer;
+  color: var(--ink-3); border-bottom: 3px solid transparent; margin-bottom: -1.5px;
+  transition: var(--trans);
+}
+.tab .flag { font-size: 1rem; margin-right: 7px; }
+.tab.se-active { color: var(--se); border-bottom-color: var(--se); }
+.tab.jp-active { color: var(--jp); border-bottom-color: var(--jp); }
+.tab:not(.se-active):not(.jp-active):hover { color: var(--ink); }
+
+/* ── PANEL ── */
+.panel { display: none; padding: 28px 48px 48px; }
+.panel.on { display: block; animation: fadeUp 0.28s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.panel-hdr {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding-bottom: 14px; border-bottom: 1px solid var(--rule); margin-bottom: 20px;
+}
+.panel-title { font-family: var(--ff-display); font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+.badge {
+  font-family: var(--ff-mono); font-size: 0.6rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 7px; border-radius: 2px;
+}
+.badge-se { background: #dbeafe; color: var(--se); }
+.badge-jp { background: #fee2e2; color: var(--jp); }
+.panel-kpi { font-family: var(--ff-mono); font-size: 0.68rem; color: var(--ink-3); text-align: right; line-height: 1.9; }
+.panel-kpi strong { color: var(--ink); font-weight: 500; }
+
+/* ── SANKEY CANVAS ── */
+.canvas-wrap { width: 100%; overflow-x: auto; background: var(--bg); border: 1px solid var(--rule); border-radius: var(--r); }
+svg.sk { display: block; }
+
+/* ── TOOLTIP ── */
+.tip {
+  position: fixed; background: var(--ink); color: #fff;
+  font-family: var(--ff-mono); font-size: 0.68rem; line-height: 1.7;
+  padding: 9px 13px; border-radius: 3px; pointer-events: none;
+  opacity: 0; transition: opacity 0.12s; z-index: 9999; max-width: 220px;
+}
+.tip.on { opacity: 1; }
+.tip-title { font-weight: 600; font-size: 0.72rem; padding-bottom: 4px; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+
+/* ── NOTES ── */
+.notes {
+  margin-top: 16px; padding: 11px 16px;
+  border-left: 3px solid var(--rule);
+  font-family: var(--ff-mono); font-size: 0.65rem; color: var(--ink-3); line-height: 1.9;
+}
+.notes strong { color: var(--ink-2); }
+.notes .warn { color: var(--jp); }
+
+/* ── LEGEND ── */
+.legend {
+  display: flex; flex-wrap: wrap; gap: 10px 22px;
+  margin-bottom: 16px; padding: 12px 16px;
+  background: var(--bg-2); border-left: 3px solid var(--rule);
+}
+.leg-item { display: flex; align-items: center; gap: 6px; font-family: var(--ff-mono); font-size: 0.64rem; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.05em; }
+.leg-sw { width: 13px; height: 9px; border-radius: 1px; flex-shrink: 0; }
+
+/* ── DATA EDITOR ── */
+.editor-section { margin-top: 28px; }
+.editor-toggle {
+  font-family: var(--ff-mono); font-size: 0.7rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  background: var(--bg-2); border: 1.5px solid var(--rule);
+  color: var(--ink-2); padding: 9px 18px; cursor: pointer;
+  border-radius: var(--r); transition: var(--trans); display: flex; align-items: center; gap: 8px;
+}
+.editor-toggle:hover { border-color: var(--ink); color: var(--ink); background: var(--bg-3); }
+.editor-toggle .arr { transition: transform 0.2s; display: inline-block; }
+.editor-toggle.open .arr { transform: rotate(90deg); }
+
+.editor-body { display: none; margin-top: 18px; }
+.editor-body.on { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+
+.ed-card {
+  border: 1px solid var(--rule); border-radius: var(--r);
+  overflow: hidden;
+}
+.ed-card-hdr {
+  background: var(--bg-2); padding: 10px 14px;
+  font-family: var(--ff-mono); font-size: 0.65rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.09em; color: var(--ink-3);
+  border-bottom: 1px solid var(--rule); display: flex; align-items: center; gap: 8px;
+}
+.ed-card-hdr .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ed-card-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+
+.ed-row { display: flex; align-items: center; gap: 10px; }
+.ed-label {
+  font-family: var(--ff-mono); font-size: 0.67rem; color: var(--ink-2);
+  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ed-input {
+  font-family: var(--ff-mono); font-size: 0.7rem; font-weight: 500;
+  color: var(--ink); background: var(--bg); border: 1.5px solid var(--rule);
+  border-radius: 2px; padding: 4px 8px; width: 110px; text-align: right;
+  transition: border-color 0.15s;
+}
+.ed-input:focus { outline: none; border-color: var(--ink); background: var(--bg-2); }
+.ed-input.changed { border-color: #16a34a; background: #f0fdf4; }
+.ed-unit { font-family: var(--ff-mono); font-size: 0.62rem; color: var(--ink-4); white-space: nowrap; }
+
+.reset-btn {
+  font-family: var(--ff-mono); font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.07em; background: none; border: 1px solid var(--rule);
+  color: var(--ink-3); padding: 5px 12px; border-radius: 2px; cursor: pointer;
+  transition: var(--trans); margin-top: 4px; align-self: flex-start;
+}
+.reset-btn:hover { border-color: var(--jp); color: var(--jp); }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div>
+    <div class="hdr-title">Energy Flow<br><em>Sweden &amp; Japan</em></div>
+  </div>
+  <div class="hdr-meta">
+    LLNL-Style Sankey · Sweden FY2022 · Japan FY2023<br>
+    Sources: <a href="https://www.iea.org/data-and-statistics/data-product/world-energy-balances" target="_blank" style="color:inherit;text-decoration:underline;">IEA World Energy Balances</a> / <a href="https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c" target="_blank" style="color:inherit;text-decoration:underline;">Eurostat nrg_bal_c</a> / <a href="https://www.enecho.meti.go.jp/statistics/total_energy/index.html" target="_blank" style="color:inherit;text-decoration:underline;">METI 総合エネルギー統計</a><br>
+    Unit: Terajoules (TJ) · End-use efficiencies: LLNL-style proxies<br>
+    MIRAI Materials for Energy Conversion and Storage - Kyushu University - Linnaeus University<br>
+    <span class="warn">★ Preliminary data — verify before publication</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab se-active" id="tab-se" onclick="showTab('se')"><span class="flag">🇸🇪</span>Sweden</button>
+  <button class="tab" id="tab-jp" onclick="showTab('jp')"><span class="flag">🇯🇵</span>Japan</button>
+</nav>
+
+<!-- ══ SWEDEN ══ -->
+<div class="panel on" id="panel-se">
+  <div class="panel-hdr">
+    <div class="panel-title">Sweden <span class="badge badge-se">FY 2022</span></div>
+    <div class="panel-kpi" id="kpi-se"></div>
+  </div>
+  <div class="legend" id="leg-se"></div>
+  <div class="canvas-wrap"><svg class="sk" id="sk-se"></svg></div>
+  <div class="notes" id="notes-se">
+    <strong>Notes —</strong>
+    Hydro / wind / solar: input = output (IEA convention; no thermal loss). ·
+    Thermal rejected energy = nuclear + fossil + biomass-CHP inputs − electricity output. ·
+    District heat is Sweden-specific (~210 PJ); absent in Japan. ·
+    End-use efficiencies: Res/Com 65 %, Ind 80 %, Tpt 25 % (LLNL-style proxies; not from official statistics). ·
+    <span class="warn">Preliminary — cross-check against <a href="https://ec.europa.eu/eurostat/databrowser/product/view/nrg_bal_c" target="_blank" style="color:inherit;text-decoration:underline;">Eurostat nrg_bal_c (SE, 2022)</a> before publication.</span>
+  </div>
+  <div class="editor-section">
+    <button class="editor-toggle" id="etog-se" onclick="toggleEditor('se')">
+      <span class="arr">▶</span> Edit data values
+    </button>
+    <div class="editor-body" id="ebody-se"></div>
+  </div>
+</div>
+
+<!-- ══ JAPAN ══ -->
+<div class="panel" id="panel-jp">
+  <div class="panel-hdr">
+    <div class="panel-title">Japan <span class="badge badge-jp">FY 2023</span></div>
+    <div class="panel-kpi" id="kpi-jp"></div>
+  </div>
+  <div class="legend" id="leg-jp"></div>
+  <div class="canvas-wrap"><svg class="sk" id="sk-jp"></svg></div>
+  <div class="notes" id="notes-jp">
+    <strong>Notes —</strong>
+    Source: <a href="https://www.enecho.meti.go.jp/statistics/total_energy/results.html" target="_blank" style="color:inherit;text-decoration:underline;">METI 総合エネルギー統計 FY2023</a>. ·
+    Electricity rejected energy = generation inputs − delivered − T&amp;D losses (LLNL lumped). ·
+    Natural gas: IEA-style (primary NG + city gas collapsed directly to sectors). ·
+    未活用エネルギー (554,770 TJ) excluded from primary supply — internal industrial loop already in fossil totals. ·
+    End-use efficiencies: Res/Com 65 %, Ind 80 %, Tpt 25 % (LLNL-style proxies; not from METI).
+  </div>
+  <div class="editor-section">
+    <button class="editor-toggle" id="etog-jp" onclick="toggleEditor('jp')">
+      <span class="arr">▶</span> Edit data values
+    </button>
+    <div class="editor-body" id="ebody-jp"></div>
+  </div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  COLORS
+// ══════════════════════════════════════════════════════════
+const C = {
+  coal:'#4a4a4a', oil:'#8B4513', gas:'#d97706', nuclear:'#7c3aed',
+  hydro:'#0ea5e9', wind:'#16a34a', solar:'#ca8a04', biomass:'#5a7c2f',
+  renew:'#15803d', elec:'#ea580c', heat:'#dc2626',
+  svc:'#059669', rej:'#9ca3af', loss:'#c8cdd5', dhLoss:'#f3a0a0'
+};
+
+// ══════════════════════════════════════════════════════════
+//  DEFAULT DATA  (all TJ)
+// ══════════════════════════════════════════════════════════
+const DEFAULTS = {
+  se: {
+    // Primary supply — inputs to electricity
+    elec_inputs: {
+      coal:    18000,
+      oil:      7000,
+      gas:     29000,
+      nuclear: 535000,
+      hydro:   562000,
+      wind:     97000,
+      solar:     8000,
+      biomass: 180000,   // CHP electricity share of biomass
+    },
+    // District heat inputs
+    dh_inputs: {
+      biomass: 167000,
+      gas:      14000,
+      oil:       8000,
+    },
+    // Direct primary → sector (bypass elec + DH)
+    direct: {
+      // coal direct
+      coal_ind: 141000,
+      // oil direct
+      oil_res:  29000, oil_com: 18000, oil_ind: 63000, oil_tpt: 382000,
+      // gas direct (after elec + DH shares)
+      gas_res:   6000, gas_com: 10000, gas_ind: 25000, gas_tpt:   6000,
+      // biomass direct (after elec + DH shares)
+      bio_res:  83000, bio_com: 22000, bio_ind: 303000, bio_tpt:  58000,
+    },
+    // Electricity balance
+    elec: {
+      gross:   939000,
+      td_loss:  75000,
+      net_exp:  23000,   // net export (positive = export)
+      // elec to sectors (sum must = gross - td_loss - net_exp)
+      res:  151000,
+      com:  208000,
+      ind:  378000,
+      tpt:   34000,
+      oth:   70000,
+    },
+    // District heat balance
+    dh: {
+      res:  105000,
+      com:   84000,
+      ind:   13000,
+      loss:   8000,
+    },
+    // End-use efficiencies (fraction)
+    eff: { res: 0.65, com: 0.65, ind: 0.80, tpt: 0.25 },
+    hasDH: true,
+  },
+
+  jp: {
+    elec_inputs: {
+      coal:    2548396,
+      oil:      337671,
+      gas:     2221092,
+      nuclear:  724074,
+      hydro:    647881,
+      wind:          0,   // included in renew
+      solar:         0,
+      biomass:       0,   // included in renew
+      renew:   1458168,   // aggregated: wind+solar+geo+biomass
+    },
+    dh_inputs: { biomass: 0, gas: 0, oil: 0 },  // no district heat in Japan
+    direct: {
+      coal_ind: 1726595,
+      oil_res:  1604301, oil_com: 2087871, oil_ind: 2733405, oil_tpt: 2797953,
+      gas_res:   384235, gas_com:  331197, gas_ind:  298716, gas_tpt:     679,
+      bio_res:        0, bio_com:       0, bio_ind: 1083309, bio_tpt:       0,
+    },
+    elec: {
+      gross:   7213207,
+      td_loss:  370316,
+      net_exp:       0,
+      res:   903120,
+      com:  1032767,
+      ind:  1155093,
+      tpt:    59190,
+      oth:         0,
+    },
+    dh: { res: 0, com: 0, ind: 0, loss: 0 },
+    eff: { res: 0.65, com: 0.65, ind: 0.80, tpt: 0.25 },
+    hasDH: false,
+  }
+};
+
+// Deep clone
+function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+const STATE = { se: clone(DEFAULTS.se), jp: clone(DEFAULTS.jp) };
+
+// ══════════════════════════════════════════════════════════
+//  SANKEY RENDERER  —  LLNL logic
+// ══════════════════════════════════════════════════════════
+function fmt(v) {
+  if (v >= 1e6) return (v/1e6).toFixed(2)+'M TJ';
+  return Math.round(v).toLocaleString()+' TJ';
+}
+
+function renderSankey(country) {
+  const d = STATE[country];
+  const svgId = 'sk-' + country;
+  const accentColor = country === 'se' ? '#0057A8' : '#C0392B';
+
+  // ── Derive totals ──
+  const ei = d.elec_inputs;
+  const elecIn = Object.values(ei).reduce((a,b) => a+b, 0);
+
+  const dhIn = d.hasDH ? Object.values(d.dh_inputs).reduce((a,b) => a+b, 0) : 0;
+  const dhOut = d.hasDH ? (d.dh.res + d.dh.com + d.dh.ind + d.dh.loss) : 0;
+
+  const elecDelivered = d.elec.res + d.elec.com + d.elec.ind + d.elec.tpt + d.elec.oth;
+  const elecRej = Math.max(0, elecIn - d.elec.gross);   // thermal only
+  const elecLoss = d.elec.td_loss + d.elec.net_exp;     // T&D + export
+
+  // Final sector totals (all carriers)
+  const dr = d.direct;
+  const dh = d.dh;
+  const el = d.elec;
+
+  const totRes = el.res + (d.hasDH ? dh.res : 0) + dr.oil_res + dr.gas_res + dr.bio_res;
+  const totCom = el.com + (d.hasDH ? dh.com : 0) + dr.oil_com + dr.gas_com + dr.bio_com;
+  const totInd = el.ind + (d.hasDH ? dh.ind : 0) + dr.coal_ind + dr.oil_ind + dr.gas_ind + dr.bio_ind;
+  const totTpt = el.tpt + dr.oil_tpt + dr.gas_tpt + dr.bio_tpt;
+
+  // KPI
+  // TPES = sum of all primary fuel inputs (mirrors fuel band logic to avoid double-counting)
+  const tpes = country === 'se'
+    ? (ei.coal + dr.coal_ind)
+    + (ei.oil  + dr.oil_res + dr.oil_com + dr.oil_ind + dr.oil_tpt + d.dh_inputs.oil)
+    + (ei.gas  + dr.gas_res + dr.gas_com + dr.gas_ind + dr.gas_tpt + d.dh_inputs.gas)
+    + ei.nuclear + ei.hydro + ei.wind + ei.solar
+    + (ei.biomass + dr.bio_res + dr.bio_com + dr.bio_ind + dr.bio_tpt + d.dh_inputs.biomass)
+    : (ei.coal + dr.coal_ind)
+    + (ei.oil  + dr.oil_res + dr.oil_com + dr.oil_ind + dr.oil_tpt)
+    + (ei.gas  + dr.gas_res + dr.gas_com + dr.gas_ind + dr.gas_tpt)
+    + ei.nuclear + ei.hydro
+    + ((ei.renew || 0) + dr.bio_ind);
+
+  const tfc = totRes + totCom + totInd + totTpt;
+  const tfcPct = tpes > 0 ? (tfc / tpes * 100).toFixed(1) : '—';
+
+  // Generation-stage losses: thermal rejection + T&D + net exports + DH distribution
+  const genLosses = elecRej + elecLoss + (d.hasDH ? d.dh.loss : 0);
+  const genLossesPct = tpes > 0 ? (genLosses / tpes * 100).toFixed(1) : '—';
+
+  // End-use losses: rejected energy at point of use across all sectors
+  const endUseLosses = totRes * (1 - d.eff.res) + totCom * (1 - d.eff.com)
+                     + totInd * (1 - d.eff.ind) + totTpt * (1 - d.eff.tpt);
+  const endUseLossesPct = tpes > 0 ? (endUseLosses / tpes * 100).toFixed(1) : '—';
+
+  document.getElementById('kpi-' + country).innerHTML =
+    `Total primary energy supply: <strong>${fmt(tpes)}</strong><br>` +
+    `Electricity generation input: <strong>${fmt(elecIn)}</strong><br>` +
+    `Total final consumption (est.): <strong>${fmt(tfc)}</strong> <span style="color:var(--ink-3);font-weight:400;">(${tfcPct}% of TPES)</span><br>` +
+    `Generation-stage losses: <strong>${fmt(genLosses)}</strong> <span style="color:var(--ink-3);font-weight:400;">(${genLossesPct}% of TPES)</span><br>` +
+    `End-use losses (est.): <strong>${fmt(endUseLosses)}</strong> <span style="color:var(--ink-3);font-weight:400;">(${endUseLossesPct}% of TPES)</span>`;
+
+  // ── Layout constants ──
+  const hasDH = d.hasDH;
+  const nodeW = 16;
+  const GAP = 6;
+  const ML = 150, MR = 210, MT = 52, MB = 52;
+
+  // ── Fuel band values — computed before scale so scale can derive from them ──
+  const fuelBands = country === 'se' ? [
+    { key:'coal',    label:'Coal',    color:C.coal,    v: ei.coal + dr.coal_ind },
+    { key:'oil',     label:'Oil',     color:C.oil,     v: ei.oil + dr.oil_res + dr.oil_com + dr.oil_ind + dr.oil_tpt + d.dh_inputs.oil },
+    { key:'gas',     label:'Nat. Gas',color:C.gas,     v: ei.gas + dr.gas_res + dr.gas_com + dr.gas_ind + dr.gas_tpt + d.dh_inputs.gas },
+    { key:'nuclear', label:'Nuclear', color:C.nuclear, v: ei.nuclear },
+    { key:'hydro',   label:'Hydro',   color:C.hydro,   v: ei.hydro },
+    { key:'wind',    label:'Wind',    color:C.wind,    v: ei.wind },
+    { key:'solar',   label:'Solar',   color:C.solar,   v: ei.solar },
+    { key:'biomass', label:'Biomass', color:C.biomass, v: ei.biomass + dr.bio_res + dr.bio_com + dr.bio_ind + dr.bio_tpt + d.dh_inputs.biomass },
+  ] : [
+    { key:'coal',    label:'Coal',    color:C.coal,    v: ei.coal + dr.coal_ind },
+    { key:'oil',     label:'Oil',     color:C.oil,     v: ei.oil + dr.oil_res + dr.oil_com + dr.oil_ind + dr.oil_tpt },
+    { key:'gas',     label:'Nat. Gas',color:C.gas,     v: ei.gas + dr.gas_res + dr.gas_com + dr.gas_ind + dr.gas_tpt },
+    { key:'nuclear', label:'Nuclear', color:C.nuclear, v: ei.nuclear },
+    { key:'hydro',   label:'Hydro',   color:C.hydro,   v: ei.hydro },
+    { key:'renew',   label:'Renew.',  color:C.renew,   v: ei.renew + dr.bio_ind },
+  ];
+
+  // ── Scale: derived from fuel column so it always fits ──
+  // Target fuel column height (gaps already subtracted so scale × totalFuelFlow = TARGET)
+  const TARGET_COL_H = 600;
+  const totalFuelFlow = fuelBands.reduce((s,f) => s + f.v, 0);
+  const scale = (TARGET_COL_H - GAP * (fuelBands.length - 1)) / totalFuelFlow;
+  function px(v) { return Math.max(v * scale, 1); }
+
+  // ── Dynamic canvas height: fit the tallest column ──
+  const fuelColH   = fuelBands.reduce((s,f) => s + px(f.v), 0) + GAP * (fuelBands.length - 1);
+  const elecDHColH = px(elecIn) + (hasDH ? px(dhIn) + 32 : 0);
+  const secColH    = [totRes, totCom, totInd, totTpt].reduce((s,v) => s + px(v), 0) + GAP * 2 * 3;
+  const IH = Math.max(fuelColH, elecDHColH, secColH) + 60;
+  const H  = IH + MT + MB;
+
+  // ── Canvas width ──
+  const W = Math.max((document.getElementById('panel-'+country).offsetWidth || 1200) - 96, 980);
+  const IW = W - ML - MR;
+
+  const svg = document.getElementById(svgId);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  svg.innerHTML = '';
+
+  function g(tag, attrs={}) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v));
+    return el;
+  }
+  function grp(transform='') {
+    const el = g('g'); if (transform) el.setAttribute('transform', transform); return el;
+  }
+
+  const root = grp(`translate(${ML},${MT})`);
+  svg.appendChild(root);
+
+  // ── Column X positions ──
+  const colX = [0, IW*0.22, IW*0.40, IW*0.62, IW*0.82];
+
+  // Layout fuel bands
+  const totalFuelH = fuelBands.reduce((s,f) => s + px(f.v), 0) + GAP * (fuelBands.length - 1);
+  let fy0 = (IH - totalFuelH) / 2;
+  if (fy0 < 0) fy0 = 0;
+  fuelBands.forEach(f => {
+    f.y0 = fy0; f.h = px(f.v); f.y1 = fy0 + f.h;
+    fy0 = f.y1 + GAP;
+  });
+  function fuelBand(key) { return fuelBands.find(f => f.key === key); }
+  // outflow tracker per fuel
+  const fuelOut = {};
+  fuelBands.forEach(f => { fuelOut[f.key] = f.y0; });
+
+  // ── Elec generation box ──
+  const elecBoxH  = px(elecIn);
+  const elecBoxY  = (IH - elecBoxH) / 2;
+  const elecBoxX  = colX[1];
+
+  // DH box
+  const dhBoxH = hasDH ? px(dhIn) : 0;
+  const dhBoxY = hasDH ? elecBoxY + elecBoxH + 30 : 0;
+
+  // ── Draw fuel band rectangles + labels ──
+  fuelBands.forEach(f => {
+    const r = g('rect', { x:0, y:f.y0, width:nodeW, height:Math.max(f.h,1),
+      fill:f.color, rx:2 });
+    r.style.cursor = 'pointer';
+    addTip(r, f.label, f.v);
+    root.appendChild(r);
+
+    // Label left
+    const lbl = g('text', { x:-6, y: f.y0+f.h/2, 'text-anchor':'end',
+      'dominant-baseline':'middle', 'font-size':'9.5px',
+      'font-family':'IBM Plex Mono,monospace', fill:'#333' });
+    lbl.textContent = f.label;
+    root.appendChild(lbl);
+
+    const vlbl = g('text', { x:-6, y: f.y0+f.h/2+11, 'text-anchor':'end',
+      'dominant-baseline':'middle', 'font-size':'8.5px',
+      'font-family':'IBM Plex Mono,monospace', fill:'#999' });
+    vlbl.textContent = fmt(f.v);
+    root.appendChild(vlbl);
+  });
+
+  // ── Helper: draw a filled flow band ──
+  function band(x0,y0a,y0b, x1,y1a,y1b, color, tip_label, tip_val, opacity=0.42) {
+    const mx = (x0+x1)/2;
+    const d2 = `M${x0},${y0a} C${mx},${y0a} ${mx},${y1a} ${x1},${y1a}
+                L${x1},${y1b} C${mx},${y1b} ${mx},${y0b} ${x0},${y0b} Z`;
+    const p = g('path', { d:d2, fill:color, 'fill-opacity':opacity,
+      stroke:color, 'stroke-width':0.4, 'stroke-opacity':0.5 });
+    p.style.cursor = 'pointer';
+    p.style.transition = 'fill-opacity 0.15s';
+    p.addEventListener('mouseover', () => p.setAttribute('fill-opacity', 0.72));
+    p.addEventListener('mouseout',  () => p.setAttribute('fill-opacity', opacity));
+    addTip(p, tip_label, tip_val);
+    root.appendChild(p);
+  }
+
+  // track inflow Y positions for boxes
+  const elecInY = { cur: elecBoxY };
+  const dhInY   = { cur: dhBoxY };
+  // track outflow from sector boxes
+  const secY = {}; // set after sector layout
+
+  // ── Flows: fuels → Elec Generation ──
+  function flowToElec(fuelKey, amount, label) {
+    if (amount <= 0) return;
+    const fb = fuelBand(fuelKey); if (!fb) return;
+    const h = px(amount);
+    const y0a = fuelOut[fuelKey]; fuelOut[fuelKey] += h;
+    const y1a = elecInY.cur; elecInY.cur += h;
+    band(nodeW, y0a, y0a+h, elecBoxX, y1a, y1a+h, fb.color, label, amount);
+  }
+
+  if (ei.coal)    flowToElec('coal',    ei.coal,    'Coal → Electricity Generation');
+  if (ei.oil)     flowToElec('oil',     ei.oil,     'Oil → Electricity Generation');
+  if (ei.gas)     flowToElec('gas',     ei.gas,     'Gas → Electricity Generation');
+  if (ei.nuclear) flowToElec('nuclear', ei.nuclear, 'Nuclear → Electricity Generation');
+  if (ei.hydro)   flowToElec('hydro',   ei.hydro,   'Hydro → Electricity Generation');
+  if (ei.wind)    flowToElec('wind',    ei.wind,    'Wind → Electricity Generation');
+  if (ei.solar)   flowToElec('solar',   ei.solar,   'Solar → Electricity Generation');
+  if (ei.biomass) flowToElec('biomass', ei.biomass, 'Biomass → Electricity Generation (CHP)');
+  if (ei.renew)   flowToElec('renew',   ei.renew,   'Renewables → Electricity Generation');
+
+  // ── Flows: fuels → District Heat ──
+  if (hasDH) {
+    function flowToDH(fuelKey, amount, label) {
+      if (amount <= 0) return;
+      const fb = fuelBand(fuelKey); if (!fb) return;
+      const h = px(amount);
+      const y0a = fuelOut[fuelKey]; fuelOut[fuelKey] += h;
+      const y1a = dhInY.cur; dhInY.cur += h;
+      band(nodeW, y0a, y0a+h, elecBoxX, y1a, y1a+h, fb.color, label, amount);
+    }
+    flowToDH('biomass', d.dh_inputs.biomass, 'Biomass → District Heat');
+    flowToDH('gas',     d.dh_inputs.gas,     'Gas → District Heat');
+    flowToDH('oil',     d.dh_inputs.oil,     'Oil → District Heat');
+  }
+
+  // ── Draw Elec Generation box ──
+  {
+    const bx = g('rect', { x:elecBoxX, y:elecBoxY, width:nodeW, height:Math.max(elecBoxH,2),
+      fill:C.elec, rx:2 });
+    addTip(bx, 'Electricity Generation', elecIn);
+    root.appendChild(bx);
+
+    const lbl = g('text', { x:elecBoxX+nodeW/2, y:elecBoxY-10, 'text-anchor':'middle',
+      'font-size':'9px', 'font-family':'IBM Plex Mono,monospace', fill:C.elec, 'font-weight':'500' });
+    lbl.textContent = 'ELEC. GEN.';
+    root.appendChild(lbl);
+    const vlbl = g('text', { x:elecBoxX+nodeW/2, y:elecBoxY-1, 'text-anchor':'middle',
+      'font-size':'8px', 'font-family':'IBM Plex Mono,monospace', fill:'#aaa' });
+    vlbl.textContent = fmt(elecIn)+' in';
+    root.appendChild(vlbl);
+  }
+
+  // ── Draw DH box ──
+  if (hasDH && dhBoxH > 1) {
+    const bx = g('rect', { x:elecBoxX, y:dhBoxY, width:nodeW, height:Math.max(dhBoxH,2),
+      fill:C.heat, rx:2 });
+    addTip(bx, 'District Heat', dhIn);
+    root.appendChild(bx);
+    const lbl = g('text', { x:elecBoxX+nodeW/2, y:dhBoxY-8, 'text-anchor':'middle',
+      'font-size':'9px', 'font-family':'IBM Plex Mono,monospace', fill:C.heat, 'font-weight':'500' });
+    lbl.textContent = 'DIST. HEAT';
+    root.appendChild(lbl);
+  }
+
+  // ── Elec rejected energy (thermal losses) — drops DOWN-right from gen box ──
+  // Rejected: right of elec box, curves up/down to a gray band
+  const rejH = Math.max(px(elecRej), 1);
+  const lossH = Math.max(px(elecLoss), 1);
+  const elecOutX = elecBoxX + nodeW;
+  const lossX = colX[2];
+
+  // Positions within elec box outflow (bottom portion = rejected)
+  const elecOutBot = elecBoxY + elecBoxH;
+  const rejY0 = elecOutBot - rejH - lossH;
+  const lossY0 = elecOutBot - lossH;
+
+  if (elecRej > 0) {
+    // Rejected energy band — goes right and terminates
+    band(elecOutX, rejY0, rejY0+rejH, lossX, rejY0, rejY0+rejH, C.loss, 'Generation rejected energy (thermal losses)', elecRej, 0.7);
+    // Rejected box
+    const rbox = g('rect', { x:lossX, y:rejY0, width:nodeW, height:rejH, fill:C.loss, rx:2 });
+    addTip(rbox, 'Gen. Rejected Energy', elecRej);
+    root.appendChild(rbox);
+    const rlbl = g('text', { x:lossX+nodeW+5, y:rejY0+rejH/2, 'dominant-baseline':'middle',
+      'font-size':'9px', 'font-family':'IBM Plex Mono,monospace', fill:'#777' });
+    rlbl.textContent = 'Rejected (' + fmt(elecRej) + ')';
+    root.appendChild(rlbl);
+  }
+
+  if (elecLoss > 0) {
+    band(elecOutX, lossY0, lossY0+lossH, lossX, lossY0, lossY0+lossH, C.loss, 'T&D losses + net exports', elecLoss, 0.55);
+    const lbox = g('rect', { x:lossX, y:lossY0, width:nodeW, height:lossH, fill:C.loss, rx:2 });
+    root.appendChild(lbox);
+    const llbl = g('text', { x:lossX+nodeW+5, y:lossY0+lossH/2, 'dominant-baseline':'middle',
+      'font-size':'9px', 'font-family':'IBM Plex Mono,monospace', fill:'#777' });
+    llbl.textContent = 'T&D losses (' + fmt(elecLoss) + ')';
+    root.appendChild(llbl);
+  }
+
+  // ── Layout final sectors ──
+  const sectors = [
+    { key:'res', label:'Residential', color:C.hydro,
+      total: totRes, eff: d.eff.res },
+    { key:'com', label:'Commercial',  color:C.wind,
+      total: totCom, eff: d.eff.com },
+    { key:'ind', label:'Industrial',  color:C.oil,
+      total: totInd, eff: d.eff.ind },
+    { key:'tpt', label:'Transport',   color:C.nuclear,
+      total: totTpt, eff: d.eff.tpt },
+  ];
+
+  const secTotalH = sectors.reduce((s, sec) => s + px(sec.total), 0) + GAP*2*(sectors.length-1);
+  let sy = (IH - secTotalH) / 2; if (sy < 0) sy = 4;
+  sectors.forEach(sec => {
+    sec.y0 = sy; sec.h = Math.max(px(sec.total), 2); sec.y1 = sy + sec.h;
+    sy = sec.y1 + GAP*2;
+    sec.inY = sec.y0; // inflow pointer
+  });
+
+  // ── Electricity → sectors (from elec gen box top portion) ──
+  const elecOutTop = elecBoxY;
+  let elecFlowY = elecOutTop; // top portion of elec output
+
+  function elecToSec(secKey, amount, label) {
+    if (amount <= 0) return;
+    const sec = sectors.find(s => s.key === secKey); if (!sec) return;
+    const h = px(amount);
+    const y0a = elecFlowY; elecFlowY += h;
+    const y1a = sec.inY; sec.inY += h;
+    band(elecOutX, y0a, y0a+h, colX[3], y1a, y1a+h, C.elec, label, amount);
+  }
+  elecToSec('res', el.res, 'Electricity → Residential');
+  elecToSec('com', el.com, 'Electricity → Commercial');
+  elecToSec('ind', el.ind, 'Electricity → Industrial');
+  elecToSec('tpt', el.tpt, 'Electricity → Transport');
+  if (el.oth > 0) elecFlowY += px(el.oth); // skip other
+
+  // ── District Heat → sectors ──
+  if (hasDH) {
+    let dhOutY = dhBoxY;
+    function dhToSec(secKey, amount, label) {
+      if (amount <= 0) return;
+      const sec = sectors.find(s => s.key === secKey); if (!sec) return;
+      const h = px(amount);
+      const y0a = dhOutY; dhOutY += h;
+      const y1a = sec.inY; sec.inY += h;
+      band(elecOutX, y0a, y0a+h, colX[3], y1a, y1a+h, C.heat, label, amount);
+    }
+    dhToSec('res', dh.res, 'District Heat → Residential');
+    dhToSec('com', dh.com, 'District Heat → Commercial');
+    dhToSec('ind', dh.ind, 'District Heat → Industrial');
+    if (dh.loss > 0) {
+      // DH losses: small band exits right of DH box
+      const h = px(dh.loss);
+      band(elecOutX, dhOutY, dhOutY+h, lossX+nodeW+80, dhOutY, dhOutY+h, C.dhLoss, 'District heat distribution losses', dh.loss, 0.6);
+    }
+  }
+
+  // ── Direct fuels → sectors ──
+  function directToSec(fuelKey, secKey, amount, label) {
+    if (amount <= 0) return;
+    const fb = fuelBand(fuelKey); if (!fb) return;
+    const sec = sectors.find(s => s.key === secKey); if (!sec) return;
+    const h = px(amount);
+    const y0a = fuelOut[fuelKey]; fuelOut[fuelKey] += h;
+    const y1a = sec.inY; sec.inY += h;
+    band(nodeW, y0a, y0a+h, colX[3], y1a, y1a+h, fb.color, label, amount);
+  }
+
+  // Coal direct
+  directToSec('coal', 'ind', dr.coal_ind, 'Coal → Industrial (direct)');
+  // Oil direct
+  directToSec('oil', 'res', dr.oil_res, 'Oil → Residential');
+  directToSec('oil', 'com', dr.oil_com, 'Oil → Commercial');
+  directToSec('oil', 'ind', dr.oil_ind, 'Oil → Industrial');
+  directToSec('oil', 'tpt', dr.oil_tpt, 'Oil → Transport');
+  // Gas direct
+  directToSec('gas', 'res', dr.gas_res, 'Natural Gas → Residential');
+  directToSec('gas', 'com', dr.gas_com, 'Natural Gas → Commercial');
+  directToSec('gas', 'ind', dr.gas_ind, 'Natural Gas → Industrial');
+  directToSec('gas', 'tpt', dr.gas_tpt, 'Natural Gas → Transport');
+  // Biomass/renew direct
+  const bioKey = country === 'jp' ? 'renew' : 'biomass';
+  directToSec(bioKey, 'res', dr.bio_res, 'Biomass → Residential');
+  directToSec(bioKey, 'com', dr.bio_com, 'Biomass → Commercial');
+  directToSec(bioKey, 'ind', dr.bio_ind, 'Biomass/Renew → Industrial');
+  directToSec(bioKey, 'tpt', dr.bio_tpt, 'Biofuels → Transport');
+
+  // ── Draw sector boxes + labels ──
+  sectors.forEach(sec => {
+    const bx = g('rect', { x:colX[3], y:sec.y0, width:nodeW, height:sec.h, fill:sec.color, rx:2 });
+    addTip(bx, sec.label, sec.total);
+    root.appendChild(bx);
+    const lbl = g('text', { x:colX[3]+nodeW/2, y:sec.y0-7, 'text-anchor':'middle',
+      'font-size':'9px', 'font-family':'IBM Plex Mono,monospace', fill:sec.color, 'font-weight':'500' });
+    lbl.textContent = sec.label.toUpperCase();
+    root.appendChild(lbl);
+    const vlbl = g('text', { x:colX[3]+nodeW/2, y:sec.y0-0, 'text-anchor':'middle',
+      'dominant-baseline':'hanging', 'font-size':'0px', fill:'transparent' });
+    root.appendChild(vlbl);
+    // value label inside or beside
+    if (sec.h > 16) {
+      const iv = g('text', { x:colX[3]+nodeW+4, y:sec.y0+sec.h/2, 'dominant-baseline':'middle',
+        'font-size':'8.5px', 'font-family':'IBM Plex Mono,monospace', fill:'#888' });
+      iv.textContent = fmt(sec.total);
+      root.appendChild(iv);
+    }
+  });
+
+  // ── Sector → Energy Services / Rejected Energy ──
+  const secX = colX[3] + nodeW;
+  const endX = colX[4];
+
+  // Group energy services and rejected
+  const svcNodes = [], rejNodes = [];
+  sectors.forEach(sec => {
+    const svcH = Math.max(px(sec.total * sec.eff), 1);
+    const rejH2 = Math.max(px(sec.total * (1-sec.eff)), 1);
+    svcNodes.push({ sec, h: svcH, y0: sec.y0 });
+    rejNodes.push({ sec, h: rejH2, y0: sec.y0 + svcH });
+
+    band(secX, sec.y0, sec.y0+svcH, endX, sec.y0, sec.y0+svcH, C.svc, sec.label+' → Energy Services', sec.total*sec.eff);
+    band(secX, sec.y0+svcH, sec.y1, endX, sec.y0+svcH, sec.y1, C.rej, sec.label+' → Rejected Energy', sec.total*(1-sec.eff));
+  });
+
+  // Energy Services boxes (merged visual — one per sector)
+  sectors.forEach(sec => {
+    const svcH = Math.max(px(sec.total * sec.eff), 1);
+    const rejH2 = Math.max(px(sec.total * (1-sec.eff)), 1);
+    // svc rect
+    const sr = g('rect', { x:endX, y:sec.y0, width:nodeW, height:svcH, fill:C.svc, rx:1 });
+    addTip(sr, sec.label+' Energy Services', sec.total*sec.eff);
+    root.appendChild(sr);
+    // rej rect
+    const rr = g('rect', { x:endX, y:sec.y0+svcH, width:nodeW, height:rejH2, fill:C.rej, rx:1 });
+    addTip(rr, sec.label+' Rejected Energy', sec.total*(1-sec.eff));
+    root.appendChild(rr);
+    // Labels
+    if (svcH > 8) {
+      const sl = g('text', { x:endX+nodeW+5, y:sec.y0+svcH/2, 'dominant-baseline':'middle',
+        'font-size':'8.5px', 'font-family':'IBM Plex Mono,monospace', fill:C.svc });
+      sl.textContent = fmt(sec.total*sec.eff);
+      root.appendChild(sl);
+    }
+    if (rejH2 > 8) {
+      const rl = g('text', { x:endX+nodeW+5, y:sec.y0+svcH+rejH2/2, 'dominant-baseline':'middle',
+        'font-size':'8.5px', 'font-family':'IBM Plex Mono,monospace', fill:'#aaa' });
+      rl.textContent = fmt(sec.total*(1-sec.eff));
+      root.appendChild(rl);
+    }
+  });
+
+  // ── Column header labels ──
+  const colLabels = [
+    [0,            'PRIMARY\nSUPPLY'],
+    [colX[1],      'ELECTRICITY\nGENERATION'],
+    [colX[2],      'LOSSES'],
+    [colX[3],      'FINAL\nSECTORS'],
+    [colX[4],      'END USE'],
+  ];
+  colLabels.forEach(([x, label]) => {
+    label.split('\n').forEach((line, i) => {
+      const t = g('text', { x:x+nodeW/2, y:-MT+13+i*11, 'text-anchor':'middle',
+        'font-size':'8px', 'font-family':'IBM Plex Mono,monospace',
+        fill: accentColor, 'font-weight':'600', 'letter-spacing':'0.08em' });
+      t.textContent = line;
+      root.appendChild(t);
+    });
+  });
+
+  // Right-side final labels
+  const svcLbl = g('text', { x:endX+nodeW+5, y:-MT+13, 'font-size':'8px',
+    'font-family':'IBM Plex Mono,monospace', fill:C.svc, 'font-weight':'600', 'letter-spacing':'0.06em' });
+  svcLbl.textContent = '● ENERGY SERVICES';
+  root.appendChild(svcLbl);
+  const rejLbl = g('text', { x:endX+nodeW+5, y:-MT+24, 'font-size':'8px',
+    'font-family':'IBM Plex Mono,monospace', fill:C.rej, 'font-weight':'600', 'letter-spacing':'0.06em' });
+  rejLbl.textContent = '● REJECTED ENERGY';
+  root.appendChild(rejLbl);
+}
+
+// ══════════════════════════════════════════════════════════
+//  TOOLTIP
+// ══════════════════════════════════════════════════════════
+const tip = document.getElementById('tip');
+function addTip(el, title, val) {
+  el.addEventListener('mousemove', ev => {
+    tip.innerHTML = `<div class="tip-title">${title}</div>${fmt(val)}`;
+    tip.classList.add('on');
+    moveTip(ev);
+  });
+  el.addEventListener('mouseleave', () => tip.classList.remove('on'));
+}
+document.addEventListener('mousemove', moveTip);
+function moveTip(ev) {
+  if (!tip.classList.contains('on')) return;
+  let x = ev.clientX+14, y = ev.clientY+14;
+  if (x+230 > window.innerWidth) x = ev.clientX-230;
+  tip.style.left = x+'px'; tip.style.top = y+'px';
+}
+
+// ══════════════════════════════════════════════════════════
+//  LEGEND
+// ══════════════════════════════════════════════════════════
+function buildLegend(country) {
+  const items = country === 'se' ? [
+    ['Coal', C.coal], ['Oil', C.oil], ['Natural Gas', C.gas], ['Nuclear', C.nuclear],
+    ['Hydro', C.hydro], ['Wind', C.wind], ['Solar', C.solar], ['Biomass+Waste', C.biomass],
+    ['Electricity', C.elec], ['District Heat', C.heat],
+    ['Energy Services', C.svc], ['Rejected Energy', C.rej], ['Losses', C.loss],
+  ] : [
+    ['Coal', C.coal], ['Oil', C.oil], ['Natural Gas', C.gas], ['Nuclear', C.nuclear],
+    ['Hydro', C.hydro], ['Renewables', C.renew],
+    ['Electricity', C.elec], ['Energy Services', C.svc], ['Rejected Energy', C.rej], ['Losses', C.loss],
+  ];
+  document.getElementById('leg-'+country).innerHTML = items.map(([n,c]) =>
+    `<div class="leg-item"><div class="leg-sw" style="background:${c}"></div>${n}</div>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+//  DATA EDITOR
+// ══════════════════════════════════════════════════════════
+const EDITOR_SCHEMA = {
+  se: [
+    { title:'Electricity Generation Inputs (TJ)', color:C.elec, fields:[
+      { path:'elec_inputs.coal',    label:'Coal → Elec.' },
+      { path:'elec_inputs.oil',     label:'Oil → Elec.' },
+      { path:'elec_inputs.gas',     label:'Gas → Elec.' },
+      { path:'elec_inputs.nuclear', label:'Nuclear → Elec.' },
+      { path:'elec_inputs.hydro',   label:'Hydro → Elec.' },
+      { path:'elec_inputs.wind',    label:'Wind → Elec.' },
+      { path:'elec_inputs.solar',   label:'Solar → Elec.' },
+      { path:'elec_inputs.biomass', label:'Biomass → Elec. (CHP)' },
+    ]},
+    { title:'District Heat Inputs (TJ)', color:C.heat, fields:[
+      { path:'dh_inputs.biomass', label:'Biomass → DH' },
+      { path:'dh_inputs.gas',     label:'Gas → DH' },
+      { path:'dh_inputs.oil',     label:'Oil → DH' },
+    ]},
+    { title:'Electricity Balance (TJ)', color:C.elec, fields:[
+      { path:'elec.gross',   label:'Gross generated' },
+      { path:'elec.td_loss', label:'T&D losses + own use' },
+      { path:'elec.net_exp', label:'Net electricity exports' },
+      { path:'elec.res',     label:'→ Residential' },
+      { path:'elec.com',     label:'→ Commercial' },
+      { path:'elec.ind',     label:'→ Industrial' },
+      { path:'elec.tpt',     label:'→ Transport' },
+      { path:'elec.oth',     label:'→ Other' },
+    ]},
+    { title:'District Heat to Sectors (TJ)', color:C.heat, fields:[
+      { path:'dh.res',  label:'DH → Residential' },
+      { path:'dh.com',  label:'DH → Commercial' },
+      { path:'dh.ind',  label:'DH → Industrial' },
+      { path:'dh.loss', label:'DH distribution losses' },
+    ]},
+    { title:'Direct Fuel — Oil (TJ)', color:C.oil, fields:[
+      { path:'direct.oil_res', label:'Oil → Residential' },
+      { path:'direct.oil_com', label:'Oil → Commercial' },
+      { path:'direct.oil_ind', label:'Oil → Industrial' },
+      { path:'direct.oil_tpt', label:'Oil → Transport' },
+    ]},
+    { title:'Direct Fuel — Gas + Coal (TJ)', color:C.gas, fields:[
+      { path:'direct.gas_res',  label:'Gas → Residential' },
+      { path:'direct.gas_com',  label:'Gas → Commercial' },
+      { path:'direct.gas_ind',  label:'Gas → Industrial' },
+      { path:'direct.gas_tpt',  label:'Gas → Transport' },
+      { path:'direct.coal_ind', label:'Coal → Industrial' },
+    ]},
+    { title:'Direct Fuel — Biomass (TJ)', color:C.biomass, fields:[
+      { path:'direct.bio_res', label:'Biomass → Residential' },
+      { path:'direct.bio_com', label:'Biomass → Commercial' },
+      { path:'direct.bio_ind', label:'Biomass → Industrial' },
+      { path:'direct.bio_tpt', label:'Biofuels → Transport' },
+    ]},
+    { title:'End-Use Efficiencies (fraction 0–1)', color:C.svc, fields:[
+      { path:'eff.res', label:'Residential efficiency', step:0.01 },
+      { path:'eff.com', label:'Commercial efficiency',  step:0.01 },
+      { path:'eff.ind', label:'Industrial efficiency',  step:0.01 },
+      { path:'eff.tpt', label:'Transport efficiency',   step:0.01 },
+    ]},
+  ],
+  jp: [
+    { title:'Electricity Generation Inputs (TJ)', color:C.elec, fields:[
+      { path:'elec_inputs.coal',    label:'Coal → Elec.' },
+      { path:'elec_inputs.oil',     label:'Oil → Elec.' },
+      { path:'elec_inputs.gas',     label:'Gas → Elec.' },
+      { path:'elec_inputs.nuclear', label:'Nuclear → Elec.' },
+      { path:'elec_inputs.hydro',   label:'Hydro → Elec.' },
+      { path:'elec_inputs.renew',   label:'Renewables → Elec.' },
+    ]},
+    { title:'Electricity Balance (TJ)', color:C.elec, fields:[
+      { path:'elec.gross',   label:'Gross generated' },
+      { path:'elec.td_loss', label:'T&D losses + own use' },
+      { path:'elec.res',     label:'→ Residential' },
+      { path:'elec.com',     label:'→ Commercial' },
+      { path:'elec.ind',     label:'→ Industrial' },
+      { path:'elec.tpt',     label:'→ Transport' },
+    ]},
+    { title:'Direct Fuel — Oil (TJ)', color:C.oil, fields:[
+      { path:'direct.oil_res', label:'Oil → Residential' },
+      { path:'direct.oil_com', label:'Oil → Commercial' },
+      { path:'direct.oil_ind', label:'Oil → Industrial' },
+      { path:'direct.oil_tpt', label:'Oil → Transport' },
+    ]},
+    { title:'Direct Fuel — Gas + Coal (TJ)', color:C.gas, fields:[
+      { path:'direct.gas_res',  label:'Gas → Residential' },
+      { path:'direct.gas_com',  label:'Gas → Commercial' },
+      { path:'direct.gas_ind',  label:'Gas → Industrial' },
+      { path:'direct.gas_tpt',  label:'Gas → Transport' },
+      { path:'direct.coal_ind', label:'Coal → Industrial (direct)' },
+    ]},
+    { title:'Direct Fuel — Renewables/Biomass (TJ)', color:C.renew, fields:[
+      { path:'direct.bio_ind', label:'Renew. → Industrial (direct)' },
+    ]},
+    { title:'End-Use Efficiencies (fraction 0–1)', color:C.svc, fields:[
+      { path:'eff.res', label:'Residential efficiency', step:0.01 },
+      { path:'eff.com', label:'Commercial efficiency',  step:0.01 },
+      { path:'eff.ind', label:'Industrial efficiency',  step:0.01 },
+      { path:'eff.tpt', label:'Transport efficiency',   step:0.01 },
+    ]},
+  ],
+};
+
+function getPath(obj, path) {
+  return path.split('.').reduce((o, k) => o[k], obj);
+}
+function setPath(obj, path, val) {
+  const keys = path.split('.');
+  const last = keys.pop();
+  keys.reduce((o, k) => o[k], obj)[last] = val;
+}
+
+function buildEditor(country) {
+  const schema = EDITOR_SCHEMA[country];
+  const state  = STATE[country];
+  const def    = DEFAULTS[country];
+  const el     = document.getElementById('ebody-'+country);
+  el.innerHTML = '';
+
+  schema.forEach(section => {
+    const card = document.createElement('div');
+    card.className = 'ed-card';
+    card.innerHTML = `
+      <div class="ed-card-hdr">
+        <div class="dot" style="background:${section.color}"></div>
+        ${section.title}
+      </div>
+      <div class="ed-card-body" id="ecb-${country}-${section.title.replace(/\W+/g,'_')}"></div>`;
+    const body = card.querySelector('.ed-card-body');
+
+    section.fields.forEach(f => {
+      const curVal = getPath(state, f.path);
+      const defVal = getPath(def, f.path);
+      const step   = f.step || 1;
+      const row = document.createElement('div');
+      row.className = 'ed-row';
+      const isChanged = curVal !== defVal;
+      row.innerHTML = `
+        <span class="ed-label" title="${f.path}">${f.label}</span>
+        <input class="ed-input${isChanged?' changed':''}" type="number"
+          step="${step}" value="${curVal}"
+          data-path="${f.path}" data-country="${country}" data-default="${defVal}">
+        <span class="ed-unit">TJ</span>`;
+      body.appendChild(row);
+
+      const input = row.querySelector('input');
+      let debounce;
+      input.addEventListener('input', () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => {
+          const v = parseFloat(input.value);
+          if (!isNaN(v)) {
+            setPath(STATE[country], f.path, v);
+            input.classList.toggle('changed', v !== parseFloat(input.dataset.default));
+            renderSankey(country);
+          }
+        }, 300);
+      });
+    });
+
+    // Reset button
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'reset-btn';
+    resetBtn.textContent = '↺ Reset section';
+    resetBtn.addEventListener('click', () => {
+      section.fields.forEach(f => {
+        const defVal = getPath(def, f.path);
+        setPath(STATE[country], f.path, defVal);
+      });
+      buildEditor(country);
+      renderSankey(country);
+    });
+    body.appendChild(resetBtn);
+    el.appendChild(card);
+  });
+}
+
+function toggleEditor(country) {
+  const btn  = document.getElementById('etog-'+country);
+  const body = document.getElementById('ebody-'+country);
+  const open = body.classList.toggle('on');
+  btn.classList.toggle('open', open);
+}
+
+// ══════════════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════════════
+function showTab(c) {
+  ['se','jp'].forEach(x => {
+    document.getElementById('panel-'+x).classList.remove('on');
+    document.getElementById('tab-'+x).className = 'tab';
+  });
+  document.getElementById('panel-'+c).classList.add('on');
+  document.getElementById('tab-'+c).classList.add(c+'-active');
+  setTimeout(() => renderSankey(c), 30);
+}
+
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
+function init() {
+  ['se','jp'].forEach(c => {
+    buildLegend(c);
+    buildEditor(c);
+    renderSankey(c);
+  });
+}
+
+window.addEventListener('load', init);
+window.addEventListener('resize', () => {
+  ['se','jp'].forEach(c => {
+    if (document.getElementById('panel-'+c).classList.contains('on')) renderSankey(c);
+  });
+});
+</script>
+</body>
+</html>
