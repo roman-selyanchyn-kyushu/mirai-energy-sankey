@@ -34,6 +34,10 @@
   }
   .toolbar button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
   .toolbar button:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+  .units{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .units button{border:none;border-radius:0;padding:8px 14px;font-weight:600;color:var(--ink-soft);background:#fff}
+  .units button:hover{transform:none;box-shadow:none;color:var(--accent)}
+  .units button.on{background:var(--accent);color:#fff}
   svg.sankey{width:100%;height:auto;display:block}
   .tip{
     position:fixed;pointer-events:none;z-index:50;display:none;max-width:330px;
@@ -66,8 +70,8 @@
   <h1>Energy Flow 2023 — Sweden &amp; Japan</h1>
   <p class="sub">Estimated national energy flows in the style of the LLNL energy flow charts,
   built from official statistics: Eurostat energy balances (Sweden, calendar 2023) and METI
-  Comprehensive Energy Statistics (Japan, fiscal 2023). All values in petajoules (PJ). Hover any
-  flow for details. Charts are scaled independently — Japan’s system is ≈9× larger than Sweden’s.</p>
+  Comprehensive Energy Statistics (Japan, fiscal 2023). Hover any flow for details; switch between
+  PJ and TWh in the toolbar. Charts are scaled independently — Japan’s system is ≈9× larger than Sweden’s.</p>
 </header>
 
 <nav class="tabs">
@@ -80,6 +84,10 @@
   <div class="card">
     <div class="toolbar">
       <span class="hint">Hover flows for values · PNG exports at 4× resolution for print</span>
+      <div class="units" role="group" aria-label="Units">
+        <button class="unit-btn on" data-unit="PJ" onclick="setUnit('PJ')">PJ</button>
+        <button class="unit-btn" data-unit="TWh" onclick="setUnit('TWh')">TWh</button>
+      </div>
       <button onclick="downloadSVG('se')">Download SVG</button>
       <button class="primary" onclick="downloadPNG('se')">Download hi-res PNG</button>
     </div>
@@ -102,11 +110,25 @@
         <tr><td>… of which nuclear / hydro / wind / solar</td><td class="num">48.5 / 66.2 / 34.2 / 3.1 TWh</td><td>Energimyndigheten ✓</td></tr>
         <tr><td>Net electricity export</td><td class="num">102,571 TJ = 28.5 TWh</td><td>Svenska kraftnät: ~29 TWh ✓</td></tr>
         <tr><td>Gross district-heat production</td><td class="num">217,869 TJ = 60.5 TWh</td><td>Energiföretagen: ~56–60 TWh ✓</td></tr>
-        <tr><td>Final energy consumption (energy use)</td><td class="num">1,502,922 TJ = 1,503 PJ</td><td>internally balanced ✓</td></tr>
+        <tr><td>Final energy consumption (energy use)</td><td class="num">1,301,926 TJ = 1,302 PJ</td><td>internally balanced ✓</td></tr>
+        <tr><td>Final consumption incl. non-energy use</td><td class="num">1,379,239 TJ = 1,379 PJ</td><td>internally balanced ✓</td></tr>
       </table>
       <p>Electricity balance closes exactly: 597,935 (gross) = 433,141 (final sectors) + 102,571 (net export)
       + 55,966 (own use &amp; grid losses) + 6,257 (to district-heat heat pumps). District heat closes exactly:
       217,869 = 192,612 (sectors) + 25,257 (own use &amp; distribution losses).</p>
+      <h3>Comparison with the IEA energy Sankey (iea.org/sankey)</h3>
+      <p>The IEA shows a total energy supply (TES) of 1,892 PJ for Sweden 2023 vs. 1,976 PJ here. The two
+      agree almost perfectly where conventions coincide; the differences are accounting conventions, not data:</p>
+      <ul>
+        <li>Per fuel, IEA vs. this chart (PJ): biofuels &amp; waste 573.5 vs. 573.5 (identical); hydro 238.3 vs. 238.5;
+        wind + solar + other 177.1 vs. 176.8; oil 373.5 vs. 367.5; gas 30.1 vs. 28.2.</li>
+        <li><b>Nuclear:</b> IEA imputes a fixed 33% reactor efficiency (→ 529 PJ primary); Eurostat reports the
+        actual Swedish reactor heat, ~36% (→ 485 PJ here). Both correspond to the same 48.5 TWh of electricity.</li>
+        <li><b>Electricity exports:</b> the IEA headline TES nets out net exports (−103 PJ); this chart draws
+        them as an explicit flow instead. IEA’s own by-source total is 1,983 PJ — within 0.3% of this chart.</li>
+        <li><b>Coal:</b> IEA reports supply (62 PJ, incl. stock changes and the steelworks coke/blast-furnace-gas
+        chain); this chart shows use (34 PJ) with the remainder inside “Own use &amp; losses”.</li>
+      </ul>
       <h3>Methodology &amp; assumptions</h3>
       <ul>
         <li>Layout and end-use efficiencies follow LLNL conventions: residential &amp; commercial 65%, industry 49%, transport 21% (“energy services” vs. “rejected energy”).</li>
@@ -126,6 +148,10 @@
   <div class="card">
     <div class="toolbar">
       <span class="hint">Hover flows for values · PNG exports at 4× resolution for print</span>
+      <div class="units" role="group" aria-label="Units">
+        <button class="unit-btn on" data-unit="PJ" onclick="setUnit('PJ')">PJ</button>
+        <button class="unit-btn" data-unit="TWh" onclick="setUnit('TWh')">TWh</button>
+      </div>
       <button onclick="downloadSVG('jp')">Download SVG</button>
       <button class="primary" onclick="downloadPNG('jp')">Download hi-res PNG</button>
     </div>
@@ -150,6 +176,26 @@
       </table>
       <p>Electricity balance closes exactly: 3,565,033 = 3,150,952 (final sectors) + 194,699 (own use)
       + 175,617 (T&amp;D losses) + 3,629 (to heat supply) + 40,136 (statistical difference).</p>
+      <h3>Comparison with the IEA energy Sankey (iea.org/sankey)</h3>
+      <p>The IEA shows a total energy supply (TES) of 15,844 PJ for Japan (calendar 2023) vs. 17,558 PJ here
+      (METI, fiscal 2023). The ≈1,714 PJ gap is fully explained by four convention differences —
+      neither figure is wrong:</p>
+      <ul>
+        <li><b>Calorific basis (≈ +970 PJ):</b> METI books all fuels at gross calorific value (HHV);
+        IEA uses net (LHV). This inflates gas ≈ +354 PJ, oil ≈ +409 PJ, coal ≈ +204 PJ relative to IEA.
+        Japanese national statistics are always a few percent above IEA figures for this reason.</li>
+        <li><b>Renewable electricity accounting (≈ +916 PJ):</b> METI converts hydro/solar/wind electricity
+        to “primary equivalent” by dividing by the average fossil-plant efficiency (implied factor 41.8%:
+        IEA hydro 271 PJ actual electricity vs. 648 PJ here). IEA counts these 1:1. Partly offset by nuclear
+        (METI actual ~38.5% heat → 724 PJ vs. IEA fixed 33% → 917 PJ; −193 PJ) and geothermal (IEA imputes
+        10% efficiency; −93 PJ).</li>
+        <li><b>Recovered energy (≈ +273 PJ):</b> METI counts recovered industrial waste heat and electricity
+        (未活用エネルギー) as primary supply; IEA does not.</li>
+        <li><b>Fiscal vs. calendar year</b> plus LHV conversion of biomass/waste: the remainder (≈ −150 PJ).</li>
+      </ul>
+      <p>Consequence of the substitution method: ≈0.9 EJ of the “rejected energy” leaving the electricity box
+      is an accounting artifact for hydro/solar/wind rather than physical waste heat — the same convention
+      LLNL uses in its U.S. chart.</p>
       <h3>Methodology &amp; assumptions</h3>
       <ul>
         <li>Layout and end-use efficiencies follow LLNL conventions: residential &amp; commercial 65%, industry 49%, transport 21%.</li>
@@ -195,8 +241,7 @@ const COLORS = {
 const DATA = {
 
 se: {
-  title: "Estimated Energy Flows in Sweden 2023",
-  subtitle: "Total primary supply: 1,976 PJ  ·  Electricity: 166.1 TWh gross  ·  Net electricity export: 28.5 TWh",
+  title: "Estimated Energy Flows in Sweden, 2023",
   source: "Data: Eurostat, complete energy balances (nrg_bal_c) & electricity/heat production by fuel (nrg_bal_peh), Sweden 2023 (dataset update 2 Jun 2026). " +
           "End-use efficiency assumptions per LLNL: residential/commercial 65%, industrial 49%, transport 21%.",
   note: "Ambient heat from building heat pumps allocated 80/20 residential/commercial. Non-energy use (feedstocks) shown separately. Marine bunkers excluded.",
@@ -216,10 +261,10 @@ se: {
     {id:"elec",    label:"Electricity generation",     col:1, color:COLORS.elec, box:true},
     {id:"dh",      label:"District heating",           col:1, color:COLORS.heat, box:true},
     {id:"own",     label:"Own use & losses",           col:2, color:COLORS.own,  box:true},
-    {id:"res",     label:"Residential",                col:2, color:"#8d99ae", box:true, eff:0.65},
-    {id:"com",     label:"Commercial & services",      col:2, color:"#8d99ae", box:true, eff:0.65},
-    {id:"ind",     label:"Industrial",                 col:2, color:"#8d99ae", box:true, eff:0.49},
-    {id:"tpt",     label:"Transport",                  col:2, color:"#8d99ae", box:true, eff:0.21},
+    {id:"res",     label:"Residential",                col:2, color:"#f0bac2", box:true, eff:0.65},
+    {id:"com",     label:"Commercial & services",      col:2, color:"#f0bac2", box:true, eff:0.65},
+    {id:"ind",     label:"Industrial",                 col:2, color:"#f0bac2", box:true, eff:0.49},
+    {id:"tpt",     label:"Transport",                  col:2, color:"#f0bac2", box:true, eff:0.21},
     {id:"ne",      label:"Non-energy use",             col:2, color:COLORS.ne,  box:true, terminal:true},
     {id:"exp",     label:"Net electricity export",     col:3, color:COLORS.exp, box:true, terminal:true},
     {id:"rej",     label:"Rejected energy",            col:3, color:COLORS.rej, box:true, terminal:true},
@@ -228,7 +273,7 @@ se: {
   flows: [
     ["nuclear","elec",484672], ["hydro","elec",238464], ["wind","elec",123282], ["solar","elec",11210],
     ["bio","elec",52682], ["bio","dh",152239], ["bio","res",34156], ["bio","com",12636],
-    ["bio","ind",216275], ["bio","tpt",65926], ["bio","own",1794], ["bio","ne",284],
+    ["bio","ind",216275], ["bio","tpt",65926], ["bio","own",2078],
     ["amb","dh",9922], ["amb","res",50655], ["amb","com",12664],
     ["wh","dh",42257],
     ["wst","elec",5701], ["wst","dh",28067], ["wst","ind",3710],
@@ -240,13 +285,12 @@ se: {
     ["elec","dh",6257], ["elec","res",142380], ["elec","com",114228], ["elec","ind",160650],
     ["elec","tpt",15883], ["elec","own",55966], ["elec","exp",102571], ["elec","rej",322579],
     ["dh","res",112108], ["dh","com",53443], ["dh","ind",27061], ["dh","own",25257], ["dh","rej",33836],
-    ["own","rej",137822],
+    ["own","rej",138106],
   ],
 },
 
 jp: {
-  title: "Estimated Energy Flows in Japan FY2023",
-  subtitle: "Domestic primary supply: 17,558 PJ  ·  Electricity: ≈990 TWh incl. auto-producers  ·  Final consumption: 11,509 PJ",
+  title: "Estimated Energy Flows in Japan, FY2023",
   source: "Data: METI Comprehensive Energy Statistics (総合エネルギー統計), FY2023 final energy balance table (確報, revised), energy-unit table in TJ. " +
           "End-use efficiency assumptions per LLNL: residential/commercial 65%, industrial 49%, transport 21%.",
   note: "Utility & auto-producer generation merged; pumped-storage losses inside electricity box. City-gas LPG feed allocated to the oil band. Non-energy use (naphtha etc.) shown separately.",
@@ -265,10 +309,10 @@ jp: {
     {id:"elec",    label:"Electricity generation",     col:1, color:COLORS.elec, box:true},
     {id:"heat",    label:"Steam & heat supply",        col:1, color:COLORS.heat, box:true},
     {id:"own",     label:"Own use & losses",           col:2, color:COLORS.own,  box:true},
-    {id:"res",     label:"Residential",                col:2, color:"#8d99ae", box:true, eff:0.65},
-    {id:"com",     label:"Commercial & services",      col:2, color:"#8d99ae", box:true, eff:0.65},
-    {id:"ind",     label:"Industrial",                 col:2, color:"#8d99ae", box:true, eff:0.49},
-    {id:"tpt",     label:"Transport",                  col:2, color:"#8d99ae", box:true, eff:0.21},
+    {id:"res",     label:"Residential",                col:2, color:"#f0bac2", box:true, eff:0.65},
+    {id:"com",     label:"Commercial & services",      col:2, color:"#f0bac2", box:true, eff:0.65},
+    {id:"ind",     label:"Industrial",                 col:2, color:"#f0bac2", box:true, eff:0.49},
+    {id:"tpt",     label:"Transport",                  col:2, color:"#f0bac2", box:true, eff:0.21},
     {id:"ne",      label:"Non-energy use",             col:2, color:COLORS.ne,  box:true, terminal:true},
     {id:"rej",     label:"Rejected energy",            col:3, color:COLORS.rej, box:true, terminal:true},
     {id:"svc",     label:"Energy services",            col:3, color:COLORS.svc, box:true, terminal:true},
@@ -309,46 +353,80 @@ for (const key of ["se","jp"]) {
 /* ══════════════════════════ LAYOUT + RENDER ══════════════════════════ */
 
 const W = 1560, H = 900;
-const CHART_TOP = 130, CHART_BOT = 770;
-const COL_X   = {0: 208, 1: 600, 2: 1030, 3: 1372};
-const NODE_W  = 16;
-const GAP     = 9;
+const CHART_TOP = 132, CHART_BOT = 772;
+const COL_X   = {0: 56, 1: 600, 2: 1010, 3: 1372};
+const BOX_W   = 118;
+const GAP     = 10;
+const MIN_H   = 28;
 const FONT    = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
-const fmtPJ  = tj => (tj/1000).toLocaleString("en-US", {maximumFractionDigits: tj < 100000 ? 1 : 0});
-const fmtTWh = tj => (tj/3600).toLocaleString("en-US", {maximumFractionDigits: 1});
+let UNIT = "PJ";                                     // "PJ" | "TWh"
+const conv = tj => UNIT === "PJ" ? tj/1000 : tj/3600;
+function fmtV(tj) {                                  // bare number, adaptive decimals
+  const v = conv(tj);
+  const d = v >= 100 ? 0 : v >= 1 ? 1 : 2;
+  return v.toLocaleString("en-US", {maximumFractionDigits: d});
+}
+const fmtU = tj => fmtV(tj) + " " + UNIT;            // number + unit
+
+function textColor(hex) {                            // black or white text on a box
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return (0.299*r + 0.587*g + 0.114*b)/255 > 0.55 ? "#1d232a" : "#ffffff";
+}
+function shade(hex, f) {                             // darken flow-label colors for readability
+  const c = i => Math.round(parseInt(hex.slice(i,i+2),16)*(1-f));
+  return "#" + [c(1),c(3),c(5)].map(v => v.toString(16).padStart(2,"0")).join("");
+}
+function wrapName(label) {                           // split long names into two balanced lines
+  if (label.length <= 14 || !label.includes(" ")) return [label];
+  const words = label.split(" ");
+  let best = 1, bestDiff = 1e9;
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0,i).join(" ").length, b = words.slice(i).join(" ").length;
+    if (Math.abs(a-b) < bestDiff) { bestDiff = Math.abs(a-b); best = i; }
+  }
+  return [words.slice(0,best).join(" "), words.slice(best).join(" ")];
+}
 
 function layout(d) {
   const nodes = {}; d.nodes.forEach((n,i) => nodes[n.id] = {...n, order:i, in:0, out:0});
   d.flows.forEach(([s,t,v]) => { nodes[s].out += v; nodes[t].in += v; });
 
-  // scale from the busiest column
   const cols = [0,1,2,3].map(c => d.nodes.filter(n => n.col===c).map(n => nodes[n.id]));
+  const avail = CHART_BOT - CHART_TOP;
+
+  // initial scale from busiest column, then shrink until min-height boxes fit everywhere
   let scale = Infinity;
   cols.forEach(list => {
     if (!list.length) return;
     const tot = list.reduce((a,n) => a + Math.max(n.in, n.out), 0);
-    const avail = (CHART_BOT - CHART_TOP) - GAP * (list.length - 1);
-    scale = Math.min(scale, avail / tot);
+    scale = Math.min(scale, (avail - GAP*(list.length-1)) / tot);
   });
+  for (let iter = 0; iter < 100; iter++) {
+    const overflow = cols.some(list =>
+      list.reduce((a,n) => a + Math.max(MIN_H, Math.max(n.in,n.out)*scale), 0) + GAP*(list.length-1) > avail);
+    if (!overflow) break;
+    scale *= 0.98;
+  }
 
-  // vertical stacking per column
+  // vertical stacking per column, centered
   cols.forEach(list => {
-    const tot = list.reduce((a,n) => a + Math.max(n.in,n.out)*scale, 0) + GAP*(list.length-1);
-    let y = CHART_TOP + ((CHART_BOT - CHART_TOP) - tot) / 2;
+    const tot = list.reduce((a,n) => a + Math.max(MIN_H, Math.max(n.in,n.out)*scale), 0) + GAP*(list.length-1);
+    let y = CHART_TOP + (avail - tot) / 2;
     list.forEach(n => {
-      n.h = Math.max(1.2, Math.max(n.in,n.out) * scale);
+      n.h = Math.max(MIN_H, Math.max(n.in, n.out) * scale);
       n.y = y; y += n.h + GAP;
       n.x = COL_X[n.col];
     });
   });
 
-  // flow geometry: order flows at each node by the other endpoint's y
+  // flow geometry: stacks centered on each box edge, ordered by the other endpoint's y
   const flows = d.flows.map(([s,t,v]) => ({s:nodes[s], t:nodes[t], v, h:Math.max(1, v*scale)}));
   const outCur = {}, inCur = {};
-  Object.values(nodes).forEach(n => { outCur[n.id]=n.y; inCur[n.id]=n.y; });
-  const bySrc = {...nodes};
-  // outgoing: sort by target column then target y
+  Object.values(nodes).forEach(n => {
+    outCur[n.id] = n.y + Math.max(0, (n.h - n.out*scale)/2);
+    inCur[n.id]  = n.y + Math.max(0, (n.h - n.in *scale)/2);
+  });
   Object.values(nodes).forEach(n => {
     flows.filter(f => f.s===n).sort((a,b) => (a.t.y - b.t.y) || (a.t.col - b.t.col))
       .forEach(f => { f.y0 = outCur[n.id]; outCur[n.id] += f.h; });
@@ -365,23 +443,31 @@ function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 function render(key) {
   const d = DATA[key];
   const {nodes, flows} = layout(d);
+
+  // headline totals, computed from the flows themselves (always consistent)
+  // useful output of a conversion box = outflows minus what it sends to Rejected energy
+  const rejOut = {};
+  d.flows.forEach(([s,t,v]) => { if (t==="rej") rejOut[s] = (rejOut[s]||0) + v; });
+  const P = d.nodes.filter(n => n.col===0).reduce((a,n) => a + nodes[n.id].out, 0);
+  const E = nodes.elec.out - (rejOut.elec || 0);
+  const F = ["res","com","ind","tpt","ne"].reduce((a,id) => a + (nodes[id] ? nodes[id].in : 0), 0);
+
   const parts = [];
   parts.push(`<svg class="sankey" id="svg-${key}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" font-family='${FONT}'>`);
   parts.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>`);
 
-  // header
-  parts.push(`<text x="28" y="44" font-size="26" font-weight="700" fill="#1d232a">${esc(d.title)}</text>`);
-  parts.push(`<text x="28" y="70" font-size="14.5" fill="#5a636e">${esc(d.subtitle)}</text>`);
+  // header — identical structure for both countries
+  parts.push(`<text x="${W/2}" y="46" font-size="26" font-weight="700" fill="#1d232a" text-anchor="middle">${esc(d.title)}: ${fmtU(P)}</text>`);
+  parts.push(`<text x="${W/2}" y="74" font-size="14.5" fill="#5a636e" text-anchor="middle">Primary energy supply ${fmtU(P)}  ·  Electricity generated ${fmtU(E)}  ·  Final energy consumption ${fmtU(F)} (incl. non-energy use)</text>`);
 
   // column headers
-  const heads = [["PRIMARY SUPPLY",COL_X[0]+NODE_W/2],["CONVERSION",COL_X[1]+NODE_W/2],
-                 ["FINAL SECTORS",COL_X[2]+NODE_W/2],["END USE",COL_X[3]+NODE_W/2]];
-  heads.forEach(([t,x]) => parts.push(
-    `<text x="${x}" y="${CHART_TOP-18}" font-size="12" font-weight="700" letter-spacing="2.5" fill="#9aa0a8" text-anchor="middle">${t}</text>`));
+  [["PRIMARY SUPPLY",0],["CONVERSION",1],["FINAL SECTORS",2],["END USE",3]].forEach(([t,c]) => parts.push(
+    `<text x="${COL_X[c]+BOX_W/2}" y="${CHART_TOP-16}" font-size="12" font-weight="700" letter-spacing="2.5" fill="#9aa0a8" text-anchor="middle">${t}</text>`));
 
-  // flows (behind nodes)
-  flows.forEach((f,i) => {
-    const x0 = f.s.x + NODE_W, x1 = f.t.x;
+  // flows (behind boxes); collect value-label positions for flows thick enough
+  const flowLabels = [];
+  flows.forEach(f => {
+    const x0 = f.s.x + BOX_W, x1 = f.t.x;
     const ya = f.y0, yb = f.y0 + f.h, yc = f.y1, yd = f.y1 + f.h;
     const mx = (x0 + x1) / 2;
     const path = `M${x0},${ya} C${mx},${ya} ${mx},${yc} ${x1},${yc} L${x1},${yd} C${mx},${yd} ${mx},${yb} ${x0},${yb} Z`;
@@ -390,68 +476,51 @@ function render(key) {
     if (f.t.id==="rej") color = COLORS.rej;
     if (f.s.id==="own") color = COLORS.rej;
     const tipTitle = `${f.s.label} → ${f.t.label}`;
-    const tipVal = `${fmtPJ(f.v)} PJ  (${fmtTWh(f.v)} TWh)`;
-    parts.push(`<path d="${path}" fill="${color}" opacity="0.52" data-tip="${esc(tipTitle)}|${esc(tipVal)}" class="flow"/>`);
+    parts.push(`<path d="${path}" fill="${color}" opacity="0.55" data-tip="${esc(tipTitle)}|${tipBoth(f.v)}" class="flow"/>`);
+    if (f.h >= 11) flowLabels.push({x:x0+7, y:ya+f.h/2+3.5, v:f.v, c:shade(color,0.35)});
   });
 
-  // nodes
+  // boxes with name + value inside (LLNL style)
   Object.values(nodes).forEach(n => {
-    const throughput = Math.max(n.in, n.out);
-    parts.push(`<rect x="${n.x}" y="${n.y}" width="${NODE_W}" height="${n.h}" fill="${n.color}" rx="2" data-tip="${esc(n.label)}|${fmtPJ(throughput)} PJ  (${fmtTWh(throughput)} TWh)" class="nodeRect"/>`);
+    const tp = Math.max(n.in, n.out);
+    const tc = textColor(n.color);
+    parts.push(`<rect x="${n.x}" y="${n.y}" width="${BOX_W}" height="${n.h}" fill="${n.color}" stroke="#00000038" stroke-width="0.8" data-tip="${esc(n.label)}|${tipBoth(tp)}" class="nodeRect"/>`);
+    const cx = n.x + BOX_W/2;
+    const isConv = (n.id==="elec" || n.id==="heat" || n.id==="dh");
+    const nameLines = (n.h >= 52) ? wrapName(n.label) : [n.label];
+    const valLines  = (isConv && n.h >= 66) ? [`${fmtV(n.in)} in`, `${fmtV(n.out - (rejOut[n.id]||0))} out`] : [fmtV(tp)];
+    const fs = Math.min(12, 205 / Math.max(...nameLines.map(l => l.length)));
+    const lh = 13.5;
+    const all = nameLines.length + valLines.length;
+    let ty = n.y + n.h/2 - (all-1)*lh/2 + 4;
+    nameLines.forEach(l => { parts.push(`<text x="${cx}" y="${ty}" font-size="${fs.toFixed(1)}" font-weight="700" fill="${tc}" text-anchor="middle">${esc(l)}</text>`); ty += lh; });
+    valLines.forEach(l => { parts.push(`<text x="${cx}" y="${ty}" font-size="11" fill="${tc}" text-anchor="middle">${l}</text>`); ty += lh; });
   });
 
-  // ── labels ──
-  // left column: name + value, with collision avoidance
-  const leftNodes = Object.values(nodes).filter(n => n.col===0).sort((a,b) => a.y-b.y);
-  let lastY = -100;
-  leftNodes.forEach(n => {
-    let ly = n.y + n.h/2;
-    if (ly < lastY + 15) ly = lastY + 15;
-    lastY = ly;
-    if (Math.abs(ly - (n.y + n.h/2)) > 7)
-      parts.push(`<line x1="${n.x-6}" y1="${ly-1}" x2="${n.x-2}" y2="${n.y+n.h/2}" stroke="#b9b9b9" stroke-width="1"/>`);
-    parts.push(`<text x="${n.x-10}" y="${ly+4}" font-size="13.5" text-anchor="end" fill="#1d232a"><tspan font-weight="600">${esc(n.label)}</tspan><tspan fill="#767d86" dx="6" font-size="12.5">${fmtPJ(Math.max(n.in,n.out))}</tspan></text>`);
-  });
-
-  // middle boxes + terminals (white halo so labels stay readable over ribbons)
-  const HALO = `paint-order="stroke" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round"`;
-  Object.values(nodes).filter(n => n.col===1 || n.col===2).forEach(n => {
-    const cy = n.y + n.h/2;
-    const big = n.h >= 34;
-    const x = n.x + NODE_W + 8;
-    if (big) {
-      parts.push(`<text x="${x}" y="${cy-3}" font-size="13.5" font-weight="600" fill="#1d232a" ${HALO}>${esc(n.label)}</text>`);
-      parts.push(`<text x="${x}" y="${cy+13}" font-size="12.5" fill="#5a636e" ${HALO}>${fmtPJ(Math.max(n.in,n.out))} PJ${n.id==="elec" ? ` in · ${fmtPJ(n.out)} PJ out` : ""}</text>`);
-    } else {
-      parts.push(`<text x="${x}" y="${cy+4}" font-size="12.5" font-weight="600" fill="#1d232a" ${HALO}>${esc(n.label)} <tspan fill="#5a636e" font-weight="400">${fmtPJ(Math.max(n.in,n.out))}</tspan></text>`);
-    }
-  });
-  // right terminals
-  Object.values(nodes).filter(n => n.col===3).forEach(n => {
-    const cy = n.y + n.h/2;
-    parts.push(`<text x="${n.x + NODE_W + 8}" y="${cy-2}" font-size="14" font-weight="700" fill="#1d232a" ${HALO}>${esc(n.label)}</text>`);
-    parts.push(`<text x="${n.x + NODE_W + 8}" y="${cy+15}" font-size="13" fill="#5a636e" ${HALO}>${fmtPJ(n.in)} PJ</text>`);
-  });
-
-  // legend
-  const legend = d.nodes.filter(n => n.col===0).map(n => [n.label, n.color])
-    .concat([["Electricity",COLORS.elec],["Heat",COLORS.heat],["Rejected energy",COLORS.rej],["Energy services",COLORS.svc]]);
-  let lx = 28, ly2 = H - 74;
-  legend.forEach(([t,c]) => {
-    const w = 22 + t.length * 6.6 + 18;
-    if (lx + w > W - 20) { lx = 28; ly2 += 20; }
-    parts.push(`<rect x="${lx}" y="${ly2-9}" width="13" height="11" fill="${c}" rx="2"/>`);
-    parts.push(`<text x="${lx+18}" y="${ly2}" font-size="11.5" fill="#3d434b">${esc(t)}</text>`);
-    lx += w;
-  });
+  // flow value labels on top, with white halo
+  flowLabels.forEach(L => parts.push(
+    `<text x="${L.x}" y="${L.y}" font-size="10.5" font-weight="600" fill="${L.c}" paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">${fmtV(L.v)}</text>`));
 
   // source lines
-  parts.push(`<text x="28" y="${H-32}" font-size="10.5" fill="#8b9199">${esc(d.source)}</text>`);
-  parts.push(`<text x="28" y="${H-16}" font-size="10.5" fill="#8b9199">${esc(d.note)}  ·  Values in petajoules (PJ); 1 PJ = 0.278 TWh.</text>`);
+  parts.push(`<text x="28" y="${H-46}" font-size="10.5" fill="#8b9199">${esc(d.source)}</text>`);
+  parts.push(`<text x="28" y="${H-30}" font-size="10.5" fill="#8b9199">${esc(d.note)}</text>`);
+  parts.push(`<text x="28" y="${H-14}" font-size="10.5" fill="#8b9199">All values in ${UNIT === "PJ" ? "petajoules (PJ); 1 PJ = 0.2778 TWh" : "terawatt-hours (TWh); 1 TWh = 3.6 PJ"}. Larger flows are labelled; hover any flow for exact values.</text>`);
 
   parts.push(`</svg>`);
   document.getElementById("chart-"+key).innerHTML = parts.join("");
   attachTips(key);
+}
+
+function tipBoth(tj) {   // tooltip always shows both units
+  const pj  = (tj/1000).toLocaleString("en-US", {maximumFractionDigits: tj >= 100000 ? 0 : 1});
+  const twh = (tj/3600).toLocaleString("en-US", {maximumFractionDigits: tj >= 360000 ? 0 : 1});
+  return `${pj} PJ  ·  ${twh} TWh`;
+}
+
+function setUnit(u) {
+  UNIT = u;
+  document.querySelectorAll(".unit-btn").forEach(b => b.classList.toggle("on", b.dataset.unit === u));
+  render("se"); render("jp");
 }
 
 /* ══════════════════════════ tooltips ══════════════════════════ */

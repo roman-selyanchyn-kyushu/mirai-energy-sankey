@@ -23,11 +23,21 @@ and contains substantial errors — e.g. Swedish hydro was ~2.4× too high.)
 - Gross electricity 597,935 TJ = 166.1 TWh (nuclear 48.5, hydro 66.2, wind 34.2, solar 3.1, bio 11.7, fossil 2.3 TWh)
 - Electricity: 597,935 = 433,141 (sectors) + 102,571 (net export, 28.5 TWh) + 55,966 (own use & grid) + 6,257 (to DH heat pumps)
 - District heat: 217,869 = 192,612 (sectors) + 25,257 (own use & distribution losses)
+- Final energy consumption 1,301,926 TJ (energy use); 1,379,239 TJ incl. non-energy use
 
 **Japan FY2023** — every box closes exactly against the METI balance table:
 - Domestic primary supply 17,557,652 TJ; final consumption 11,509,459 TJ (matches METI press release: 17,575 / 11,515 PJ pre-revision)
 - Electricity (utility + auto-producers, net of pumping) 3,565,033 TJ ≈ 990 TWh
   = 3,150,952 (sectors) + 194,699 (own use) + 175,617 (T&D) + 3,629 (to heat) + 40,136 (stat. difference)
+
+### Comparison with IEA (iea.org/sankey)
+
+The in-page methodology panels include a full reconciliation against the IEA energy Sankey.
+Summary: Sweden agrees with IEA within 0.3% per fuel (differences: IEA's fixed 33% nuclear
+convention and netting of electricity exports in the headline TES). Japan's METI figure is
+1,714 PJ above IEA's TES; the gap decomposes exactly into gross vs. net calorific value (≈ +970 PJ),
+METI's substitution method for hydro/solar/wind (≈ +916 PJ, offset by nuclear −193 and geothermal
+−93), recovered energy counted only by METI (+273 PJ), and fiscal- vs. calendar-year timing.
 
 ---
 
@@ -56,10 +66,15 @@ Key modelling assumptions (full details in the in-page methodology panels):
 
 ## Features
 
-- Tabs for Sweden / Japan, hover tooltips (PJ + TWh) on every flow and node
+- LLNL-style rendering: labelled boxes with values inside, value labels on major flows,
+  pink sector boxes, gray Rejected energy / Energy services terminals
+- **PJ ⇄ TWh unit switch** — re-renders both charts, titles and footnotes; tooltips always show both units
+- Uniform headline for both countries: primary supply · electricity generated · final consumption
+- Tabs for Sweden / Japan, hover tooltips on every flow and node
 - **Download hi-res PNG** — 6240 × 3600 px (4×), white background, print-ready
 - **Download SVG** — vector, for editing in Illustrator/Inkscape
 - Collapsible "Data sources, verification & methodology" panel per country with source links
+  and an IEA reconciliation section
 - Single file, no external libraries or fonts; SVG text uses system fonts so exports are pixel-identical
 
 ## Implementation notes
