@@ -8,10 +8,22 @@ import derive_se, derive_jp
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-# Every year published on the page and in the workbook. 2014 is the ten-year
-# comparison point; Sweden cannot go earlier than 2005 because Energimyndigheten's
-# balance table EN0202_A starts there.
-YEARS = (2014, 2023, 2024)
+
+def available_years(country):
+    """Every year we hold source data for, discovered from the raw files.
+
+    Sweden is bounded by Energimyndigheten's balance table EN0202_A, which starts
+    at 2005; Japan's METI series reaches back to FY1990. The two countries
+    therefore publish different year lists, and the page handles that per country.
+    """
+    import glob, re
+    pat = "se_em_*.json" if country == "se" else "stte_*.xlsx"
+    years = set()
+    for path in glob.glob(os.path.join(derive_se.SOURCES, pat)):
+        m = re.search(r"(\d{4})", os.path.basename(path))
+        if m:
+            years.add(int(m.group(1)))
+    return sorted(years)
 
 # LLNL end-use efficiency assumptions
 EFF = {"res": 0.65, "com": 0.65, "ind": 0.49, "tpt": 0.21}
@@ -195,7 +207,7 @@ def build(country, year):
 def main():
     out = {}
     for c in ("se", "jp"):
-        for y in YEARS:
+        for y in available_years(c):
             out[f"{c}{y}"] = build(c, y)
     with open(os.path.join(HERE, "datasets.json"), "w") as fh:
         json.dump(out, fh, ensure_ascii=False, indent=1)

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Energy Flow Diagrams — Sweden &amp; Japan, 2014, 2023 &amp; 2024</title>
+<title>Energy Flow Diagrams — Sweden 2005–2024 &amp; Japan FY1990–FY2024</title>
 <style>
   :root{
     --ink:#1d232a; --ink-soft:#5a636e; --bg:#f7f6f2; --card:#ffffff;
@@ -94,6 +94,12 @@
   .yoy th{font-weight:600;color:var(--ink-soft);font-size:12px}
   .yoy td.num,.yoy th.num{text-align:right;font-variant-numeric:tabular-nums}
   .yoy td.cur,.yoy th.cur{background:#f3f1ea}
+  .yoy table{max-width:720px}
+  .yoy i.sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:8px;vertical-align:baseline}
+  .trendwrap{overflow-x:auto;margin:4px 0 16px}
+  svg.trend{width:100%;min-width:640px;height:auto;display:block}
+  svg.trend .thit{cursor:pointer}
+  svg.trend .thit:hover{fill:rgba(29,35,42,.05)}
   /* deliberately neutral: a rise or fall in a fuel is not inherently good or bad */
   .yoy .up,.yoy .down{color:var(--ink);font-weight:600}
   .yoy .down{color:#6b737d}
@@ -128,11 +134,14 @@
 
 <header class="page">
   <h1>Energy Flow Diagrams — Sweden &amp; Japan</h1>
-  <p class="sub">Estimated national energy flows for <b>2014, 2023 and 2024</b>, drawn in the style of the
+  <p class="sub">Estimated national energy flows for every year each country publishes a full balance for —
+  <b>Sweden 2005–2024 (20 years)</b> and <b>Japan FY1990–FY2024 (35 years)</b> — drawn in the style of the
   Lawrence Livermore National Laboratory energy flow charts and built directly from each country's
   national statistics: the Energimyndigheten annual energy balance (Sweden, calendar years) and METI
-  Comprehensive Energy Statistics (Japan, fiscal years). Choose a year from the dropdown, <b>click any box to trace where
-  its energy goes and in what proportions</b>, hover a flow for exact values, and switch between PJ and TWh.
+  Comprehensive Energy Statistics (Japan, fiscal years). Every year is derived by the same script, so years
+  are directly comparable within a country. Choose a year from the dropdown or click the trend chart below
+  each diagram, <b>click any box to trace where its energy goes and in what proportions</b>, hover a flow for
+  exact values, and switch between PJ and TWh.
   Charts are scaled independently — Japan’s system is roughly 9× larger than Sweden’s.</p>
 </header>
 
@@ -166,7 +175,7 @@
       <h3>Source</h3>
       <ul>
         <li><b>Energimyndigheten</b> (Swedish Energy Agency), official annual energy balance
-        <b>EN0202_A</b> “Energy balance, 2005–”, calendar years 2014, 2023 and 2024, in terajoules, retrieved from the
+        <b>EN0202_A</b> “Energy balance, 2005–”, <b>every calendar year from 2005 to 2024</b>, in terajoules, retrieved from the
         <a href="https://pxexternal.energimyndigheten.se/pxweb/en/Energimyndighetens_statistikdatabas/" target="_blank" rel="noopener">Agency’s statistics database</a> (PxWeb API); table updated 30 April 2026.</li>
         <li>This is Sweden’s <b>national primary source</b>, matching the use of METI’s national statistics for
         Japan. Earlier versions of this chart used Eurostat, which republishes the same underlying statistics
@@ -174,7 +183,8 @@
         <li>The source table is 96 hierarchical balance rows × 44 energy commodities. Only <b>top-level
         commodities</b> are summed into bands, so the hierarchy is never double-counted.</li>
       </ul>
-      <h3>Verified totals</h3>
+      <h3>Verified totals — reference years</h3>
+      <p style="margin-bottom:6px">All twenty years are in the workbook; three are shown here as anchors.</p>
       <table>
         <tr><th>Quantity</th><th>2014</th><th>2023</th><th>2024</th></tr>
         <tr><td>Gross electricity production</td><td class="num">553,289 TJ (153.7 TWh)</td><td class="num">597,188 TJ (165.9 TWh)</td><td class="num">619,653 TJ (172.1 TWh)</td></tr>
@@ -184,9 +194,10 @@
         <tr><td>Final energy consumption</td><td class="num">1,326,406 TJ</td><td class="num">1,271,729 TJ</td><td class="num">1,271,753 TJ</td></tr>
         <tr><td>Non-energy use</td><td class="num">93,600 TJ</td><td class="num">73,178 TJ</td><td class="num">90,111 TJ</td></tr>
       </table>
-      <p>All three years are derived by the same script from the same table, so the columns are directly
-      comparable. Every band matches the Agency’s own <i>Energy in Sweden — Facts and Figures</i> compendium
-      (table 1.2) to 0.01 TWh once the statistical difference is accounted for, both conversion boxes
+      <p>All twenty years are derived by the same script from the same table, so they are directly
+      comparable. Every band of every year matches the Agency’s own <i>Energy in Sweden — Facts and Figures</i>
+      compendium (table 1.2) to within 0.02 TWh once the statistical difference is accounted for — 220 band
+      comparisons across 2005–2024, no mismatches. Both conversion boxes
       reconcile to the Agency’s published production figures to within 2 TJ (0.000%), and every node
       balances exactly. The electricity balance closes as
       production = final consumption + own use + grid losses + net export + heat-plant use + statistical
@@ -288,14 +299,15 @@
       <ul>
         <li>METI / Agency for Natural Resources and Energy,
         <a href="https://www.enecho.meti.go.jp/statistics/total_energy/results.html" target="_blank" rel="noopener">総合エネルギー統計 — Comprehensive Energy Statistics</a>,
-        FY2014, FY2023 and FY2024 balance tables (確報, revised), energy-unit sheet, terajoules
-        (<code>stte_2014.xlsx</code>, <code>stte_2023.xlsx</code>, <code>stte_2024.xlsx</code>). METI restates
-        the whole back series on the current methodology, so all three years are on one basis.</li>
+        <b>every fiscal year from FY1990 to FY2024</b> (確報, revised), energy-unit sheet, terajoules
+        (<code>stte_&lt;FY&gt;.xlsx</code>). METI restates the whole back series on the current methodology,
+        so all 35 years are on one basis.</li>
         <li>FY2023 press release of 25 April 2025:
         <a href="https://www.meti.go.jp/press/2025/04/20250425004/20250425004.html" target="_blank" rel="noopener">令和5年度エネルギー需給実績（確報）</a>.</li>
         <li>Japanese fiscal years run April–March; FY2024 covers April 2024 – March 2025.</li>
       </ul>
-      <h3>Verified totals</h3>
+      <h3>Verified totals — reference years</h3>
+      <p style="margin-bottom:6px">All 35 fiscal years are in the workbook; three are shown here as anchors.</p>
       <table>
         <tr><th>Quantity</th><th>FY2014</th><th>FY2023</th><th>FY2024</th></tr>
         <tr><td>Domestic primary energy supply (国内供給)</td><td class="num">20,264,195 TJ</td><td class="num">17,557,652 TJ</td><td class="num">17,461,344 TJ</td></tr>
@@ -304,8 +316,8 @@
         <tr><td>Non-energy use</td><td class="num">1,586,508 TJ</td><td class="num">1,233,909 TJ</td><td class="num">1,126,372 TJ</td></tr>
       </table>
       <p>The FY2023 figures match METI’s published headline (17,558 PJ supply, 11,509 PJ final consumption).
-      Every conversion box closes exactly in all three years. <b>FY2014 has no nuclear band at all</b>: every
-      Japanese reactor was offline that fiscal year, so the chart shows the energy system as it stood at the
+      Every conversion box closes exactly in all 35 years. <b>FY2012–FY2014 have almost no nuclear at all</b>: every
+      Japanese reactor was offline through FY2014, so those charts show the energy system as it stood at the
       bottom of the post-Fukushima shutdown.</p>
       <h3>How the numbers were derived</h3>
       <ul>
@@ -347,8 +359,9 @@
         <tr><td>Solar PV</td><td class="num">96,458 GWh</td><td class="num">830,836 TJ</td><td class="num">41.80%</td></tr>
         <tr><td>Wind</td><td class="num">10,489 GWh</td><td class="num">90,344 TJ</td><td class="num">41.80%</td></tr>
       </table>
-      <p>The factor is 42.86% in FY2014, 41.80% in FY2023 and 42.41% in FY2024, applied identically to every
-      generating source present that year.
+      <p>The factor is not fixed across the series — it rises from 38.66% in FY1990 to 42.86% in FY2014 and
+      42.41% in FY2024, and is recovered from each year’s own natural-units sheet rather than assumed. Within
+      a year it is applied identically to every generating source present.
       Their band widths are therefore <b>mutually comparable</b>, but each is about 2.4× the electricity
       actually generated. Geothermal is the exception, reported directly as heat. Rejected energy leaving
       the electricity node consequently includes this accounting artefact rather than only physical losses.
@@ -411,13 +424,17 @@
    ══════════════════════════════════════════════════════════════════ */
 const DATASETS = __DATA__;
 
-/* every year present in the data, ascending — the year dropdowns and the
-   comparison table are both built from this, so adding a dataset is enough */
-const YEARS = Array.from(new Set(Object.keys(DATASETS).map(k => parseInt(k.slice(2), 10))))
-                   .sort((a,b) => a-b);
-const LATEST = YEARS[YEARS.length-1];
+/* Years available per country, ascending. The two lists differ — Energimyndigheten's
+   balance table starts at 2005, METI's series reaches back to FY1990 — so the year
+   dropdown and the trend chart are built per country, not from one shared list. */
+const YEARS_BY = {};
+["se","jp"].forEach(c => {
+  YEARS_BY[c] = Object.keys(DATASETS).filter(k => k.slice(0,2) === c)
+                      .map(k => parseInt(k.slice(2), 10)).sort((a,b) => a-b);
+});
+const LATEST_BY = {se: YEARS_BY.se[YEARS_BY.se.length-1], jp: YEARS_BY.jp[YEARS_BY.jp.length-1]};
 
-const STATE = { se: LATEST, jp: LATEST };
+const STATE = { se: LATEST_BY.se, jp: LATEST_BY.jp };
 let UNIT = "PJ";
 
 const W = 1560, BASE_H = 900;
@@ -600,7 +617,7 @@ function render(key){
   attachFocus(key);
   applyFocus(key);
   renderNotes(key);
-  renderYoY(key);
+  renderTrend(key);
 }
 
 /* ── comparability notes, shown on the page in readable size ────── */
@@ -617,61 +634,146 @@ function renderNotes(key){
   el.innerHTML = h;
 }
 
-/* ── multi-year comparison table ───────────────────────────────
-   One column per published year, then the change across the whole span.
-   Driven by YEARS, so adding a dataset adds a column with no edits here. */
-function renderYoY(key){
-  const sets = YEARS.map(y => DATASETS[key+y]).filter(Boolean);
-  if (sets.length < 2){ document.getElementById("yoy-"+key).innerHTML = ""; return; }
-  const bands = d => {
-    const m = {}, lab = {};
-    const ids = new Set(d.nodes.filter(n=>n.col===0).map(n=>n.id));
-    d.nodes.forEach(n => lab[n.id] = n.label);
-    d.flows.forEach(([s,t,v]) => { if (ids.has(s)) m[s] = (m[s]||0)+v; });
-    return {m, lab, year: d.year, yearLabel: d.yearLabel};
-  };
-  const B = sets.map(bands);
-  const first = B[0], last = B[B.length-1];
-  const lab = {};
-  B.forEach(b => Object.assign(lab, b.lab));
-  const keys = Array.from(new Set([].concat.apply([], B.map(b => Object.keys(b.m)))))
-    .sort((x,y) => (last.m[y]||0) - (last.m[x]||0));
-  const cur = STATE[key];
+/* ── trend: primary supply by source across every published year ──
+   With twenty years a wide table stops being readable, so the whole series is
+   drawn as a stacked area chart and the table collapses to first / selected /
+   latest. Clicking the chart jumps the Sankey to that year. */
+const TR = {W: 1200, H: 300, ML: 68, MR: 14, MT: 14, MB: 28};
 
-  // percentage change, guarding the cases where the band did not exist in the base year
-  const change = (x, y) => {
-    if (!x && !y) return {txt: "—", cls: ""};
-    if (!x) return {txt: "from zero", cls: "up"};   // e.g. Japanese nuclear, offline throughout FY2014
-    if (!y) return {txt: "to zero", cls: "down"};
-    // a tenfold rise reads better as a multiple than as a four-digit percentage
-    if (y/x >= 10) return {txt: "×" + (y/x).toFixed(y/x >= 100 ? 0 : 0), cls: "up"};
-    const d = (y-x)/x*100;
-    const s = d >= 0 ? "+" : "−";
-    return {txt: s + (Math.abs(d) >= 100 ? Math.abs(d).toFixed(0) : Math.abs(d).toFixed(1)) + "%",
-            cls: d > 0 ? "up" : "down"};
-  };
+function trendBands(d){
+  const m = {};
+  const ids = new Set(d.nodes.filter(n => n.col === 0).map(n => n.id));
+  d.flows.forEach(([s,t,v]) => { if (ids.has(s)) m[s] = (m[s]||0)+v; });
+  return m;
+}
 
-  let html = `<h3>Primary supply by source, ${first.yearLabel} to ${last.yearLabel}`
-           + `<span style="text-transform:none;letter-spacing:0;font-weight:400"> (chart is showing `
-           + `${(B.find(b => b.year === cur) || last).yearLabel})</span></h3>`;
-  html += `<table><tr><th>Source</th>`
-       +  B.map(b => `<th class="num${b.year===cur?" cur":""}">${b.yearLabel}</th>`).join("")
-       +  `<th class="num">${first.yearLabel} → ${last.yearLabel}</th></tr>`;
-  keys.forEach(k => {
-    const c = change(first.m[k]||0, last.m[k]||0);
-    html += `<tr><td>${esc(lab[k]||k)}</td>`
-         +  B.map(b => `<td class="num${b.year===cur?" cur":""}">${fmtV(b.m[k]||0)}</td>`).join("")
-         +  `<td class="num ${c.cls}">${c.txt}</td></tr>`;
+/* band ids stacked bottom-to-top, taking the newest year's column order first so
+   colours line up with the Sankey, then any band that only existed in older years */
+function trendOrder(sets){
+  const order = [], meta = {};
+  sets.slice().reverse().forEach(d => d.nodes.forEach(n => {
+    if (n.col !== 0) return;
+    meta[n.id] = n;
+    if (order.indexOf(n.id) < 0) order.push(n.id);
+  }));
+  return {order, meta};
+}
+
+function renderTrend(key){
+  const el = document.getElementById("yoy-"+key);
+  const years = YEARS_BY[key];
+  if (!years || years.length < 2){ el.innerHTML = ""; return; }
+  const sets = years.map(y => DATASETS[key+y]);
+  const B = sets.map(trendBands);
+  const {order, meta} = trendOrder(sets);
+  const cur = STATE[key], curIdx = Math.max(0, years.indexOf(cur));
+  const totals = B.map(m => Object.values(m).reduce((a,v)=>a+v, 0));
+  const peak = Math.max.apply(null, totals);
+
+  const {W:CW, H:CH, ML, MR, MT, MB} = TR;
+  const pw = CW-ML-MR, ph = CH-MT-MB;
+  // position by the year itself, not by its index — the series may have gaps
+  const y0 = years[0], y1 = years[years.length-1], span = (y1-y0) || 1;
+  const X = i => ML + pw*(years[i]-y0)/span;
+  const Y = v => MT + ph*(1 - v/peak);
+
+  // cumulative upper edge per year as bands are stacked
+  const acc = years.map(() => 0);
+  const p = [`<svg class="trend" viewBox="0 0 ${CW} ${CH}" width="${CW}" height="${CH}" xmlns="http://www.w3.org/2000/svg">`];
+
+  // y grid
+  const step = Math.pow(10, Math.floor(Math.log10(conv(peak)))) * (conv(peak)/Math.pow(10, Math.floor(Math.log10(conv(peak)))) > 5 ? 2 : 1);
+  for (let g = 0; g <= conv(peak); g += step){
+    const y = Y(UNIT === "PJ" ? g*1000 : g*3600);
+    p.push(`<line x1="${ML}" y1="${y.toFixed(1)}" x2="${CW-MR}" y2="${y.toFixed(1)}" stroke="#e8e5dc" stroke-width="1"/>`);
+    p.push(`<text x="${ML-8}" y="${(y+3.5).toFixed(1)}" font-size="10.5" fill="#9aa0a8" text-anchor="end">${g.toLocaleString("en-US")}</text>`);
+  }
+  p.push(`<text x="${ML-8}" y="${MT-2}" font-size="10" font-weight="700" fill="#9aa0a8" text-anchor="end">${UNIT}</text>`);
+
+  order.forEach(id => {
+    const top = years.map((_, i) => acc[i] + (B[i][id] || 0));
+    const upper = top.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" L");
+    const lower = acc.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).reverse().join(" L");
+    p.push(`<path d="M${upper} L${lower} Z" fill="${meta[id].color}" opacity="0.88" class="tband" data-band="${id}">`
+         + `<title>${esc(meta[id].label)}</title></path>`);
+    years.forEach((_, i) => acc[i] = top[i]);
   });
-  const tot = b => Object.values(b.m).reduce((s,v)=>s+v, 0);
-  const ct = change(tot(first), tot(last));
-  html += `<tr><td><b>Total</b></td>`
-       +  B.map(b => `<td class="num${b.year===cur?" cur":""}"><b>${fmtV(tot(b))}</b></td>`).join("")
-       +  `<td class="num"><b>${ct.txt}</b></td></tr></table>`;
-  html += `<p style="font-size:12px;color:#5a636e;margin-top:8px">Values in ${UNIT}. `
-       +  `Each year is derived from that year's own national balance by the same script, so the columns are `
-       +  `directly comparable within a country — but not between the two countries (see the notes above).</p>`;
-  document.getElementById("yoy-"+key).innerHTML = html;
+
+  // x axis: first, last, and every fifth calendar year in between that is far
+  // enough from the ends not to collide with them
+  years.forEach((y, i) => {
+    const edge = i === 0 || i === years.length-1;
+    if (!edge && (y % 5 !== 0 || Math.abs(X(i)-X(0)) < 26 || Math.abs(X(years.length-1)-X(i)) < 26)) return;
+    p.push(`<text x="${X(i).toFixed(1)}" y="${CH-8}" font-size="10.5" fill="#9aa0a8" text-anchor="middle">${y}</text>`);
+  });
+
+  // marker on the year the Sankey is showing
+  p.push(`<line x1="${X(curIdx).toFixed(1)}" y1="${MT}" x2="${X(curIdx).toFixed(1)}" y2="${MT+ph}" stroke="#1d232a" stroke-width="1.6" stroke-dasharray="3 3"/>`);
+  p.push(`<circle cx="${X(curIdx).toFixed(1)}" cy="${Y(totals[curIdx]).toFixed(1)}" r="4.5" fill="#fff" stroke="#1d232a" stroke-width="2"/>`);
+  p.push(`<text x="${X(curIdx).toFixed(1)}" y="${(Y(totals[curIdx])-11).toFixed(1)}" font-size="11.5" font-weight="700" fill="#1d232a" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3.5" stroke-linejoin="round">${fmtU(totals[curIdx])}</text>`);
+
+  // invisible hit strips, each reaching halfway to its neighbours so a click
+  // always lands on the nearest year even where the series has gaps
+  years.forEach((y, i) => {
+    const a = i === 0 ? ML : (X(i-1)+X(i))/2;
+    const b = i === years.length-1 ? CW-MR : (X(i)+X(i+1))/2;
+    p.push(`<rect x="${a.toFixed(1)}" y="${MT}" width="${Math.max(1,b-a).toFixed(1)}" height="${ph}" fill="transparent" class="thit" data-year="${y}" data-key="${key}"><title>${sets[i].yearLabel} — ${fmtU(totals[i])}</title></rect>`);
+  });
+  p.push(`</svg>`);
+
+  // If the series has holes, say so rather than letting the area chart imply
+  // data we do not hold: the bands are drawn straight across any missing years.
+  const missing = [];
+  for (let y = years[0]; y <= years[years.length-1]; y++) if (years.indexOf(y) < 0) missing.push(y);
+  const gapNote = missing.length
+    ? ` <b>${missing.length} year${missing.length>1?"s":""} in this range ${missing.length>1?"are":"is"} not yet loaded`
+      + ` (${missing.length > 12 ? missing[0]+"–"+missing[missing.length-1] : missing.join(", ")});`
+      + ` the chart draws straight across ${missing.length>1?"those gaps":"that gap"}.</b>`
+    : "";
+
+  // compact table: first, the year on screen, latest, and the change across the span
+  const first = 0, lastI = years.length-1;
+  const change = (x, y) => {
+    if (!x && !y) return {txt:"—", cls:""};
+    if (!x) return {txt:"from zero", cls:"up"};
+    if (!y) return {txt:"to zero", cls:"down"};
+    if (y/x >= 10) return {txt:"×"+(y/x).toFixed(0), cls:"up"};
+    const d = (y-x)/x*100;
+    return {txt:(d>=0?"+":"−") + (Math.abs(d)>=100?Math.abs(d).toFixed(0):Math.abs(d).toFixed(1)) + "%",
+            cls: d>0?"up":"down"};
+  };
+  const showCur = curIdx !== first && curIdx !== lastI;
+  const rows = order.slice().sort((a,b) => (B[lastI][b]||0) - (B[lastI][a]||0)).map(id => {
+    const c = change(B[first][id]||0, B[lastI][id]||0);
+    return `<tr><td><i class="sw" style="background:${meta[id].color}"></i>${esc(meta[id].label)}</td>`
+         + `<td class="num${curIdx===first?" cur":""}">${fmtV(B[first][id]||0)}</td>`
+         + (showCur ? `<td class="num cur">${fmtV(B[curIdx][id]||0)}</td>` : "")
+         + `<td class="num${curIdx===lastI?" cur":""}">${fmtV(B[lastI][id]||0)}</td>`
+         + `<td class="num ${c.cls}">${c.txt}</td></tr>`;
+  }).join("");
+  const ct = change(totals[first], totals[lastI]);
+
+  el.innerHTML =
+      `<h3>Primary supply by source, ${sets[first].yearLabel} to ${sets[lastI].yearLabel}`
+    + `<span style="text-transform:none;letter-spacing:0;font-weight:400"> — ${years.length} years, `
+    + `each derived from its own national balance by the same script. Click the chart to jump to a year.</span></h3>`
+    + `<div class="trendwrap">${p.join("")}</div>`
+    + `<table><tr><th>Source</th><th class="num${curIdx===first?" cur":""}">${sets[first].yearLabel}</th>`
+    + (showCur ? `<th class="num cur">${sets[curIdx].yearLabel}</th>` : "")
+    + `<th class="num${curIdx===lastI?" cur":""}">${sets[lastI].yearLabel}</th>`
+    + `<th class="num">${sets[first].yearLabel} → ${sets[lastI].yearLabel}</th></tr>`
+    + rows
+    + `<tr><td><b>Total</b></td><td class="num${curIdx===first?" cur":""}"><b>${fmtV(totals[first])}</b></td>`
+    + (showCur ? `<td class="num cur"><b>${fmtV(totals[curIdx])}</b></td>` : "")
+    + `<td class="num${curIdx===lastI?" cur":""}"><b>${fmtV(totals[lastI])}</b></td>`
+    + `<td class="num"><b>${ct.txt}</b></td></tr></table>`
+    + `<p style="font-size:12px;color:#5a636e;margin-top:8px">Values in ${UNIT}. Years are directly `
+    + `comparable within a country, but not between the two countries — see the notes above.`
+    + gapNote + `</p>`;
+
+  el.querySelectorAll(".thit").forEach(r => {
+    r.addEventListener("click", () => setYear(key, r.getAttribute("data-year")));
+  });
 }
 
 /* ── tooltips ──────────────────────────────────────────────────── */
@@ -846,11 +948,8 @@ window.addEventListener("keydown", e => {
 
 function fillYearSelects(){
   ["se","jp"].forEach(k => {
-    document.getElementById("year-"+k).innerHTML = YEARS.map(y => {
-      const d = DATASETS[k+y];
-      if (!d) return "";
-      return `<option value="${y}"${y===STATE[k]?" selected":""}>${d.yearLabel}</option>`;
-    }).join("");
+    document.getElementById("year-"+k).innerHTML = YEARS_BY[k].slice().reverse().map(y =>
+      `<option value="${y}"${y===STATE[k]?" selected":""}>${DATASETS[k+y].yearLabel}</option>`).join("");
   });
 }
 

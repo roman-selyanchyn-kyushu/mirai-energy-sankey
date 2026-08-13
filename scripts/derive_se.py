@@ -16,6 +16,12 @@ output rows are negative for energy produced.
 import json, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+# Raw source files live in sources/ next to the scripts directory. They are
+# gitignored (23 MB of official spreadsheets and API dumps) but every published
+# number is reproducible from them by re-running this pipeline.
+SOURCES = os.path.join(os.path.dirname(HERE), "sources")
+if not os.path.isdir(SOURCES):
+    SOURCES = HERE
 
 # ── bands: chart id -> top-level commodity names in EN0202_A ───────────────
 BANDS = {
@@ -58,7 +64,7 @@ OWN_USE, DIST_LOSS, NON_ENERGY = "3.4 Energy sector own use", "3.5 Distribution 
 
 
 def load(year):
-    d = json.load(open(os.path.join(HERE, f"se_em_{year}.json")))
+    d = json.load(open(os.path.join(SOURCES, f"se_em_{year}.json")))
     dims, sizes = d["id"], d["size"]
     cat = {k: d["dimension"][k]["category"] for k in dims}
     inv = {k: {v: kk for kk, v in cat[k]["index"].items()} for k in dims}

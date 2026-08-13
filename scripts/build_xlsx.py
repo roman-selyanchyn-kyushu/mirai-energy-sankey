@@ -23,9 +23,30 @@ TITLE_FONT = Font(bold=True, size=14)
 H2_FONT = Font(bold=True, size=11, color="0F6F8E")
 THIN = Side(style="thin", color="D8D5CC")
 BORDER = Border(bottom=THIN)
-ORDER = [f"{c}{y}" for c in ("se", "jp") for y in sorted({int(k[2:]) for k in DATA})]
+ORDER = sorted(DATA, key=lambda k: (k[:2] != "se", int(k[2:])))
 SHEET_NAME = {k: f"{'SE' if k[:2] == 'se' else 'JP'} {DATA[k]['yearLabel']}" for k in ORDER}
-YEAR_LIST = ", ".join(str(y) for y in sorted({int(k[2:]) for k in DATA}))
+
+
+def _span(prefix):
+    ys = sorted(int(k[2:]) for k in DATA if k.startswith(prefix))
+    return ys
+
+
+def year_list(prefix=None):
+    ys = _span(prefix) if prefix else sorted({int(k[2:]) for k in DATA})
+    return f"{ys[0]}-{ys[-1]} ({len(ys)} years)"
+
+
+# One readable matrix per dataset would mean 55 tabs. Every flow of every year is
+# already in "All flows" and "Derivation", so the matrix sheets are limited to
+# anchor years: the first, the last, and each year ending in 0 or 5.
+def is_anchor(k):
+    ys = _span(k[:2])
+    y = int(k[2:])
+    return y in (ys[0], ys[-1]) or y % 5 == 0
+
+
+MATRIX = [k for k in ORDER if is_anchor(k)]
 
 
 def label_map(d):
@@ -49,7 +70,7 @@ def widths(ws, *pairs):
 def sheet_readme(wb):
     ws = wb.create_sheet("README")
     rows = [
-        (f"Energy flow (Sankey) datasets — Sweden and Japan, {YEAR_LIST}", "title"),
+        (f"Energy flow (Sankey) datasets — Sweden {year_list('se')}, Japan {year_list('jp')}", "title"),
         ("", ""),
         ("Prepared for the MIRAI Research Group, Kyushu University. Compiled and verified August 2026.", ""),
         ("Interactive charts: https://roman-selyanchyn-kyushu.github.io/mirai-energy-sankey/", ""),
@@ -57,12 +78,12 @@ def sheet_readme(wb):
         ("", ""),
         ("Sources", "h2"),
         ("Sweden", f"Energimyndigheten (Swedish Energy Agency), official annual energy balance, table "
-                   f"EN0202_A 'Energy balance, 2005-', calendar years {YEAR_LIST}, terajoules. Retrieved from "
+                   f"EN0202_A 'Energy balance, 2005-', calendar years {year_list('se')}, terajoules. Retrieved from "
                    f"the Agency's statistics database (PxWeb API); table updated 30 April 2026. This is "
                    f"Sweden's national primary source. Every band reproduces the Agency's own 'Energy in "
                    f"Sweden - Facts and Figures' compendium (table 1.2) to 0.01 TWh."),
         ("Japan", f"METI / Agency for Natural Resources and Energy, Comprehensive Energy Statistics "
-                  f"(総合エネルギー統計), fiscal years {YEAR_LIST} (確報, revised), energy-unit balance "
+                  f"(総合エネルギー統計), fiscal years {year_list('jp')} (確報, revised), energy-unit balance "
                   f"table, terajoules. Files stte_<FY>.xlsx from enecho.meti.go.jp. METI restates the whole "
                   f"back series on the current methodology. Japanese fiscal years run April to March."),
         ("", ""),
@@ -76,7 +97,9 @@ def sheet_readme(wb):
                        "Use this to trace any number back to the official statistics."),
         ("Reconciliation", "Node-by-node balance check (inputs = outputs) plus headline totals compared with "
                            "the official published figures and with the IEA energy Sankey."),
-        ("SE 2014 … JP FY2024", "One readable matrix per dataset: rows are sources, columns are destinations."),
+        ("Year matrices", f"One readable matrix per anchor year ({len(MATRIX)} sheets: first, last and every "
+                          f"fifth year of each country) — rows are sources, columns are destinations. "
+                          f"Every flow of every year is in 'All flows' and 'Derivation'."),
         ("", ""),
         ("Method summary", "h2"),
         ("Sweden", "Only top-level commodities of EN0202_A are summed into bands, so the source hierarchy is "
@@ -334,7 +357,7 @@ def main():
     sheet_all_flows(wb)
     sheet_derivation(wb)
     sheet_reconciliation(wb)
-    for k in ORDER:
+    for k in MATRIX:
         sheet_matrix(wb, k)
     dest = os.path.join(PROJECT, "energy_sankey_data.xlsx")
     wb.save(dest)

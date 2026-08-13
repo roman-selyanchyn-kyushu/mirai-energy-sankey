@@ -17,6 +17,12 @@ import os
 from openpyxl import load_workbook
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+# Raw source files live in sources/ next to the scripts directory. They are
+# gitignored (23 MB of official spreadsheets and API dumps) but every published
+# number is reproducible from them by re-running this pipeline.
+SOURCES = os.path.join(os.path.dirname(HERE), "sources")
+if not os.path.isdir(SOURCES):
+    SOURCES = HERE
 
 # ── fuel bands: chart id -> METI column codes summed into it ───────────────
 BANDS = {
@@ -65,7 +71,7 @@ def primary_equivalent_factor(year):
     at one uniform reference efficiency. Recover it from the natural-units sheet, which reports
     the same rows in GWh: factor = generated electricity (GWh x 3.6 TJ) / primary energy (TJ).
     Verified identical for nuclear, hydro, solar PV and wind (41.80% FY2023, 42.41% FY2024)."""
-    wb = load_workbook(os.path.join(HERE, f"stte_{year}.xlsx"), read_only=True, data_only=True)
+    wb = load_workbook(os.path.join(SOURCES, f"stte_{year}.xlsx"), read_only=True, data_only=True)
     ws = wb["固有単位表"]
     rows = list(ws.iter_rows(values_only=True))
     col = {str(c).strip(): j for j, c in enumerate(rows[0])
@@ -82,7 +88,7 @@ def primary_equivalent_factor(year):
 
 
 def read_table(year):
-    wb = load_workbook(os.path.join(HERE, f"stte_{year}.xlsx"), read_only=True, data_only=True)
+    wb = load_workbook(os.path.join(SOURCES, f"stte_{year}.xlsx"), read_only=True, data_only=True)
     ws = wb["ｴﾈﾙｷﾞｰ単位表（本表）"]
     rows = list(ws.iter_rows(values_only=True))
     col = {str(c).strip(): j for j, c in enumerate(rows[0])
