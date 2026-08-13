@@ -1,4 +1,4 @@
-"""Build the four Sankey datasets (SE/JP x 2023/2024) and emit datasets.json.
+"""Build the Sankey datasets (SE/JP x YEARS) and emit datasets.json.
 
 Single source of truth: the HTML page and the Excel workbook are both generated from this,
 so every published number is identical across deliverables.
@@ -7,6 +7,11 @@ import json, os
 import derive_se, derive_jp
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+# Every year published on the page and in the workbook. 2014 is the ten-year
+# comparison point; Sweden cannot go earlier than 2005 because Energimyndigheten's
+# balance table EN0202_A starts there.
+YEARS = (2014, 2023, 2024)
 
 # LLNL end-use efficiency assumptions
 EFF = {"res": 0.65, "com": 0.65, "ind": 0.49, "tpt": 0.21}
@@ -88,13 +93,18 @@ def footnotes(country, ds_flows, meta):
         })
     else:
         f = meta.get("primary_equivalent_factor") or 0.418
+        NAMES = {"nuclear": "nuclear", "hydro": "hydro", "solar": "solar PV", "wind": "wind"}
+        present = [b for b in ("nuclear", "hydro", "solar", "wind") if band_out.get(b)]
+        listed = ", ".join(NAMES[b] for b in present[:-1]) + " and " + NAMES[present[-1]]
+        absent = ("" if band_out.get("nuclear") else
+                  " No nuclear energy appears this year: every Japanese reactor was offline.")
         notes.append({
-            "marker": "†", "nodes": ["nuclear", "hydro", "solar", "wind"],
-            "text": (f"† Primary-energy convention (METI substitution method): nuclear, hydro, solar PV and wind are all "
+            "marker": "†", "nodes": present,
+            "text": (f"† Primary-energy convention (METI substitution method): {listed} are all "
                      f"converted to primary-energy equivalent at one uniform reference efficiency of {f*100:.1f}%, so "
                      f"their band widths are mutually comparable but are about {1/f:.1f}x the electricity actually "
                      f"generated. Geothermal is reported directly as heat. Rejected energy leaving the electricity node "
-                     f"therefore includes this accounting artefact rather than only physical losses.")
+                     f"therefore includes this accounting artefact rather than only physical losses.{absent}")
         })
         rec = (meta.get("recovered_heat_elec_TJ") or 0) / 1000
         ref = (meta.get("refuse_energy_TJ") or 0) / 1000
@@ -185,7 +195,7 @@ def build(country, year):
 def main():
     out = {}
     for c in ("se", "jp"):
-        for y in (2023, 2024):
+        for y in YEARS:
             out[f"{c}{y}"] = build(c, y)
     with open(os.path.join(HERE, "datasets.json"), "w") as fh:
         json.dump(out, fh, ensure_ascii=False, indent=1)

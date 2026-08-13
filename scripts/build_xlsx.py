@@ -5,7 +5,7 @@ Sheets:
   All flows         tidy long format: one row per flow (pivot-friendly)
   Derivation        every flow with the exact source rows/columns it came from
   Reconciliation    node-by-node balance check + headline totals vs official publications
-  SE 2023 .. JP FY2024   one readable matrix per dataset
+  SE 2014 .. JP FY2024   one readable matrix per dataset
 """
 import json, os
 from openpyxl import Workbook
@@ -23,9 +23,9 @@ TITLE_FONT = Font(bold=True, size=14)
 H2_FONT = Font(bold=True, size=11, color="0F6F8E")
 THIN = Side(style="thin", color="D8D5CC")
 BORDER = Border(bottom=THIN)
-ORDER = ["se2023", "se2024", "jp2023", "jp2024"]
-SHEET_NAME = {"se2023": "SE 2023", "se2024": "SE 2024",
-              "jp2023": "JP FY2023", "jp2024": "JP FY2024"}
+ORDER = [f"{c}{y}" for c in ("se", "jp") for y in sorted({int(k[2:]) for k in DATA})]
+SHEET_NAME = {k: f"{'SE' if k[:2] == 'se' else 'JP'} {DATA[k]['yearLabel']}" for k in ORDER}
+YEAR_LIST = ", ".join(str(y) for y in sorted({int(k[2:]) for k in DATA}))
 
 
 def label_map(d):
@@ -49,21 +49,22 @@ def widths(ws, *pairs):
 def sheet_readme(wb):
     ws = wb.create_sheet("README")
     rows = [
-        ("Energy flow (Sankey) datasets — Sweden and Japan, 2023 and 2024", "title"),
+        (f"Energy flow (Sankey) datasets — Sweden and Japan, {YEAR_LIST}", "title"),
         ("", ""),
         ("Prepared for the MIRAI Research Group, Kyushu University. Compiled and verified August 2026.", ""),
         ("Interactive charts: https://roman-selyanchyn-kyushu.github.io/mirai-energy-sankey/", ""),
         ("Code and documentation: https://github.com/roman-selyanchyn-kyushu/mirai-energy-sankey", ""),
         ("", ""),
         ("Sources", "h2"),
-        ("Sweden", "Eurostat, Complete energy balances (nrg_bal_c) and Production of electricity and derived "
-                   "heat by fuel (nrg_bal_peh), calendar years 2023 and 2024, terajoules. Retrieved from the "
-                   "Eurostat REST API; dataset update 2 June 2026. Both years final, no provisional flags. "
-                   "Eurostat receives these from Energimyndigheten (Swedish Energy Agency)."),
-        ("Japan", "METI / Agency for Natural Resources and Energy, Comprehensive Energy Statistics "
-                  "(総合エネルギー統計), fiscal years 2023 and 2024 (確報, revised), energy-unit balance "
-                  "table, terajoules. Files stte_2023.xlsx and stte_2024.xlsx from enecho.meti.go.jp. "
-                  "Japanese fiscal years run April to March."),
+        ("Sweden", f"Energimyndigheten (Swedish Energy Agency), official annual energy balance, table "
+                   f"EN0202_A 'Energy balance, 2005-', calendar years {YEAR_LIST}, terajoules. Retrieved from "
+                   f"the Agency's statistics database (PxWeb API); table updated 30 April 2026. This is "
+                   f"Sweden's national primary source. Every band reproduces the Agency's own 'Energy in "
+                   f"Sweden - Facts and Figures' compendium (table 1.2) to 0.01 TWh."),
+        ("Japan", f"METI / Agency for Natural Resources and Energy, Comprehensive Energy Statistics "
+                  f"(総合エネルギー統計), fiscal years {YEAR_LIST} (確報, revised), energy-unit balance "
+                  f"table, terajoules. Files stte_<FY>.xlsx from enecho.meti.go.jp. METI restates the whole "
+                  f"back series on the current methodology. Japanese fiscal years run April to March."),
         ("", ""),
         ("Units", "h2"),
         ("Native unit", "All source data and the 'value_TJ' column are in terajoules (TJ)."),
@@ -75,15 +76,17 @@ def sheet_readme(wb):
                        "Use this to trace any number back to the official statistics."),
         ("Reconciliation", "Node-by-node balance check (inputs = outputs) plus headline totals compared with "
                            "the official published figures and with the IEA energy Sankey."),
-        ("SE 2023 … JP FY2024", "One readable matrix per dataset: rows are sources, columns are destinations."),
+        ("SE 2014 … JP FY2024", "One readable matrix per dataset: rows are sources, columns are destinations."),
         ("", ""),
         ("Method summary", "h2"),
-        ("Sweden", "Only additive Eurostat balance components are used. Eurostat's attributed memo aggregates "
-                   "(BIOE 'Bioenergy', FE 'Fossil energy') include fuel embodied in delivered heat and would "
-                   "double-count, so bioenergy is taken as the residual of RA000 after removing hydro, wind, "
-                   "solar, ambient heat and geothermal. CHP fuel inputs are split between the electricity and "
-                   "district-heating boxes in proportion to each fuel's gross electricity vs heat output. "
-                   "Ambient heat from building heat pumps is allocated 80% residential / 20% commercial."),
+        ("Sweden", "Only top-level commodities of EN0202_A are summed into bands, so the source hierarchy is "
+                   "never double-counted. CHP fuel input is split between the electricity and district-heating "
+                   "boxes by the plants' own reported output shares (27.4% electricity in 2014, 26.6% in 2023, "
+                   "24.5% in 2024). Swedish heat-only plants deliver more heat than their booked fuel input "
+                   "because the ambient heat drawn by heat pumps is not recorded as a supply item; that "
+                   "implicit ambient heat is added so the district-heating box closes. Band throughput uses "
+                   "gross inland consumption, which is total supply less the commodity's statistical "
+                   "difference."),
         ("Japan", "Aggregated bands (coal + coal products, crude + oil products, natural gas + city gas) net "
                   "out product manufacture inside the band (coke ovens, refineries, gas works, inter-product "
                   "transfers such as the ~96 PJ of LPG blended into city gas), otherwise the natural gas that "
@@ -94,11 +97,15 @@ def sheet_readme(wb):
                     "transport 21%. These are assumptions, not measured statistics."),
         ("", ""),
         ("Caution", "h2"),
-        ("Cross-country comparison", "Sweden (Eurostat) and Japan (METI) follow different conventions. METI "
-                                     "uses gross calorific value and a substitution method for renewable "
-                                     "electricity; Eurostat uses net calorific value and counts renewable "
-                                     "electricity 1:1. Do not compare the two countries' totals directly "
-                                     "without adjusting — see the Reconciliation sheet."),
+        ("Cross-country comparison", "Sweden (Energimyndigheten) and Japan (METI) follow different "
+                                     "conventions. METI uses gross calorific value and a substitution method "
+                                     "for every generating source; the Swedish balance uses net calorific "
+                                     "value, books nuclear as reactor heat and counts renewable electricity "
+                                     "1:1. Do not compare the two countries' totals directly without "
+                                     "adjusting - see the Reconciliation sheet."),
+        ("Year-on-year comparison", "Within a country the years ARE directly comparable: each is derived from "
+                                    "that year's own national balance by the same script, with no methodology "
+                                    "change between them."),
     ]
     r = 1
     for a, b in rows:
@@ -196,16 +203,23 @@ def sheet_reconciliation(wb):
     ws.append(["dataset", "quantity", "this workbook (TJ)", "official figure", "source of official figure"])
     style_header(ws, row=r, ncol=5)
     r += 1
-    official = {
-        "se2023": [("Gross electricity production", 597935, "597,935 TJ = 166.1 TWh", "Eurostat nrg_bal_peh GEP TOTAL"),
-                   ("Final energy consumption", 1301927, "1,301,927 TJ", "Eurostat nrg_bal_c, sum of final sectors")],
-        "se2024": [("Gross electricity production", 620521, "620,521 TJ = 172.4 TWh", "Eurostat nrg_bal_peh GEP TOTAL"),
-                   ("Final energy consumption", 1311379, "1,311,379 TJ", "Eurostat nrg_bal_c, sum of final sectors")],
-        "jp2023": [("Domestic primary energy supply", 17557652, "17,558 PJ", "METI press release 25 Apr 2025 (確報)"),
-                   ("Final energy consumption", 11509459, "11,509 PJ", "METI balance table row #500000")],
-        "jp2024": [("Domestic primary energy supply", 17461344, "17,461 PJ", "METI balance table row #190000"),
-                   ("Final energy consumption", 11280435, "11,280 PJ", "METI balance table row #500000")],
-    }
+    SE_SRC = "Energimyndigheten EN0202_A, row 3.3 Transformation output / row 3.7"
+    JP_SRC = "METI balance table rows #190000 / #500000"
+    official = {}
+    for k in ORDER:
+        m = DATA[k]["meta"]
+        if k.startswith("se"):
+            official[k] = [
+                ("Gross electricity production", m["gross_electricity_TJ"],
+                 f"{m['gross_electricity_TJ']:,} TJ = {m['gross_electricity_TJ']/3600:,.1f} TWh", SE_SRC),
+                ("Final energy consumption", m["final_consumption_energy_TJ"],
+                 f"{m['final_consumption_energy_TJ']:,} TJ", SE_SRC)]
+        else:
+            official[k] = [
+                ("Domestic primary energy supply", m["domestic_primary_supply_TJ"],
+                 f"{m['domestic_primary_supply_TJ']/1000:,.0f} PJ", JP_SRC),
+                ("Final energy consumption", m["final_consumption_TJ"],
+                 f"{m['final_consumption_TJ']/1000:,.0f} PJ", JP_SRC)]
     for k in ORDER:
         d = DATA[k]
         for qty, val, off, srctxt in official[k]:
@@ -237,10 +251,10 @@ def sheet_reconciliation(wb):
     ws.cell(row=r, column=1, value="4. Why these charts differ from the IEA energy Sankey").font = H2_FONT
     r += 1
     notes = [
-        ("Sweden 2023", "IEA total energy supply 1,892 PJ vs 1,975 PJ here. Per fuel the two agree closely "
+        ("Sweden 2023", "IEA total energy supply 1,892 PJ vs 1,951 PJ here. Per fuel the two agree closely "
                         "(biofuels & waste 573.5 vs 570.4 PJ; hydro 238.3 vs 238.3; wind+solar+other 177.1 vs 177.1). "
-                        "Differences: the IEA imputes a fixed 33% nuclear efficiency (529 PJ) where Eurostat reports "
-                        "actual reactor heat ~36% (485 PJ), and the IEA headline nets out net electricity exports "
+                        "Differences: the IEA imputes a fixed 33% nuclear efficiency (529 PJ) where the Swedish balance reports "
+                        "actual reactor heat ~36% (488 PJ), and the IEA headline nets out net electricity exports "
                         "(-103 PJ) which this chart draws explicitly. The IEA's own by-source total is 1,983 PJ, "
                         "within 0.4% of this chart."),
         ("Japan FY2023", "IEA total energy supply 15,844 PJ (calendar 2023) vs METI 17,558 PJ (fiscal 2023). "

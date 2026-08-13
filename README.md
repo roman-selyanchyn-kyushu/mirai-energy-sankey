@@ -1,15 +1,16 @@
-# Energy Flow Sankey Diagrams — Sweden & Japan, 2023 & 2024
+# Energy Flow Sankey Diagrams — Sweden & Japan, 2014, 2023 & 2024
 
-Interactive LLNL-style energy flow (Sankey) diagrams for **Sweden** (calendar years 2023 and 2024)
-and **Japan** (fiscal years 2023 and 2024), built from official statistics.
+Interactive LLNL-style energy flow (Sankey) diagrams for **Sweden** (calendar years 2014, 2023 and 2024)
+and **Japan** (fiscal years 2014, 2023 and 2024), built from official statistics.
+2014 is included as a ten-year comparison point, derived from the same tables by the same scripts.
 Created for the **MIRAI Research Group · Kyushu University**.
 
 **Live page:** <https://roman-selyanchyn-kyushu.github.io/mirai-energy-sankey/>
 
 | File | What it is |
 |---|---|
-| `energy_sankey.html` | **Main deliverable.** All four datasets, country tabs + year dropdown, PJ/TWh switch, hi-res PNG and SVG export. Self-contained, no external dependencies. |
-| `energy_sankey_data.xlsx` | All numbers for all four datasets, with the full derivation trail and balance checks. |
+| `energy_sankey.html` | **Main deliverable.** All six datasets, country tabs + year dropdown, PJ/TWh switch, hi-res PNG and SVG export. Self-contained, no external dependencies. |
+| `energy_sankey_data.xlsx` | All numbers for all six datasets, with the full derivation trail and balance checks. |
 | `scripts/` | The extraction and build pipeline — the authoritative record of how every number was produced. `derive_se.py` reads the Swedish PxWeb API, `derive_jp.py` the METI workbook. |
 | `energy_sankey_2023.html` | Frozen 2023-only earlier version, kept so existing links and citations stay valid. |
 
@@ -19,11 +20,32 @@ Created for the **MIRAI Research Group · Kyushu University**.
 
 | Country | Source | Coverage | Unit | Retrieved |
 |---|---|---|---|---|
-| Sweden | **Energimyndigheten** (Swedish Energy Agency), official annual energy balance [`EN0202_A`](https://pxexternal.energimyndigheten.se/pxweb/en/Energimyndighetens_statistikdatabas/) "Energy balance, 2005–" | Calendar 2023, 2024 | TJ | PxWeb API, table updated 30 Apr 2026 |
-| Japan | METI / ANRE [総合エネルギー統計](https://www.enecho.meti.go.jp/statistics/total_energy/results.html) — Comprehensive Energy Statistics, 確報 (revised), energy-unit balance table (`stte_2023.xlsx`, `stte_2024.xlsx`) | Fiscal 2023, 2024 (Apr–Mar) | TJ | enecho.meti.go.jp |
+| Sweden | **Energimyndigheten** (Swedish Energy Agency), official annual energy balance [`EN0202_A`](https://pxexternal.energimyndigheten.se/pxweb/en/Energimyndighetens_statistikdatabas/) "Energy balance, 2005–" | Calendar 2014, 2023, 2024 | TJ | PxWeb API, table updated 30 Apr 2026 |
+| Japan | METI / ANRE [総合エネルギー統計](https://www.enecho.meti.go.jp/statistics/total_energy/results.html) — Comprehensive Energy Statistics, 確報 (revised), energy-unit balance table (`stte_2014.xlsx`, `stte_2023.xlsx`, `stte_2024.xlsx`) | Fiscal 2014, 2023, 2024 (Apr–Mar) | TJ | enecho.meti.go.jp |
 
-Both countries are drawn from their **national primary source**. Both Japanese years are the **確報**
-(final/revised) release.
+Both countries are drawn from their **national primary source**. All Japanese years are the **確報**
+(final/revised) release, and METI restates the whole back series on the current methodology, so the
+three fiscal years sit on one basis.
+
+### How far back the series can go
+
+Checked August 2026, by pulling and deriving each candidate year:
+
+| Year | Sweden | Japan |
+|---|---|---|
+| 2024 | ✔ | ✔ |
+| 2023 | ✔ | ✔ |
+| 2014 | ✔ | ✔ — no nuclear at all, every reactor offline |
+| 2005 | ✔ (earliest) | file exists, not yet pulled |
+| 2004 and earlier | ✘ | ✔ back to at least FY1990 |
+
+**Sweden cannot go before 2005.** `EN0202_A` begins there, and the Agency's pre-2005 tables are long
+aggregate series only (supply by commodity from 1970, final use by sector from 1970) — enough for a bar
+chart, not enough to derive a Sankey the same way. Eurostat carries Sweden back to 1990, but that would
+mean mixing sources again. **2005 is therefore the earliest year a matched pair could be built.**
+
+METI's server sits behind an AWS WAF that starts issuing bot challenges after a handful of rapid
+downloads; fetch the historical `stte_<FY>.xlsx` files slowly, or by hand in a browser.
 
 ### Relationship to Eurostat
 
@@ -50,7 +72,8 @@ Charts published before August 2026 used the Eurostat figures and therefore diff
 
 ### Reproducing the raw pulls
 
-Sweden — PxWeb POST query against table `EN0202_A` (year 19 = 2024, unit 3 = TJ):
+Sweden — PxWeb POST query against table `EN0202_A`. The `År` value is an **index, not the year**:
+0 = 2005 … 9 = 2014 … 18 = 2023, 19 = 2024. Unit 3 = TJ. Example for 2024:
 
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"query":[{"code":"År","selection":{"filter":"item","values":["19"]}},{"code":"Enhet","selection":{"filter":"item","values":["3"]}}],"response":{"format":"json-stat2"}}' "https://pxexternal.energimyndigheten.se/api/v1/en/Energimyndighetens_statistikdatabas/Officiell_energistatistik/Arlig_energibalans/Balanser/EN0202_A.px"
@@ -74,7 +97,9 @@ python3 scripts/export.py && python3 scripts/build_html.py && python3 scripts/bu
 ```
 
 `derive_se.py` and `derive_jp.py` each expose one `derive(year)` function, run identically for every year,
-so the two years of each country are guaranteed methodologically consistent.
+so all three years of each country are guaranteed methodologically consistent. The published year list lives
+in one place — `YEARS` in `scripts/export.py` — and the year dropdowns, the comparison table and the workbook
+sheets are all generated from it.
 
 ### 2.1 Sweden — national balance structure
 
@@ -84,12 +109,12 @@ double-counted — `1. Biofuels` already contains solid biofuels, bioliquids, bi
 waste. Transformation input rows are positive for fuel consumed, output rows negative for energy produced.
 
 - **CHP split** — combined heat and power plants report electricity and heat output separately, so their
-  fuel input is divided by the plants' *actual* output shares (26.6% electricity in 2023, 24.5% in 2024)
-  rather than by an assumption. This is more direct than the Eurostat-based approach it replaced.
-- **Ambient & recovered heat** — the balance books 18.9 PJ (2023) of primary heat into CHP and heat-only
+  fuel input is divided by the plants' *actual* output shares (27.4% electricity in 2014, 26.6% in 2023,
+  24.5% in 2024) rather than by an assumption. This is more direct than the Eurostat-based approach it replaced.
+- **Ambient & recovered heat** — the balance books 18.1 PJ (2014) and 18.9 PJ (2023) of primary heat into CHP and heat-only
   plants. Swedish heat-only plants deliver *more* heat than their booked fuel input, because the ambient
   heat drawn by heat pumps from air, water and sewage is not recorded as a supply item; that implicit
-  ambient heat (4.8 PJ in 2023) is added so the box closes. Unlike Eurostat, the national balance does
+  ambient heat (5.0 PJ in 2014, 4.8 PJ in 2023) is added so the box closes. Unlike Eurostat, the national balance does
   **not** count ambient heat captured by *building* heat pumps at all, so none reaches the final sectors.
 - **Sectors** — Industrial = industry + construction; Commercial & services = commercial, public
   administration, agriculture, forestry and fishing.
@@ -227,12 +252,17 @@ the LLNL convention, **not** measured statistics, and they are the least certain
 
 Every dataset is checked programmatically; results are in the workbook's **Reconciliation** sheet.
 
-- **Node balance** — all 28 conversion/sector nodes across the four datasets have inputs = outputs to
+- **Node balance** — all 42 conversion/sector nodes across the six datasets have inputs = outputs to
   within 1 TJ.
 - **Headline totals** match the official publications: Japan FY2023 reproduces METI's published
   17,558 PJ supply and 11,509 PJ final consumption exactly; Sweden's conversion boxes reconcile to the
-  Agency's published gross electricity (597,188 TJ in 2023, 619,653 in 2024) and derived heat
-  (220,352 / 213,120 TJ) to within 2 TJ.
+  Agency's published gross electricity (553,289 TJ in 2014, 597,188 in 2023, 619,653 in 2024) and derived
+  heat (203,024 / 220,352 / 213,120 TJ) to within 2 TJ.
+- **Independent cross-check against the Agency's own compendium** — every Swedish fuel band reproduces
+  *Energy in Sweden — Facts and Figures* (2026 edition, table 1.2) to 0.01 TWh for 2014, 2023 and 2024,
+  once the per-commodity statistical difference is accounted for. The charts use gross inland consumption
+  (total supply − statistical difference); the compendium publishes total supply, a gap of 6.4 PJ in 2023
+  and 6.8 PJ in 2024 spread across coal, oil and gas.
 - **Source migration check** — when Sweden moved from Eurostat to the national balance, nuclear
   electricity was confirmed identical between the two (174,492 TJ in 2023, to 1 TJ), and every other
   difference was traced to a documented harmonisation effect rather than an error (see section 1).
@@ -243,8 +273,8 @@ The charts differ from <https://www.iea.org/sankey/> by documented convention, n
 
 **Sweden 2023** — IEA total energy supply 1,892 PJ vs 1,951 PJ here. Per fuel the two agree closely
 (biofuels & waste 573.5 vs 570.4 PJ; hydro 238.3 vs 238.3; wind+solar+other 177.1 vs 177.1). The
-differences are that the IEA imputes a fixed 33% nuclear efficiency (529 PJ) where Eurostat reports actual
-reactor heat of ~36% (485 PJ), and the IEA headline nets out net electricity exports (−103 PJ) which this
+differences are that the IEA imputes a fixed 33% nuclear efficiency (529 PJ) where the Swedish balance reports actual
+reactor heat of ~36% (488 PJ), and the IEA headline nets out net electricity exports (−103 PJ) which this
 chart draws explicitly. The IEA's own by-source total is 1,983 PJ — within 0.4% of this chart.
 
 **Japan FY2023** — IEA 15,844 PJ (calendar) vs METI 17,558 PJ (fiscal). The ~1,714 PJ gap decomposes into:

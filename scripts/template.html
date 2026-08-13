@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Energy Flow Diagrams — Sweden &amp; Japan, 2023 &amp; 2024</title>
+<title>Energy Flow Diagrams — Sweden &amp; Japan, 2014, 2023 &amp; 2024</title>
 <style>
   :root{
     --ink:#1d232a; --ink-soft:#5a636e; --bg:#f7f6f2; --card:#ffffff;
@@ -92,7 +92,8 @@
   .yoy table{border-collapse:collapse;font-size:13px;width:100%;max-width:640px}
   .yoy td,.yoy th{border-bottom:1px solid var(--line);padding:5px 10px;text-align:left}
   .yoy th{font-weight:600;color:var(--ink-soft);font-size:12px}
-  .yoy td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .yoy td.num,.yoy th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .yoy td.cur,.yoy th.cur{background:#f3f1ea}
   /* deliberately neutral: a rise or fall in a fuel is not inherently good or bad */
   .yoy .up,.yoy .down{color:var(--ink);font-weight:600}
   .yoy .down{color:#6b737d}
@@ -127,7 +128,7 @@
 
 <header class="page">
   <h1>Energy Flow Diagrams — Sweden &amp; Japan</h1>
-  <p class="sub">Estimated national energy flows for <b>2023 and 2024</b>, drawn in the style of the
+  <p class="sub">Estimated national energy flows for <b>2014, 2023 and 2024</b>, drawn in the style of the
   Lawrence Livermore National Laboratory energy flow charts and built directly from each country's
   national statistics: the Energimyndigheten annual energy balance (Sweden, calendar years) and METI
   Comprehensive Energy Statistics (Japan, fiscal years). Choose a year from the dropdown, <b>click any box to trace where
@@ -146,10 +147,7 @@
     <div class="toolbar">
       <span class="hint"><b>Click any box</b> to trace its flows · hover for values · PNG exports at 4× resolution for print</span>
       <span class="yearsel"><label for="year-se">Year</label>
-        <select id="year-se" onchange="setYear('se', this.value)">
-          <option value="2023">2023</option>
-          <option value="2024" selected>2024</option>
-        </select></span>
+        <select id="year-se" onchange="setYear('se', this.value)"></select></span>
       <div class="units" role="group" aria-label="Units">
         <button class="unit-btn on" data-unit="PJ" onclick="setUnit('PJ')">PJ</button>
         <button class="unit-btn" data-unit="TWh" onclick="setUnit('TWh')">TWh</button>
@@ -168,7 +166,7 @@
       <h3>Source</h3>
       <ul>
         <li><b>Energimyndigheten</b> (Swedish Energy Agency), official annual energy balance
-        <b>EN0202_A</b> “Energy balance, 2005–”, calendar years 2023 and 2024, in terajoules, retrieved from the
+        <b>EN0202_A</b> “Energy balance, 2005–”, calendar years 2014, 2023 and 2024, in terajoules, retrieved from the
         <a href="https://pxexternal.energimyndigheten.se/pxweb/en/Energimyndighetens_statistikdatabas/" target="_blank" rel="noopener">Agency’s statistics database</a> (PxWeb API); table updated 30 April 2026.</li>
         <li>This is Sweden’s <b>national primary source</b>, matching the use of METI’s national statistics for
         Japan. Earlier versions of this chart used Eurostat, which republishes the same underlying statistics
@@ -178,28 +176,31 @@
       </ul>
       <h3>Verified totals</h3>
       <table>
-        <tr><th>Quantity</th><th>2023</th><th>2024</th></tr>
-        <tr><td>Gross electricity production</td><td class="num">597,188 TJ (165.9 TWh)</td><td class="num">619,653 TJ (172.1 TWh)</td></tr>
-        <tr><td>… of which nuclear</td><td class="num">174,492 TJ</td><td class="num">182,395 TJ</td></tr>
-        <tr><td>Gross district-heat production</td><td class="num">220,352 TJ</td><td class="num">213,120 TJ</td></tr>
-        <tr><td>Net electricity export</td><td class="num">102,650 TJ (28.5 TWh)</td><td class="num">120,242 TJ (33.4 TWh)</td></tr>
-        <tr><td>Final energy consumption</td><td class="num">1,271,729 TJ</td><td class="num">1,271,753 TJ</td></tr>
-        <tr><td>Non-energy use</td><td class="num">73,178 TJ</td><td class="num">90,111 TJ</td></tr>
+        <tr><th>Quantity</th><th>2014</th><th>2023</th><th>2024</th></tr>
+        <tr><td>Gross electricity production</td><td class="num">553,289 TJ (153.7 TWh)</td><td class="num">597,188 TJ (165.9 TWh)</td><td class="num">619,653 TJ (172.1 TWh)</td></tr>
+        <tr><td>… of which nuclear</td><td class="num">233,556 TJ</td><td class="num">174,492 TJ</td><td class="num">182,395 TJ</td></tr>
+        <tr><td>Gross district-heat production</td><td class="num">203,024 TJ</td><td class="num">220,352 TJ</td><td class="num">213,120 TJ</td></tr>
+        <tr><td>Net electricity export</td><td class="num">56,240 TJ (15.6 TWh)</td><td class="num">102,650 TJ (28.5 TWh)</td><td class="num">120,242 TJ (33.4 TWh)</td></tr>
+        <tr><td>Final energy consumption</td><td class="num">1,326,406 TJ</td><td class="num">1,271,729 TJ</td><td class="num">1,271,753 TJ</td></tr>
+        <tr><td>Non-energy use</td><td class="num">93,600 TJ</td><td class="num">73,178 TJ</td><td class="num">90,111 TJ</td></tr>
       </table>
-      <p>Both conversion boxes reconcile to the Agency’s published production figures to within 2 TJ
-      (0.000%), and every node balances exactly. The electricity balance closes as
+      <p>All three years are derived by the same script from the same table, so the columns are directly
+      comparable. Every band matches the Agency’s own <i>Energy in Sweden — Facts and Figures</i> compendium
+      (table 1.2) to 0.01 TWh once the statistical difference is accounted for, both conversion boxes
+      reconcile to the Agency’s published production figures to within 2 TJ (0.000%), and every node
+      balances exactly. The electricity balance closes as
       production = final consumption + own use + grid losses + net export + heat-plant use + statistical
       difference; derived heat closes as production = final consumption + distribution losses + statistical
       difference.</p>
       <h3>How the numbers were derived</h3>
       <ul>
         <li><b>CHP split</b> — combined heat and power plants report their electricity and heat output
-        separately, so fuel input is divided by those actual output shares (26.6% electricity in 2023,
-        24.5% in 2024) rather than by an assumption.</li>
-        <li><b>Ambient &amp; recovered heat</b> — the balance books 18.9 PJ (2023) of primary heat into CHP and
-        heat-only plants. Swedish heat-only plants deliver more heat than their booked fuel input because the
+        separately, so fuel input is divided by those actual output shares (27.4% electricity in 2014,
+        26.6% in 2023, 24.5% in 2024) rather than by an assumption.</li>
+        <li><b>Ambient &amp; recovered heat</b> — the balance books 18.1 PJ (2014) and 18.9 PJ (2023) of primary
+        heat into CHP and heat-only plants. Swedish heat-only plants deliver more heat than their booked fuel input because the
         ambient heat that heat pumps draw from air, water and sewage is not recorded as a supply item; that
-        implicit ambient heat (4.8 PJ in 2023) is added so the box closes. Unlike Eurostat, the national
+        implicit ambient heat (5.0 PJ in 2014, 4.8 PJ in 2023) is added so the box closes. Unlike Eurostat, the national
         balance does <b>not</b> count ambient heat captured by <i>building</i> heat pumps at all, so no ambient
         heat reaches the final sectors here.</li>
         <li><b>Sectors</b> — Industrial = industry + construction; Commercial &amp; services = commercial,
@@ -217,16 +218,16 @@
       sources alike:</p>
       <table>
         <tr><th>Source</th><th>Input to generation</th><th>Electricity out</th><th>Implied</th></tr>
-        <tr><td>Nuclear (2023 / 2024)</td><td class="num">488,248 / 510,026 TJ</td><td class="num">174,492 / 182,395 TJ</td><td class="num">35.7% / 35.8%</td></tr>
-        <tr><td>Hydro</td><td class="num">237,927 / 232,337 TJ</td><td class="num">237,927 / 232,337 TJ</td><td class="num">100%</td></tr>
-        <tr><td>Wind</td><td class="num">122,669 / 145,508 TJ</td><td class="num">122,669 / 145,508 TJ</td><td class="num">100%</td></tr>
-        <tr><td>Solar</td><td class="num">11,167 / 14,928 TJ</td><td class="num">11,167 / 14,928 TJ</td><td class="num">100%</td></tr>
+        <tr><td>Nuclear (2014 / 2023 / 2024)</td><td class="num">654,330 / 488,248 / 510,026 TJ</td><td class="num">233,556 / 174,492 / 182,395 TJ</td><td class="num">35.7% / 35.7% / 35.8%</td></tr>
+        <tr><td>Hydro</td><td class="num">229,547 / 237,927 / 232,337 TJ</td><td class="num">229,547 / 237,927 / 232,337 TJ</td><td class="num">100%</td></tr>
+        <tr><td>Wind</td><td class="num">40,443 / 122,669 / 145,508 TJ</td><td class="num">40,443 / 122,669 / 145,508 TJ</td><td class="num">100%</td></tr>
+        <tr><td>Solar</td><td class="num">169 / 11,167 / 14,928 TJ</td><td class="num">169 / 11,167 / 14,928 TJ</td><td class="num">100%</td></tr>
       </table>
       <p>Nuclear therefore enters as <b>reactor heat</b>, roughly 2.8× the electricity it yields, while hydro,
       wind and solar enter as generated electricity. <b>Band widths are not comparable across source types</b>,
       and the rejected energy leaving the electricity node is largely a consequence of this convention rather
       than a measure of the relative efficiency of the sources. Japan applies a different convention again
-      (a single 41.8–42.4% factor to <i>all</i> generating sources), so band widths must not be compared
+      (a single 41.8–42.9% factor to <i>all</i> generating sources), so band widths must not be compared
       between the two charts.</p>
       <h3>Relationship to Eurostat</h3>
       <p>Eurostat republishes these Swedish statistics in a harmonised structure. Nuclear electricity is
@@ -267,10 +268,7 @@
     <div class="toolbar">
       <span class="hint"><b>Click any box</b> to trace its flows · hover for values · PNG exports at 4× resolution for print</span>
       <span class="yearsel"><label for="year-jp">Fiscal year</label>
-        <select id="year-jp" onchange="setYear('jp', this.value)">
-          <option value="2023">FY2023</option>
-          <option value="2024" selected>FY2024</option>
-        </select></span>
+        <select id="year-jp" onchange="setYear('jp', this.value)"></select></span>
       <div class="units" role="group" aria-label="Units">
         <button class="unit-btn on" data-unit="PJ" onclick="setUnit('PJ')">PJ</button>
         <button class="unit-btn" data-unit="TWh" onclick="setUnit('TWh')">TWh</button>
@@ -290,22 +288,25 @@
       <ul>
         <li>METI / Agency for Natural Resources and Energy,
         <a href="https://www.enecho.meti.go.jp/statistics/total_energy/results.html" target="_blank" rel="noopener">総合エネルギー統計 — Comprehensive Energy Statistics</a>,
-        FY2023 and FY2024 balance tables (確報, revised), energy-unit sheet, terajoules
-        (<code>stte_2023.xlsx</code>, <code>stte_2024.xlsx</code>).</li>
+        FY2014, FY2023 and FY2024 balance tables (確報, revised), energy-unit sheet, terajoules
+        (<code>stte_2014.xlsx</code>, <code>stte_2023.xlsx</code>, <code>stte_2024.xlsx</code>). METI restates
+        the whole back series on the current methodology, so all three years are on one basis.</li>
         <li>FY2023 press release of 25 April 2025:
         <a href="https://www.meti.go.jp/press/2025/04/20250425004/20250425004.html" target="_blank" rel="noopener">令和5年度エネルギー需給実績（確報）</a>.</li>
         <li>Japanese fiscal years run April–March; FY2024 covers April 2024 – March 2025.</li>
       </ul>
       <h3>Verified totals</h3>
       <table>
-        <tr><th>Quantity</th><th>FY2023</th><th>FY2024</th></tr>
-        <tr><td>Domestic primary energy supply (国内供給)</td><td class="num">17,557,652 TJ</td><td class="num">17,461,344 TJ</td></tr>
-        <tr><td>Final energy consumption</td><td class="num">11,509,459 TJ</td><td class="num">11,280,435 TJ</td></tr>
-        <tr><td>Electricity generated (utility + auto)</td><td class="num">3,565,034 TJ</td><td class="num">3,583,272 TJ</td></tr>
-        <tr><td>Non-energy use</td><td class="num">1,233,909 TJ</td><td class="num">1,126,372 TJ</td></tr>
+        <tr><th>Quantity</th><th>FY2014</th><th>FY2023</th><th>FY2024</th></tr>
+        <tr><td>Domestic primary energy supply (国内供給)</td><td class="num">20,264,195 TJ</td><td class="num">17,557,652 TJ</td><td class="num">17,461,344 TJ</td></tr>
+        <tr><td>Final energy consumption</td><td class="num">13,670,689 TJ</td><td class="num">11,509,459 TJ</td><td class="num">11,280,435 TJ</td></tr>
+        <tr><td>Electricity generated (utility + auto)</td><td class="num">3,855,963 TJ</td><td class="num">3,565,034 TJ</td><td class="num">3,583,272 TJ</td></tr>
+        <tr><td>Non-energy use</td><td class="num">1,586,508 TJ</td><td class="num">1,233,909 TJ</td><td class="num">1,126,372 TJ</td></tr>
       </table>
       <p>The FY2023 figures match METI’s published headline (17,558 PJ supply, 11,509 PJ final consumption).
-      Every conversion box closes exactly in both years.</p>
+      Every conversion box closes exactly in all three years. <b>FY2014 has no nuclear band at all</b>: every
+      Japanese reactor was offline that fiscal year, so the chart shows the energy system as it stood at the
+      bottom of the post-Fukushima shutdown.</p>
       <h3>How the numbers were derived</h3>
       <ul>
         <li><b>Sign convention:</b> in the METI table, transformation rows are negative for fuel consumed
@@ -346,7 +347,8 @@
         <tr><td>Solar PV</td><td class="num">96,458 GWh</td><td class="num">830,836 TJ</td><td class="num">41.80%</td></tr>
         <tr><td>Wind</td><td class="num">10,489 GWh</td><td class="num">90,344 TJ</td><td class="num">41.80%</td></tr>
       </table>
-      <p>The factor is 41.80% in FY2023 and 42.41% in FY2024, applied identically to all four sources.
+      <p>The factor is 42.86% in FY2014, 41.80% in FY2023 and 42.41% in FY2024, applied identically to every
+      generating source present that year.
       Their band widths are therefore <b>mutually comparable</b>, but each is about 2.4× the electricity
       actually generated. Geothermal is the exception, reported directly as heat. Rejected energy leaving
       the electricity node consequently includes this accounting artefact rather than only physical losses.
@@ -409,7 +411,13 @@
    ══════════════════════════════════════════════════════════════════ */
 const DATASETS = __DATA__;
 
-const STATE = { se: 2024, jp: 2024 };
+/* every year present in the data, ascending — the year dropdowns and the
+   comparison table are both built from this, so adding a dataset is enough */
+const YEARS = Array.from(new Set(Object.keys(DATASETS).map(k => parseInt(k.slice(2), 10))))
+                   .sort((a,b) => a-b);
+const LATEST = YEARS[YEARS.length-1];
+
+const STATE = { se: LATEST, jp: LATEST };
 let UNIT = "PJ";
 
 const W = 1560, BASE_H = 900;
@@ -609,35 +617,60 @@ function renderNotes(key){
   el.innerHTML = h;
 }
 
-/* ── year-on-year comparison table ─────────────────────────────── */
+/* ── multi-year comparison table ───────────────────────────────
+   One column per published year, then the change across the whole span.
+   Driven by YEARS, so adding a dataset adds a column with no edits here. */
 function renderYoY(key){
-  const a = DATASETS[key+"2023"], b = DATASETS[key+"2024"];
+  const sets = YEARS.map(y => DATASETS[key+y]).filter(Boolean);
+  if (sets.length < 2){ document.getElementById("yoy-"+key).innerHTML = ""; return; }
   const bands = d => {
-    const m = {};
+    const m = {}, lab = {};
     const ids = new Set(d.nodes.filter(n=>n.col===0).map(n=>n.id));
-    const lab = {};
-    d.nodes.forEach(n => lab[n.id]=n.label);
-    d.flows.forEach(([s,t,v]) => { if (ids.has(s)) m[s]=(m[s]||0)+v; });
-    return {m, lab};
+    d.nodes.forEach(n => lab[n.id] = n.label);
+    d.flows.forEach(([s,t,v]) => { if (ids.has(s)) m[s] = (m[s]||0)+v; });
+    return {m, lab, year: d.year, yearLabel: d.yearLabel};
   };
-  const A = bands(a), B = bands(b);
-  const keys = Array.from(new Set(Object.keys(A.m).concat(Object.keys(B.m))))
-    .sort((x,y) => (B.m[y]||0)-(B.m[x]||0));
+  const B = sets.map(bands);
+  const first = B[0], last = B[B.length-1];
+  const lab = {};
+  B.forEach(b => Object.assign(lab, b.lab));
+  const keys = Array.from(new Set([].concat.apply([], B.map(b => Object.keys(b.m)))))
+    .sort((x,y) => (last.m[y]||0) - (last.m[x]||0));
   const cur = STATE[key];
-  let html = `<h3>Change from ${a.yearLabel} to ${b.yearLabel} — primary supply by source`
-           + `<span style="text-transform:none;letter-spacing:0;font-weight:400"> (currently showing ${cur===2023?a.yearLabel:b.yearLabel})</span></h3>`;
-  html += `<table><tr><th>Source</th><th style="text-align:right">${a.yearLabel}</th><th style="text-align:right">${b.yearLabel}</th><th style="text-align:right">Change</th></tr>`;
+
+  // percentage change, guarding the cases where the band did not exist in the base year
+  const change = (x, y) => {
+    if (!x && !y) return {txt: "—", cls: ""};
+    if (!x) return {txt: "from zero", cls: "up"};   // e.g. Japanese nuclear, offline throughout FY2014
+    if (!y) return {txt: "to zero", cls: "down"};
+    // a tenfold rise reads better as a multiple than as a four-digit percentage
+    if (y/x >= 10) return {txt: "×" + (y/x).toFixed(y/x >= 100 ? 0 : 0), cls: "up"};
+    const d = (y-x)/x*100;
+    const s = d >= 0 ? "+" : "−";
+    return {txt: s + (Math.abs(d) >= 100 ? Math.abs(d).toFixed(0) : Math.abs(d).toFixed(1)) + "%",
+            cls: d > 0 ? "up" : "down"};
+  };
+
+  let html = `<h3>Primary supply by source, ${first.yearLabel} to ${last.yearLabel}`
+           + `<span style="text-transform:none;letter-spacing:0;font-weight:400"> (chart is showing `
+           + `${(B.find(b => b.year === cur) || last).yearLabel})</span></h3>`;
+  html += `<table><tr><th>Source</th>`
+       +  B.map(b => `<th class="num${b.year===cur?" cur":""}">${b.yearLabel}</th>`).join("")
+       +  `<th class="num">${first.yearLabel} → ${last.yearLabel}</th></tr>`;
   keys.forEach(k => {
-    const x = A.m[k]||0, y = B.m[k]||0, dpc = x ? (y-x)/x*100 : 0;
-    const cls = (y-x) > 0 ? "up" : "down";
-    const sign = (y-x) >= 0 ? "+" : "−";
-    html += `<tr><td>${esc(B.lab[k]||A.lab[k]||k)}</td><td class="num">${fmtV(x)}</td><td class="num">${fmtV(y)}</td>`
-         +  `<td class="num ${cls}">${sign}${Math.abs(dpc).toFixed(1)}%</td></tr>`;
+    const c = change(first.m[k]||0, last.m[k]||0);
+    html += `<tr><td>${esc(lab[k]||k)}</td>`
+         +  B.map(b => `<td class="num${b.year===cur?" cur":""}">${fmtV(b.m[k]||0)}</td>`).join("")
+         +  `<td class="num ${c.cls}">${c.txt}</td></tr>`;
   });
-  const ta = Object.values(A.m).reduce((s,v)=>s+v,0), tb = Object.values(B.m).reduce((s,v)=>s+v,0);
-  html += `<tr><td><b>Total</b></td><td class="num"><b>${fmtV(ta)}</b></td><td class="num"><b>${fmtV(tb)}</b></td>`
-       +  `<td class="num"><b>${tb>=ta?"+":"−"}${Math.abs((tb-ta)/ta*100).toFixed(1)}%</b></td></tr></table>`;
-  html += `<p style="font-size:12px;color:#5a636e;margin-top:8px">Values in ${UNIT}.</p>`;
+  const tot = b => Object.values(b.m).reduce((s,v)=>s+v, 0);
+  const ct = change(tot(first), tot(last));
+  html += `<tr><td><b>Total</b></td>`
+       +  B.map(b => `<td class="num${b.year===cur?" cur":""}"><b>${fmtV(tot(b))}</b></td>`).join("")
+       +  `<td class="num"><b>${ct.txt}</b></td></tr></table>`;
+  html += `<p style="font-size:12px;color:#5a636e;margin-top:8px">Values in ${UNIT}. `
+       +  `Each year is derived from that year's own national balance by the same script, so the columns are `
+       +  `directly comparable within a country — but not between the two countries (see the notes above).</p>`;
   document.getElementById("yoy-"+key).innerHTML = html;
 }
 
@@ -811,6 +844,17 @@ window.addEventListener("keydown", e => {
   if (e.key === "Escape") ["se","jp"].forEach(k => setFocus(k, null));
 });
 
+function fillYearSelects(){
+  ["se","jp"].forEach(k => {
+    document.getElementById("year-"+k).innerHTML = YEARS.map(y => {
+      const d = DATASETS[k+y];
+      if (!d) return "";
+      return `<option value="${y}"${y===STATE[k]?" selected":""}>${d.yearLabel}</option>`;
+    }).join("");
+  });
+}
+
+fillYearSelects();
 render("se");
 render("jp");
 </script>
