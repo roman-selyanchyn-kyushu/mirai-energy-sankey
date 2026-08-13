@@ -43,6 +43,8 @@
   .v.supported{background:#e6f3ea;color:#276a3c}
   .v.revised{background:#fdf3e0;color:#8a6216}
   .v.unsupported{background:#fbeaea;color:#973030}
+  .v.panel{background:#eaf1f5;color:#215c73}
+  .blocknote{font-size:13px;color:var(--ink-soft);margin:4px 0;max-width:940px}
   .verdict{display:flex;gap:12px;align-items:flex-start;margin:14px 0 2px}
   .verdict p{font-size:14px;margin:0}
   h3.sec{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);
@@ -196,6 +198,57 @@ function figure(ch, id){
   return p.join("");
 }
 
+/* ── paired dot plot: one row per metric, two dots joined, ratio at the right.
+   Each row is scaled to its own maximum because the metrics carry different
+   units; the printed values, not the dot positions, are what should be quoted. */
+const SE_C = "#0f6f8e", JP_C = "#c2562f";
+const DP = {W: 1000, ML: 268, MR: 104, MT: 30, RH: 30, PAD: 16};
+
+function dotplot(blocks, id){
+  const rows = [];
+  blocks.forEach(b => { rows.push({head: b.title, note: b.note}); b.metrics.forEach(m => rows.push({m})); });
+  const {W:CW, ML, MR, MT, RH, PAD} = DP;
+  const pw = CW-ML-MR;
+  let y = MT, H = MT;
+  rows.forEach(r => H += r.head ? RH+10 : RH);
+  H += PAD;
+
+  const p = [`<svg class="fig" id="${id}" viewBox="0 0 ${CW} ${H}" width="${CW}" height="${H}" xmlns="http://www.w3.org/2000/svg" font-family='"Helvetica Neue", Helvetica, Arial, sans-serif'>`];
+  p.push(`<rect x="0" y="0" width="${CW}" height="${H}" fill="#ffffff"/>`);
+  p.push(`<circle cx="${ML}" cy="14" r="5" fill="${SE_C}"/><text x="${ML+11}" y="18" font-size="11.5" font-weight="600" fill="#1d232a">Sweden</text>`);
+  p.push(`<circle cx="${ML+82}" cy="14" r="5" fill="${JP_C}"/><text x="${ML+93}" y="18" font-size="11.5" font-weight="600" fill="#1d232a">Japan</text>`);
+  p.push(`<text x="${CW-8}" y="18" font-size="10.5" font-weight="700" letter-spacing="1" fill="#9aa0a8" text-anchor="end">SE / JP</text>`);
+
+  rows.forEach(r => {
+    if (r.head){
+      y += 10;
+      p.push(`<text x="6" y="${y+14}" font-size="10.5" font-weight="700" letter-spacing="1" fill="#9aa0a8">${esc(r.head.toUpperCase())}</text>`);
+      p.push(`<line x1="6" y1="${y+21}" x2="${CW-6}" y2="${y+21}" stroke="#e8e5dc" stroke-width="1"/>`);
+      y += RH;
+      return;
+    }
+    const m = r.m, cy = y + RH/2;
+    const max = Math.max(m.se, m.jp) * 1.06 || 1;
+    const X = v => ML + pw*(v/max);
+    p.push(`<text x="${ML-12}" y="${cy+4}" font-size="12.5" fill="#1d232a" text-anchor="end">${esc(m.label)}`
+         + `<tspan fill="#9aa0a8" font-size="11"> ${esc(m.unit)}</tspan></text>`);
+    p.push(`<line x1="${ML}" y1="${cy}" x2="${ML+pw}" y2="${cy}" stroke="#f0eee7" stroke-width="1"/>`);
+    p.push(`<line x1="${X(Math.min(m.se,m.jp)).toFixed(1)}" y1="${cy}" x2="${X(Math.max(m.se,m.jp)).toFixed(1)}" y2="${cy}" stroke="#c9c5ba" stroke-width="2.2"/>`);
+    [[m.jp, JP_C], [m.se, SE_C]].forEach(([v, c]) =>
+      p.push(`<circle cx="${X(v).toFixed(1)}" cy="${cy}" r="6" fill="${c}" stroke="#fff" stroke-width="1.6"/>`));
+    // value labels: the higher one outside its dot, the lower one on the far side.
+    // Decimals are chosen from the row, so a pair is never formatted 128 against 91.12.
+    const dp = max >= 100 ? 0 : max >= 10 ? 1 : 2;
+    const put = (v, c, side) => p.push(`<text x="${(X(v) + side*11).toFixed(1)}" y="${cy+4}" font-size="11.5" font-weight="700" fill="${c}" text-anchor="${side>0?"start":"end"}" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">${fmt(v, dp)}</text>`);
+    if (m.se >= m.jp){ put(m.se, SE_C, 1); put(m.jp, JP_C, -1); }
+    else { put(m.jp, JP_C, 1); put(m.se, SE_C, -1); }
+    p.push(`<text x="${CW-8}" y="${cy+4}" font-size="12" font-weight="700" fill="#5a636e" text-anchor="end">${m.ratio ? "×"+fmt(m.ratio,2) : "—"}</text>`);
+    y += RH;
+  });
+  p.push(`</svg>`);
+  return p.join("");
+}
+
 /* ── cards ── */
 function tableHTML(t, series){
   const colorOf = l => {
@@ -217,7 +270,58 @@ function tableHTML(t, series){
   return h + `</table>`;
 }
 
+function panelCard(c){
+  const figId = `fig-${c.id}`;
+  const blocks = c.panel.blocks;
+  return `<section class="claim" id="${esc(c.id)}"><div class="body">
+    <h2><span class="num">${c.number}.</span>${esc(c.title)}</h2>
+    <p style="font-size:14px;margin:10px 0 4px">${esc(c.lead)}</p>
+
+    <h3 class="sec">Comparison</h3>
+    <div class="figbar"><span class="cap">Each row is scaled to its own maximum — the printed values, not the dot positions, are the comparable quantities.</span>
+      <button data-fig="${figId}" data-name="${esc(c.id)}" data-fmt="png">PNG</button>
+      <button data-fig="${figId}" data-name="${esc(c.id)}" data-fmt="svg">SVG</button></div>
+    <div class="chartwrap">${dotplot(blocks, figId)}</div>
+    ${blocks.map(b => b.note ? `<p class="blocknote"><b>${esc(b.title)}.</b> ${esc(b.note)}</p>` : "").join("")}
+
+    ${blocks.map(b => `<table><caption>${esc(b.title)}</caption>
+      <tr><th>Metric</th><th class="num">Sweden</th><th class="num">Japan</th><th class="num">SE / JP</th><th>Unit</th></tr>
+      ${b.metrics.map(m => { const dp = Math.max(m.se, m.jp) >= 100 ? 0 : 2; return `<tr><td>${esc(m.label)}</td>
+        <td class="num">${fmt(m.se, dp)}</td><td class="num">${fmt(m.jp, dp)}</td>
+        <td class="num">${m.ratio ? "×"+fmt(m.ratio,2) : "—"}</td><td>${esc(m.unit)}</td></tr>`; }).join("")}
+      </table>`).join("")}
+
+    <h3 class="sec">The harmonisation, step by step</h3>
+    <p style="font-size:13.5px;margin-bottom:6px">Each line is one adjustment to primary energy supply, in PJ,
+    so the restated totals can be checked rather than taken on trust.</p>
+    <table><tr><th>Adjustment</th><th class="num">PJ</th></tr>
+      ${c.steps.map(s => `<tr><td>${esc(s.what)}</td><td class="num">${s.delta>0?"+":"−"}${fmt(Math.abs(s.delta),1)}</td></tr>`).join("")}
+    </table>
+
+    <h3 class="sec">Population used</h3>
+    <table><tr><th>Country</th><th class="num">Population</th><th>Basis</th></tr>
+      ${["se","jp"].map(k => `<tr><td>${k==="se"?"Sweden":"Japan"}</td>
+        <td class="num">${c.population[k].value.toLocaleString("en-US")}</td>
+        <td>${esc(c.population[k].basis)}</td></tr>`).join("")}
+    </table>
+
+    <h3 class="sec">How this was derived</h3>
+    <ul class="pts">${c.derivation.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
+
+    <h3 class="sec">Caveats</h3>
+    <ul class="pts">${c.caveats.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
+
+    <h3 class="sec">Sources</h3>
+    ${c.sources.map(s => `<div class="cite"><b>${esc(s.author)} (${esc(s.year)}). ${esc(s.title)}.</b>
+      <div class="d">${esc(s.detail)}</div>
+      <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>`).join("")}
+
+    <p class="permalink">Cite this card: <code>evidence.html#${esc(c.id)}</code></p>
+  </div></section>`;
+}
+
 function card(c){
+  if (c.kind === "panel") return panelCard(c);
   const figId = `fig-${c.id}`;
   return `<section class="claim" id="${esc(c.id)}"><div class="body">
     <h2><span class="num">${c.number}.</span>${esc(c.title)}</h2>
@@ -255,8 +359,8 @@ function card(c){
 }
 
 document.getElementById("claims").innerHTML = CLAIMS.map(card).join("");
-document.getElementById("toc").innerHTML = "<h2>Claims tested</h2><ol>"
-  + CLAIMS.map(c => `<li><span class="v ${c.verdict}">${VERDICT[c.verdict]}</span>`
+document.getElementById("toc").innerHTML = "<h2>Contents</h2><ol>"
+  + CLAIMS.map(c => `<li><span class="v ${c.verdict || "panel"}">${c.verdict ? VERDICT[c.verdict] : "Comparison"}</span>`
     + `<a href="#${esc(c.id)}">${c.number}. ${esc(c.title)}</a></li>`).join("") + "</ol>";
 
 /* ── tooltips ── */

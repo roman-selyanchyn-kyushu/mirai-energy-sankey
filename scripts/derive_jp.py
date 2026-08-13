@@ -87,6 +87,24 @@ def primary_equivalent_factor(year):
     return (gwh * 3.6) / primary if primary else None
 
 
+def natural_units(year):
+    """Row #190000 of the 固有単位表 sheet, keyed by column code.
+
+    For the generating sources the value is GWh; for sources reported directly as
+    heat (solar thermal, geothermal) it is TJ, the same as the energy-unit table.
+    """
+    wb = load_workbook(os.path.join(SOURCES, f"stte_{year}.xlsx"), read_only=True, data_only=True)
+    rows = list(wb["固有単位表"].iter_rows(values_only=True))
+    wb.close()
+    col = {str(c).strip(): j for j, c in enumerate(rows[0])
+           if c and str(c).strip().startswith("$")}
+    for r in rows:
+        if r[0] and str(r[0]).strip() == "#190000":
+            return {k: (float(r[j]) if isinstance(r[j], (int, float)) else 0.0)
+                    for k, j in col.items()}
+    raise KeyError("#190000 not found in 固有単位表")
+
+
 def read_table(year):
     wb = load_workbook(os.path.join(SOURCES, f"stte_{year}.xlsx"), read_only=True, data_only=True)
     ws = wb["ｴﾈﾙｷﾞｰ単位表（本表）"]

@@ -200,9 +200,204 @@ def main():
         json.dump(out, fh, ensure_ascii=False, indent=1)
     print(f"wrote {path}  ({len(out)} claim{'s' if len(out)!=1 else ''})")
     for c in out:
-        n = len(c["chart"]["years"])
-        print(f"  {c['number']}. {c['id']:24} verdict={c['verdict']:11} "
-              f"{n} years, {len(c['chart']['series'])} series, {len(c['sources'])} sources")
+        if c.get("kind") == "panel":
+            m = sum(len(b["metrics"]) for b in c["panel"]["blocks"])
+            print(f"  {c['number']}. {c['id']:24} panel        "
+                  f"{len(c['panel']['blocks'])} blocks, {m} metrics, {len(c['sources'])} sources")
+        else:
+            n = len(c["chart"]["years"])
+            print(f"  {c['number']}. {c['id']:24} verdict={c['verdict']:11} "
+                  f"{n} years, {len(c['chart']['series'])} series, {len(c['sources'])} sources")
+
+
+
+
+# ── per-capita comparison panel ────────────────────────────────────────────
+# Sweden and Japan book primary energy differently, so a naive per-capita
+# comparison of primary supply or fossil share is an artefact of accounting.
+# The panel therefore separates metrics that need no adjustment from two that
+# are restated onto one convention, with every adjustment shown as its own step.
+
+NCV_GCV = {"coal": 0.95, "oil": 0.95, "gas": 0.90}   # IEA/Eurostat net-to-gross ratios
+NUCLEAR_EFF = 0.33                                    # IEA convention, applied to both countries
+
+
+def _pop():
+    return json.load(open(os.path.join(SOURCES, "population.json")))
+
+
+def _ds():
+    return json.load(open(os.path.join(HERE, "datasets.json")))
+
+
+def build_se_jp_percapita():
+    import derive_se, derive_jp
+    D, POP = _ds(), _pop()
+    YEAR = 2024
+    pse = POP["se"][str(YEAR)]["value"]
+    pjp = POP["jp"][str(YEAR)]["value"]
+    SEC = ("res", "com", "ind", "tpt")
+
+    def parts(key):
+        d = D[key]
+        ids = {n["id"] for n in d["nodes"] if n["col"] == 0}
+        band, inn, out = {}, {}, {}
+        for s, t, v in d["flows"]:
+            out[s] = out.get(s, 0) + v
+            inn[t] = inn.get(t, 0) + v
+            if s in ids:
+                band[s] = band.get(s, 0) + v
+        return d, band, inn, out
+
+    se, seB, seI, seO = parts(f"se{YEAR}")
+    jp, jpB, jpI, jpO = parts(f"jp{YEAR}")
+    carrier = lambda d, c: sum(v for s, t, v in d["flows"] if s == c and t in SEC)
+    gen = lambda d, O: O.get("elec", 0) - sum(v for s, t, v in d["flows"] if s == "elec" and t == "rej")
+    TJ_MWH = 1e6/3600
+
+    # ── trade, for self-sufficiency ──
+    T = derive_se.load(YEAR)
+    g = lambda r: (T.get((r, "Total")) or 0)
+    val = derive_jp.read_table(YEAR)
+    se_ss = g("1.1 Indigenous production")/g("1. Total supply")*100
+    jp_ss = val("#110000", "$1400")/val("#190000", "$1400")*100
+
+    # ── harmonisation: put both on the physical energy content method ──
+    ng = derive_jp.natural_units(YEAR)          # GWh by source, from METI's own sheet
+    e = lambda c: ng[c]*3.6                     # GWh -> TJ of electricity
+    jp_h = {
+        "nuclear": e("$1100")/NUCLEAR_EFF,      # substitution -> reactor heat
+        "hydro":   e("$0800"),                  # substitution -> generated electricity
+        "wind":    e("$N120"),
+        "solar":   e("$N111") + val("#190000", "$N112"),   # PV as electricity, solar heat as heat
+        "geo":     jpB.get("geo", 0),           # already reported as heat
+        "bio":     jpB.get("bio", 0),
+        "wst":     jpB.get("wst", 0) - val("#190000", "$N250"),   # drop recovered energy
+        "coal":    jpB.get("coal", 0)*NCV_GCV["coal"],            # gross -> net calorific value
+        "oil":     jpB.get("oil", 0)*NCV_GCV["oil"],
+        "gas":     jpB.get("gas", 0)*NCV_GCV["gas"],
+    }
+    se_nuc_elec = D[f"se{YEAR}"]["meta"]["nuclear_electricity_TJ"]
+    se_h = dict(seB)
+    se_h["nuclear"] = se_nuc_elec/NUCLEAR_EFF   # restate from actual 35.8% onto the same 33%
+
+    FOSSIL = ("coal", "gas", "oil")
+    fos = lambda b: sum(b.get(f, 0) for f in FOSSIL)
+
+    def M(label, a, b, unit, note=""):
+        return {"label": label, "se": round(a, 2), "jp": round(b, 2), "unit": unit,
+                "ratio": round(a/b, 2) if b else None, "note": note}
+
+    block_a = [
+        M("Electricity used", carrier(se, "elec")*TJ_MWH/pse, carrier(jp, "elec")*TJ_MWH/pjp, "MWh/person"),
+        M("Electricity generated", gen(se, seO)*TJ_MWH/pse, gen(jp, jpO)*TJ_MWH/pjp, "MWh/person"),
+        M("District heat used", carrier(se, "heat")*1000/pse, carrier(jp, "heat")*1000/pjp, "GJ/person"),
+        M("Final energy consumption", sum(seI.get(x, 0) for x in SEC+("ne",))*1000/pse,
+          sum(jpI.get(x, 0) for x in SEC+("ne",))*1000/pjp, "GJ/person"),
+        M("Non-energy use (feedstocks)", seI.get("ne", 0)*1000/pse, jpI.get("ne", 0)*1000/pjp, "GJ/person"),
+        M("Energy self-sufficiency", se_ss, jp_ss, "%",
+          "Both balances count nuclear as domestic production although uranium is imported."),
+    ]
+    block_b = [
+        M("Primary energy supply", sum(se_h.values())*1000/pse, sum(jp_h.values())*1000/pjp, "GJ/person"),
+        M("Fossil share of primary supply", fos(se_h)/sum(se_h.values())*100,
+          fos(jp_h)/sum(jp_h.values())*100, "%"),
+    ]
+
+    sector = [{"label": {"res": "Residential", "com": "Commercial & services",
+                         "ind": "Industrial", "tpt": "Transport"}[s],
+               "se": round(seI.get(s, 0)/sum(seI.get(x, 0) for x in SEC)*100, 1),
+               "jp": round(jpI.get(s, 0)/sum(jpI.get(x, 0) for x in SEC)*100, 1),
+               "unit": "%", "ratio": None} for s in SEC]
+
+    steps = [
+        {"what": "Japan: hydro, wind and solar PV from substitution equivalent to generated electricity",
+         "delta": round((e("$0800")+e("$N120")+e("$N111")
+                         - (jpB.get("hydro", 0)+jpB.get("wind", 0)+jpB.get("solar", 0)-val("#190000", "$N112")))/1000, 1)},
+        {"what": f"Japan: nuclear from substitution equivalent to reactor heat at {NUCLEAR_EFF:.0%}",
+         "delta": round((jp_h["nuclear"]-jpB.get("nuclear", 0))/1000, 1)},
+        {"what": "Japan: fossil fuels from gross to net calorific value "
+                 f"(coal ×{NCV_GCV['coal']}, oil ×{NCV_GCV['oil']}, gas ×{NCV_GCV['gas']})",
+         "delta": round((fos(jp_h)-fos(jpB))/1000, 1)},
+        {"what": "Japan: recovered industrial steam and electricity removed, which Sweden does not book",
+         "delta": round(-val("#190000", "$N250")/1000, 1)},
+        {"what": f"Sweden: nuclear restated from its actual {se_nuc_elec/seB['nuclear']*100:.1f}% "
+                 f"reactor efficiency onto the same {NUCLEAR_EFF:.0%}",
+         "delta": round((se_h["nuclear"]-seB["nuclear"])/1000, 1)},
+    ]
+
+    return {
+        "id": "se-jp-percapita",
+        "kind": "panel",
+        "title": f"Sweden and Japan per person, {YEAR}",
+        "claim": "The two energy systems differ structurally, not just in scale.",
+        "verdict": None,
+        "lead": (
+            f"Normalised by population — Sweden {pse:,} and Japan {pjp:,} — the two systems separate on "
+            f"electricity and heat rather than on total energy. The first block needs no adjustment: every "
+            f"metric is measured energy, unaffected by how the two countries book primary energy. The "
+            f"second block does, and the adjustment is shown rather than assumed."),
+        "panel": {"blocks": [
+            {"title": "Directly comparable — no adjustment needed", "metrics": block_a,
+             "note": "These are measured quantities: delivered energy, generated electricity, and trade. "
+                     "The primary-energy convention that makes the two Sankeys incomparable does not touch them."},
+            {"title": "Harmonised onto one convention", "metrics": block_b,
+             "note": "Both countries restated onto the physical energy content method: renewable electricity "
+                     "counted 1:1, nuclear as reactor heat at a single efficiency, fossil fuels at net "
+                     "calorific value."},
+            {"title": "Sector split of final energy use", "metrics": sector,
+             "note": "Share of final energy consumption excluding non-energy use."},
+        ]},
+        "steps": steps,
+        "population": {"se": POP["se"][str(YEAR)], "jp": POP["jp"][str(YEAR)]},
+        "derivation": [
+            "Energy figures come from the same derivation that produces the Sankey diagrams, so the panel "
+            "and the charts cannot disagree.",
+            "Population is put on a mid-period basis in both countries so the denominator matches the "
+            "energy year: Sweden the mean of the bracketing year-ends, Japan the 1 October estimate that "
+            "sits inside the April–March fiscal year.",
+            f"Harmonisation applies the physical energy content method to both countries: renewable "
+            f"electricity at 1:1, nuclear as reactor heat at {NUCLEAR_EFF:.0%}, and Japanese fossil fuels "
+            f"converted from gross to net calorific value.",
+        ],
+        "caveats": [
+            f"The net-to-gross calorific ratios (coal {NCV_GCV['coal']}, oil {NCV_GCV['oil']}, gas "
+            f"{NCV_GCV['gas']}) are the standard IEA/Eurostat values, not METI's own published table, "
+            "which sits behind an access restriction. They agree with the ratios implied by the IEA "
+            "reconciliation in the project README to within about one percentage point.",
+            f"Nuclear is put at {NUCLEAR_EFF:.0%} for both countries so the comparison is internally "
+            f"consistent. Sweden's balance reports an actual {se_nuc_elec/seB['nuclear']*100:.1f}%; using "
+            f"that instead would lower Swedish primary supply by "
+            f"{abs((se_h['nuclear']-seB['nuclear'])*1000/pse):.1f} GJ/person.",
+            "Japanese biomass is also booked at gross calorific value, but no reliable net ratio was "
+            "available for it, so it is left unadjusted. It is 2.8% of Japanese supply, so the effect on "
+            "the totals is under half a percent.",
+            "Sweden is a large net electricity exporter, which is why generated electricity per person "
+            "exceeds electricity used by more than it does in Japan.",
+        ],
+        "sources": [
+            {"author": "SCB (Statistics Sweden)", "year": "2026",
+             "title": "Population by region, age, marital status and sex",
+             "detail": POP["se"][str(YEAR)]["basis"] + ". Table BE0101, retrieved through the PxWeb API.",
+             "url": POP["se"][str(YEAR)]["url"]},
+            {"author": "Statistics Bureau of Japan", "year": "2025",
+             "title": "人口推計 (Population Estimates), 2024",
+             "detail": POP["jp"][str(YEAR)]["basis"] + ". Table 1, total population.",
+             "url": POP["jp"][str(YEAR)]["url"]},
+            {"author": "Energimyndigheten (Swedish Energy Agency)", "year": "2026",
+             "title": "Annual energy balance EN0202_A, calendar year 2024",
+             "detail": "The same extraction that produces the Swedish Sankey diagram.",
+             "url": "https://pxexternal.energimyndigheten.se/pxweb/en/Energimyndighetens_statistikdatabas/"},
+            {"author": "METI / Agency for Natural Resources and Energy", "year": "2026",
+             "title": "総合エネルギー統計 Comprehensive Energy Statistics, FY2024 (確報)",
+             "detail": "The same extraction that produces the Japanese Sankey diagram, plus the "
+                       "natural-units sheet for generation in GWh.",
+             "url": "https://www.enecho.meti.go.jp/statistics/total_energy/results.html"},
+        ],
+    }
+
+
+CLAIMS.append(build_se_jp_percapita)
 
 
 if __name__ == "__main__":
