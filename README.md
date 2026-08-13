@@ -10,8 +10,8 @@ Created for the **MIRAI Research Group · Kyushu University**.
 
 | File | What it is |
 |---|---|
-| `energy_sankey.html` | **Main deliverable.** All 55 datasets, country tabs + year dropdown, PJ/TWh switch, hi-res PNG and SVG export. Self-contained, no external dependencies. |
-| `energy_sankey_data.xlsx` | All numbers for all 55 datasets (3,171 flows), with the full derivation trail and balance checks. |
+| `energy_sankey.html` | **Main deliverable.** All 55 datasets, country tabs + year dropdown, trend chart, click-to-trace, PJ/TWh switch, hi-res PNG and SVG export. Self-contained, no external dependencies. |
+| `energy_sankey_data.xlsx` | All numbers for all 55 datasets (3,170 flows), with the full derivation trail and balance checks. |
 | `scripts/` | The extraction and build pipeline — the authoritative record of how every number was produced. `derive_se.py` reads the Swedish PxWeb API, `derive_jp.py` the METI workbook. |
 | `energy_sankey_2023.html` | Frozen 2023-only earlier version, kept so existing links and citations stay valid. |
 
@@ -28,7 +28,7 @@ Both countries are drawn from their **national primary source**. All Japanese ye
 (final/revised) release, and METI restates the whole back series on the current methodology, so all 35
 fiscal years sit on one basis.
 
-Raw source files (23 MB of spreadsheets and API dumps) live in `sources/`, which is gitignored. The
+Raw source files (~67 MB of spreadsheets and API dumps) live in `sources/`, which is gitignored. The
 pipeline discovers available years by globbing that folder, so adding a year is just dropping its file in
 and re-running the build — no code change.
 
@@ -79,14 +79,22 @@ Charts published before August 2026 used the Eurostat figures and therefore diff
 
 ### Reproducing the raw pulls
 
-Sweden — PxWeb POST query against table `EN0202_A`. The `År` value is an **index, not the year**:
-0 = 2005 … 9 = 2014 … 18 = 2023, 19 = 2024. Unit 3 = TJ. Example for 2024:
+Both fetchers are scripted and skip anything already in `sources/`, so they are safe to re-run:
+
+```bash
+python3 scripts/fetch_se.py          # all Swedish years, ~30 s
+python3 scripts/fetch_jp.py 1990 2024  # all Japanese years — slow, see the WAF note above
+```
+
+Underneath, Sweden is a PxWeb POST query against table `EN0202_A`. The `År` value is an **index, not the
+year**: 0 = 2005 … 9 = 2014 … 18 = 2023, 19 = 2024. Unit 3 = TJ. Example for 2024:
 
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"query":[{"code":"År","selection":{"filter":"item","values":["19"]}},{"code":"Enhet","selection":{"filter":"item","values":["3"]}}],"response":{"format":"json-stat2"}}' "https://pxexternal.energimyndigheten.se/api/v1/en/Energimyndighetens_statistikdatabas/Officiell_energistatistik/Arlig_energibalans/Balanser/EN0202_A.px"
 ```
 
-Japan (the site requires a browser user-agent and referer):
+Japan needs a browser user-agent and referer, and even then only a few files in a row succeed before the
+WAF starts challenging (above):
 
 ```bash
 curl -L -A "Mozilla/5.0" -e "https://www.enecho.meti.go.jp/statistics/total_energy/results.html" -o stte_2024.xlsx "https://www.enecho.meti.go.jp/statistics/total_energy/xls/stte_2024.xlsx"
@@ -118,10 +126,11 @@ double-counted — `1. Biofuels` already contains solid biofuels, bioliquids, bi
 waste. Transformation input rows are positive for fuel consumed, output rows negative for energy produced.
 
 - **CHP split** — combined heat and power plants report electricity and heat output separately, so their
-  fuel input is divided by the plants' *actual* output shares each year (27.4% electricity in 2014, 26.6%
-  in 2023, 24.5% in 2024) rather than by an assumption. This is more direct than the Eurostat-based approach it replaced.
-- **Ambient & recovered heat** — the balance books 18.1 PJ (2014) and 18.9 PJ (2023) of primary heat into CHP and heat-only
-  plants. Swedish heat-only plants deliver *more* heat than their booked fuel input, because the ambient
+  fuel input is divided by the plants' *actual* output shares, recomputed for each of the 20 years
+  (e.g. 27.4% electricity in 2014, 26.6% in 2023, 24.5% in 2024) rather than by an assumption. This is more direct than the Eurostat-based approach it replaced.
+- **Ambient & recovered heat** — the balance books primary heat into CHP and heat-only plants each year
+  (18.1 PJ in 2014, 18.9 PJ in 2023). Swedish heat-only
+  plants deliver *more* heat than their booked fuel input, because the ambient
   heat drawn by heat pumps from air, water and sewage is not recorded as a supply item; that implicit
   ambient heat (5.0 PJ in 2014, 4.8 PJ in 2023) is added so the box closes. Unlike Eurostat, the national balance does
   **not** count ambient heat captured by *building* heat pumps at all, so none reaches the final sectors.
@@ -134,8 +143,8 @@ waste. Transformation input rows are positive for fuel consumed, output rows neg
 - **Net electricity export** is exports − imports (102,650 TJ in 2023), *not* gross inland consumption,
   which folds in the 11,052 TJ electricity statistical difference — that is routed to own use & losses.
 
-Both conversion boxes reconcile to the Agency's published production figures to within 2 TJ (0.000%):
-gross electricity 597,188 TJ and derived heat 220,352 TJ in 2023.
+Both conversion boxes reconcile to the Agency's published production figures to within 2 TJ (0.000%) in
+every one of the 20 years; for 2023, gross electricity 597,188 TJ and derived heat 220,352 TJ.
 
 ### 2.2 Japan — aggregated bands and city gas
 
@@ -191,11 +200,11 @@ So the nuclear band is ~2.8× the electricity it yields while the renewable band
 therefore not comparable across source types within the Swedish chart**, and the rejected energy leaving the
 electricity node reflects this convention rather than the relative efficiency of the sources.
 
-**Japan — METI substitution method.** The reference efficiency is recovered from each year's own
-natural-units sheet rather than assumed, and it drifts across the series: 38.66% (FY1990), 40.56% (FY2000),
-42.14% (FY2010), 42.86% (FY2014), 42.41% (FY2024). Within any one year, every generating source is
-converted at that *single* reference
-efficiency, recovered from METI's own natural-units sheet (GWh × 3.6 ÷ primary energy booked):
+**Japan — METI substitution method.** Within any one year every generating source is converted at a
+*single* reference efficiency, recovered from METI's own natural-units sheet (GWh × 3.6 ÷ primary energy
+booked) rather than assumed. It is **not constant across the series** — it drifts from 38.66% (FY1990)
+through 40.56% (FY2000), 42.14% (FY2010) and 42.86% (FY2014) to 42.41% (FY2024) — so each year is read
+from its own sheet. For FY2023:
 
 | Source | Generated FY2023 | Primary booked | Implied factor |
 |---|---|---|---|
@@ -204,27 +213,33 @@ efficiency, recovered from METI's own natural-units sheet (GWh × 3.6 ÷ primary
 | Solar PV | 96,458 GWh | 830,836 TJ | 41.80% |
 | Wind | 10,489 GWh | 90,344 TJ | 41.80% |
 
-The factor is 41.80% in FY2023 and 42.41% in FY2024, applied identically to all four. Japan's bands are
-therefore **mutually comparable with each other** — unlike Sweden's — but each is about 2.4× the electricity
-actually generated. Geothermal is the exception, reported directly as heat.
+All four take the same factor, so Japan's bands are **mutually comparable with each other** — unlike
+Sweden's — but each is **2.4–2.6× the electricity actually generated**, depending on the year
+(2.59× in FY1990, 2.36× in FY2024). Geothermal is the exception, reported directly as heat.
 
 > **Consequence for the manuscript:** a given amount of wind or solar electricity appears at 1.0× on the
-> Swedish chart and about 2.4× on the Japanese one. Never compare band widths, totals or shares between the
-> two charts without adjustment.
+> Swedish chart and 2.4–2.6× on the Japanese one, depending on the year. Never compare band widths,
+> totals or shares between the two charts without adjustment.
 
 ### 2.4 Biomass and waste scope — also not comparable
 
-The biomass bands (Sweden 533 PJ, Japan 502 PJ in 2023) look similar but count different things.
-Flagged on both charts as footnote ‡.
+The biomass bands look similar in size but count different things. Flagged on both charts as footnote ‡.
 
-**Sweden** — the national balance *splits municipal waste* into a biogenic and a fossil half:
+**Mind the basis.** METI's supply row and the width actually drawn differ, because a Japanese band's
+throughput nets intra-band manufacture and stock change (section 2.2). For FY2023 biomass that is
+502.1 PJ supplied vs **481.6 PJ drawn**; for waste, 555.1 PJ supplied vs **550.9 PJ drawn**. Everything
+below quotes the *drawn* figure unless a METI row code is given.
+
+**Sweden** — the biomass band is **538.4 PJ (2023)**, and the national balance *splits municipal waste*
+into a biogenic and a fossil half:
 
 | Inside the biomass band (`1. Biofuels`) | 2023 | 2024 |
 |---|---|---|
-| Solid biofuels (wood fuels, black liquor, other) | 397,749 TJ | — |
+| Solid biofuels (wood fuels, black liquor, other) | 397,749 TJ | 386,259 TJ |
 | **Biogenic municipal waste (`1.4 Municipal waste -bio`)** | 36,222 TJ | 36,399 TJ |
-| Bioliquids (bioethanol, biodiesel, biooils) | 94,839 TJ | — |
-| Biogas | 9,612 TJ | — |
+| Bioliquids (bioethanol, biodiesel, biooils) | 94,839 TJ | 53,528 TJ |
+| Biogas | 9,612 TJ | 9,494 TJ |
+| **Total** | **538,422 TJ** | **485,680 TJ** |
 | … of which delivered to transport | 70,663 TJ | 38,249 TJ |
 
 The fossil half of municipal waste sits with peat in the separate *Other fuels & waste* band
@@ -232,25 +247,34 @@ The fossil half of municipal waste sits with peat in the separate *Other fuels &
 
 **Japan** — METI does **not** split municipal waste, and keeps all of it out of biomass:
 
-| Band | Contents | FY2023 |
+| Band | Contents | FY2023 supply |
 |---|---|---|
 | Biomass (`$N130`) | wood 179.6, waste wood 42.1, black liquor 141.6, other 118.9, liquid biofuel 19.8, biogas 0.1 PJ | 502,061 TJ |
-| Waste & recovered (`$N200`) | refuse fuels — biogenic *and* fossil together, unsplit | 282,074 TJ |
-| … of which **not a waste fuel at all** | recovered industrial steam 218.5 + recovered electricity 52.1 PJ | 273,020 TJ |
+| Waste & recovered (`$N200`) | the two rows below | 555,094 TJ |
+| … waste energy utilisation (`$N210`) | refuse fuels — biogenic *and* fossil together, unsplit | 282,075 TJ |
+| … direct use of waste energy (`$N250`) | **not a waste fuel at all**: recovered industrial steam 218.5, recovered electricity 52.1, other 2.4 PJ | 273,020 TJ |
 
 Three consequences:
 
 1. **Waste-to-energy sits on opposite sides.** Sweden's biomass includes 36 PJ of biogenic municipal
    waste; Japan's excludes municipal waste entirely.
-2. **Japan's waste band is half not-waste.** 273 of its 555 PJ is recovered industrial steam and
-   electricity. The Swedish balance has no equivalent item at all — recovered heat appears only as the
-   18.9 PJ of primary heat entering CHP and heat-only plants.
+2. **Japan's waste band is half not-waste.** 273 PJ of the 555 PJ METI books as 未活用エネルギー
+   (551 PJ as drawn) is recovered industrial steam and electricity, not a fuel. The Swedish balance has no
+   equivalent item at all — recovered heat appears only as the 18.9 PJ of primary heat entering CHP and
+   heat-only plants.
 3. **Transport biofuels are invisible in Japan.** Sweden shows 71 PJ (2023) of biomass flowing to
    transport. Japan's ~20 PJ of bioethanol is blended upstream (into ETBE/gasoline) and reaches transport
    inside the *oil* band — `#800000 [$N133]` is exactly zero — so Japan's chart shows no biomass to transport.
 
-Removing biogenic waste from Sweden's band gives 502 PJ against Japan's 502 PJ. **That closeness is a
-coincidence of composition, not evidence of comparability.**
+Put on the same footing — both as drawn, with Sweden's biogenic municipal waste removed so that neither
+band contains municipal waste — the two are **502.2 PJ (Sweden) against 481.6 PJ (Japan)**, about 4%
+apart rather than identical. The bands still are not equivalent, because Japan's excludes the transport
+biofuels that Sweden's includes and the two treat recovered heat differently. **Do not read the raw
+band widths as a like-for-like biomass comparison.**
+
+> An earlier version of this file compared Sweden's *drawn band* against Japan's *supply row* and reported
+> the two as an identical 502 PJ. That was a basis mismatch, not a real coincidence; the corrected
+> like-for-like pair is above.
 
 ### 2.5 End use (both countries)
 
@@ -268,8 +292,9 @@ Every dataset is checked programmatically; results are in the workbook's **Recon
   within 1 TJ.
 - **Headline totals** match the official publications: Japan FY2023 reproduces METI's published
   17,558 PJ supply and 11,509 PJ final consumption exactly; Sweden's conversion boxes reconcile to the
-  Agency's published gross electricity (553,289 TJ in 2014, 597,188 in 2023, 619,653 in 2024) and derived
-  heat (203,024 / 220,352 / 213,120 TJ) to within 2 TJ.
+  Agency's published gross electricity and derived heat to within 2 TJ in every year — for the three
+  reference years, electricity 553,289 / 597,188 / 619,653 TJ and derived heat 203,024 / 220,352 /
+  213,120 TJ (2014 / 2023 / 2024).
 - **Independent cross-check against the Agency's own compendium** — every Swedish fuel band reproduces
   *Energy in Sweden — Facts and Figures* (2026 edition, table 1.2) for every year 2005–2024,
   once the per-commodity statistical difference is accounted for — **220 band comparisons across all 20
@@ -282,7 +307,7 @@ Every dataset is checked programmatically; results are in the workbook's **Recon
 
 ### Comparison with the IEA energy Sankey
 
-The charts differ from <https://www.iea.org/sankey/> by documented convention, not by data quality.
+The charts differ from <https://www.iea.org/sankey> by documented convention, not by data quality.
 
 **Sweden 2023** — IEA total energy supply 1,892 PJ vs 1,951 PJ here. Per fuel the two agree closely
 (biofuels & waste 573.5 vs 570.4 PJ; hydro 238.3 vs 238.3; wind+solar+other 177.1 vs 177.1). The
@@ -312,13 +337,32 @@ convention in its U.S. chart.
 
 ## 4. What the data shows
 
+### The long run
+
+**Sweden, 2005 → 2024.** Primary supply fell 2,245 → 1,988 PJ (**−11.4%**), and 2005 is the peak of the
+series. The mix rotated hard underneath that flat-ish total: nuclear −32% (755 → 510 PJ), oil −34%
+(636 → 422 PJ), coal −36%, against wind **×43** (3.4 → 146 PJ), biomass +28% (378 → 486 PJ) and solar from
+zero to 14.9 PJ. Biomass and nuclear are now within a percentage point of each other at about a quarter of
+supply each.
+
+**Japan, FY1990 → FY2024.** Primary supply 19,484 → 17,322 PJ (**−11.1%**), but not monotonically: it rose
+through the 1990s to a **peak of 22,970 PJ in FY2004** and has fallen ever since. Oil −46% (10,867 →
+5,903 PJ) is the dominant move, offset by gas +67% and coal +37%. Nuclear −58% (1,884 → 794 PJ) with its
+own peak of 2,997 PJ in FY1998 — long before Fukushima — and a floor of zero through FY2014, when every
+reactor was offline. Solar ×16 (51.5 → 838 PJ), almost all of it after the 2012 feed-in tariff.
+
+The two countries end up at nearly the same headline decline, −11%, by completely different routes:
+Sweden by decarbonising a system that was already low-carbon, Japan by shrinking a fossil-heavy one.
+
+### The latest year
+
 **Sweden 2023 → 2024.** Primary supply +1.9%. Electricity generation rose 165.9 → 172.1 TWh, with wind
-+18.6% (34.1 → 40.4 TWh) and solar +34%. The striking change is a **−9.9% fall in biomass against +16% for
-oil**, concentrated almost entirely in transport (biofuels to transport 70.7 → 38.2 PJ) — the effect of
++18.6% (34.1 → 40.4 TWh) and solar +34%. The striking change is a **−9.8% fall in biomass against +11.0%
+for oil**, concentrated almost entirely in transport (biofuels to transport 70.7 → 38.2 PJ) — the effect of
 Sweden cutting its *reduktionsplikt* biofuel blending mandate from January 2024.
 
-**Japan FY2023 → FY2024.** Domestic supply −0.6% and final consumption −2.0%, continuing a downward trend.
-Nuclear rose +9.7% (724 → 794 PJ) as reactor restarts continued, while hydro fell −3.4%.
+**Japan FY2023 → FY2024.** Domestic supply −0.5% and final consumption −2.0%, continuing the downward
+trend. Nuclear rose +9.6% (724 → 794 PJ) as reactor restarts continued, while hydro fell −3.4%.
 
 ---
 
@@ -340,11 +384,13 @@ Nuclear rose +9.7% (724 → 794 PJ) as reactor restarts continued, while hydro f
   (both directions for the conversion boxes). Clicking a ribbon selects the box it leaves from; clicking
   empty canvas, the Clear button or <kbd>Esc</kbd> releases it. The selection survives unit and year
   changes. The dimming is applied in CSS only, so **exports are always the complete chart**
-- **PJ ⇄ TWh switch** re-rendering titles, box values, flow labels and footnotes; tooltips always show both
-- Year-on-year comparison table under each chart, in the selected unit
+- **PJ ⇄ TWh switch** re-rendering titles, box values, flow labels, footnotes and the trend chart's axis;
+  tooltips always show both
 - LLNL-style rendering: labelled boxes with values inside, value labels on major flows, pink sector boxes,
   grey Rejected energy / Energy services terminals
-- **Hi-res PNG export** at 4× (about 6240 × 4200 px), white background, print-ready; **SVG export** for Illustrator
+- **Hi-res PNG export** at 4× (about 6240 × 4200 px), white background, print-ready; **SVG export** for
+  Illustrator. The trend chart exports separately, so a single-source figure such as
+  `Japan_Solar_FY1990_FY2024.png` can go straight into a paper
 - **Comparability footnotes** drawn inside the SVG (so they travel with the exported figure), with markers
   on the affected bands, plus a readable notes card on the page
 - Collapsible per-country methodology panel with sources, verified totals, primary-energy conventions and
@@ -358,12 +404,18 @@ energy_sankey.html         published page (generated — edit scripts/template.h
 energy_sankey_data.xlsx    published workbook (generated)
 index.html                 redirect so the site root opens the page
 scripts/
-  derive_se.py             Sweden: Energimyndigheten PxWeb -> flows + audit trail
+  fetch_se.py              pulls every year of EN0202_A from the PxWeb API -> sources/
+  fetch_jp.py              pulls stte_<FY>.xlsx from METI -> sources/ (slow; see the WAF note)
+  derive_se.py             Sweden: EN0202_A -> flows + audit trail
   derive_jp.py             Japan: METI xlsx -> flows + audit trail
-  export.py                builds all four datasets -> datasets.json
+  export.py                discovers years in sources/, builds all 55 datasets -> datasets.json
   build_html.py            injects datasets into template.html -> energy_sankey.html
   build_xlsx.py            builds the Excel workbook
   template.html            page source (layout, styling, renderer)
+sources/                   raw source files, gitignored (~67 MB)
+  se_em_<year>.json        Energimyndigheten json-stat2 dumps, 2005-2024
+  stte_<FY>.xlsx           METI balance workbooks, FY1990-FY2024
+  download_missing.html    generated helper: lists and downloads whatever METI years are absent
 energy_sankey_2023.html    frozen earlier 2023-only version
 ```
 
