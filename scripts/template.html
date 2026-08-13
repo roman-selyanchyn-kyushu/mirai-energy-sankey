@@ -81,8 +81,11 @@
   details.method li{margin:3px 0}
   details.method a{color:var(--accent)}
   details.method code{background:#f3f1ea;padding:1px 5px;border-radius:4px;font-size:12.5px}
-  footer{margin-top:26px;color:var(--ink-soft);font-size:12.5px}
+  footer{margin-top:26px;color:var(--ink-soft);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
   footer a{color:var(--accent)}
+  footer p{margin:0 0 8px}
+  footer p.credits{font-size:13.5px;color:var(--ink);line-height:1.7}
+  footer p.credits a{font-weight:600}
 </style>
 </head>
 <body>
@@ -340,11 +343,19 @@
 </div>
 
 <footer>
-  Built for the <b>MIRAI Research Group · Kyushu University</b>. Data compiled and verified August 2026.
-  Sources: Energimyndigheten (Sweden) and METI (Japan). Complete numbers for all four datasets, with the full derivation trail, are published alongside this page as
-  <a href="energy_sankey_data.xlsx">energy_sankey_data.xlsx</a>; the method is documented in the
-  <a href="https://github.com/roman-selyanchyn-kyushu/mirai-energy-sankey" target="_blank" rel="noopener">project README</a>.
-  Chart convention follows <a href="https://flowcharts.llnl.gov" target="_blank" rel="noopener">flowcharts.llnl.gov</a>.
+  <p class="credits">
+    Built for the <a href="https://www.mirai.nu/" target="_blank" rel="noopener">Sweden–Japan MIRAI Project</a>
+    · <a href="https://www.mirai.nu/pages/materials" target="_blank" rel="noopener">GCT for Materials for Energy Conversion and Storage</a>
+    · Designed by <a href="https://q-pit.kyushu-u.ac.jp/roman_selyanchyn/" target="_blank" rel="noopener">Roman Selyanchyn</a> (Kyushu University)
+    · Data extraction, preparation and coding with Claude Code
+  </p>
+  <p>
+    Sources: Energimyndigheten (Sweden) and METI (Japan); compiled and verified August 2026.
+    Complete numbers for all four datasets, with the full derivation trail, are published alongside this page as
+    <a href="energy_sankey_data.xlsx">energy_sankey_data.xlsx</a>; the method is documented in the
+    <a href="https://github.com/roman-selyanchyn-kyushu/mirai-energy-sankey" target="_blank" rel="noopener">project README</a>.
+    Chart convention follows <a href="https://flowcharts.llnl.gov" target="_blank" rel="noopener">flowcharts.llnl.gov</a>.
+  </p>
 </footer>
 
 </div>
