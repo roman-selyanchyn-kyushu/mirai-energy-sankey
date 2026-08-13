@@ -131,8 +131,26 @@
         <li>Eurostat, <a href="https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_c/default/table" target="_blank" rel="noopener">Complete energy balances (nrg_bal_c)</a>, Sweden, 2023 and 2024, terajoules.</li>
         <li>Eurostat, <a href="https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_peh/default/table" target="_blank" rel="noopener">Production of electricity and derived heat by fuel (nrg_bal_peh)</a>, Sweden, 2023 and 2024.</li>
         <li>Retrieved from the Eurostat REST API; dataset update of 2 June 2026. Both years are final — no provisional or estimated flags.</li>
-        <li>Eurostat receives these figures from <b>Energimyndigheten</b> (Swedish Energy Agency), so they are the Agency’s own statistics in Eurostat’s harmonised structure.</li>
+        <li>Eurostat receives these figures from <b>Energimyndigheten</b> (Swedish Energy Agency), so they
+        originate as the Agency’s own statistics — but Eurostat republishes them in a harmonised structure,
+        and the harmonisation shifts some aggregates. Checked against the Agency’s official annual energy
+        balance (<a href="https://pxexternal.energimyndigheten.se/pxweb/en/Energimyndighetens_statistikdatabas/" target="_blank" rel="noopener">statistics database</a>, table EN0202_A, 2023 and 2024):</li>
       </ul>
+      <table>
+        <tr><th>Quantity (2023)</th><th>Energimyndigheten</th><th>Eurostat (used here)</th><th>Difference</th></tr>
+        <tr><td><b>Nuclear electricity</b></td><td class="num">174,492 TJ</td><td class="num">174,492 TJ</td><td class="num"><b>0.00%</b></td></tr>
+        <tr><td>Gross electricity, total</td><td class="num">597,188 TJ</td><td class="num">597,935 TJ</td><td class="num">−0.12%</td></tr>
+        <tr><td>Hydro / wind / solar electricity</td><td class="num">237,927 / 122,669 / 11,167</td><td class="num">238,464 / 123,282 / 11,210</td><td class="num">−0.2 to −0.5%</td></tr>
+        <tr><td>Nuclear reactor heat</td><td class="num">488,248 TJ</td><td class="num">484,672 TJ</td><td class="num">+0.74%</td></tr>
+        <tr><td>Gross derived heat</td><td class="num">220,352 TJ</td><td class="num">217,869 TJ</td><td class="num">+1.14%</td></tr>
+        <tr><td>Final energy consumption</td><td class="num">1,271,729 TJ</td><td class="num">1,301,927 TJ</td><td class="num">−2.32%</td></tr>
+        <tr><td>Non-energy use</td><td class="num">73,178 TJ</td><td class="num">77,313 TJ</td><td class="num">−5.35%</td></tr>
+      </table>
+      <p><b>Nuclear electricity matches exactly</b> (to 1 TJ in both years), confirming a common origin.
+      The remaining gaps are harmonisation, not disagreement: Eurostat implies a 36.00% nuclear thermal
+      efficiency where the Agency reports about 35.74%, and Eurostat’s definitions of derived heat, final
+      consumption and non-energy use differ slightly in scope. Figures on this chart are Eurostat’s;
+      the Agency’s own publication will differ by the amounts above.</p>
       <h3>Verified totals</h3>
       <table>
         <tr><th>Quantity</th><th>2023</th><th>2024</th></tr>

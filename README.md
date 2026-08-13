@@ -22,9 +22,34 @@ Created for the **MIRAI Research Group · Kyushu University**.
 | Sweden | Eurostat [`nrg_bal_c`](https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_c/default/table) (complete energy balances) + [`nrg_bal_peh`](https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_peh/default/table) (electricity & heat production by fuel) | Calendar 2023, 2024 | TJ | Eurostat REST API, dataset update 2 Jun 2026 |
 | Japan | METI / ANRE [総合エネルギー統計](https://www.enecho.meti.go.jp/statistics/total_energy/results.html) — Comprehensive Energy Statistics, 確報 (revised), energy-unit balance table (`stte_2023.xlsx`, `stte_2024.xlsx`) | Fiscal 2023, 2024 (Apr–Mar) | TJ | enecho.meti.go.jp |
 
-Both Swedish years are **final** — Eurostat returns no provisional or estimated flags. Eurostat receives
-Swedish figures from **Energimyndigheten** (Swedish Energy Agency), so these *are* the Agency's statistics
-in Eurostat's harmonised structure. Both Japanese years are the **確報** (final/revised) release.
+Both Swedish years are **final** — Eurostat returns no provisional or estimated flags. Both Japanese years
+are the **確報** (final/revised) release.
+
+### Eurostat vs Energimyndigheten — verified, not assumed
+
+Swedish figures originate with **Energimyndigheten** (Swedish Energy Agency) and are republished by Eurostat
+in a harmonised structure. Checked against the Agency's own official annual energy balance
+([statistics database](https://pxexternal.energimyndigheten.se/pxweb/en/Energimyndighetens_statistikdatabas/),
+table `EN0202_A`, PxWeb API):
+
+| Quantity (2023) | Energimyndigheten | Eurostat (used here) | Diff |
+|---|---|---|---|
+| **Nuclear electricity** | 174,492 TJ | 174,492 TJ | **0.00%** |
+| Gross electricity, total | 597,188 TJ | 597,935 TJ | −0.12% |
+| Hydro / wind / solar electricity | 237,927 / 122,669 / 11,167 | 238,464 / 123,282 / 11,210 | −0.2 to −0.5% |
+| Nuclear reactor heat | 488,248 TJ | 484,672 TJ | +0.74% |
+| Gross derived heat | 220,352 TJ | 217,869 TJ | +1.14% |
+| Final energy consumption | 1,271,729 TJ | 1,301,927 TJ | −2.32% |
+| Non-energy use | 73,178 TJ | 77,313 TJ | −5.35% |
+
+**Nuclear electricity matches exactly** (to 1 TJ in both years), confirming common origin. The remaining
+gaps are harmonisation, not disagreement: Eurostat implies a 36.00% nuclear thermal efficiency where the
+Agency reports ~35.74%, and the two differ slightly in the scope of derived heat, final consumption and
+non-energy use. **The charts use Eurostat figures; the Agency's own publication differs by the amounts above.**
+
+Note that the project currently mixes a harmonised supranational source (Eurostat, Sweden) with a national
+source (METI, Japan). The Agency's balance carries the full sector × commodity detail needed to rebuild
+Sweden from the national source instead, which would make the sourcing symmetric.
 
 ### Reproducing the raw pulls
 
