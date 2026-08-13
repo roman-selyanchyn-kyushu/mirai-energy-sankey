@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Energy Flow Diagrams — Sweden &amp; Japan, 2023 &amp; 2024</title>
+<style>
+  :root{
+    --ink:#1d232a; --ink-soft:#5a636e; --bg:#f7f6f2; --card:#ffffff;
+    --line:#e4e1d8; --accent:#0f6f8e;
+    --f-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);line-height:1.5;padding:28px 20px 60px}
+  .wrap{max-width:1480px;margin:0 auto}
+  header.page h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+  header.page p.sub{color:var(--ink-soft);font-size:14px;margin-top:6px;max-width:940px}
+  .tabs{display:flex;gap:8px;margin:22px 0 14px}
+  .tabs button{
+    font-family:var(--f-ui);font-size:14px;font-weight:600;padding:9px 22px;border-radius:999px;
+    border:1px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer;transition:all .15s;
+  }
+  .tabs button:hover{border-color:var(--accent);color:var(--accent)}
+  .tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .panel{display:none}
+  .panel.on{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 10px;box-shadow:0 1px 3px rgba(30,30,20,.05)}
+  .toolbar{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-bottom:6px;flex-wrap:wrap}
+  .toolbar .hint{margin-right:auto;color:var(--ink-soft);font-size:12.5px}
+  .toolbar button{
+    font-family:var(--f-ui);font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;
+    border:1px solid var(--line);background:#fff;color:var(--ink);transition:all .15s;
+  }
+  .toolbar button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .toolbar button:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+  .yearsel{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink-soft)}
+  .yearsel select{
+    font-family:var(--f-ui);font-size:13px;font-weight:700;color:var(--ink);
+    padding:8px 30px 8px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;
+    appearance:none;
+    background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a636e'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 11px center;
+  }
+  .yearsel select:hover{border-color:var(--accent)}
+  .units{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .units button{border:none;border-radius:0;padding:8px 14px;font-weight:600;color:var(--ink-soft);background:#fff}
+  .units button:hover{transform:none;box-shadow:none;color:var(--accent)}
+  .units button.on{background:var(--accent);color:#fff}
+  svg.sankey{width:100%;height:auto;display:block}
+  .tip{
+    position:fixed;pointer-events:none;z-index:50;display:none;max-width:340px;
+    background:rgba(22,26,30,.94);color:#fff;font-size:12.5px;line-height:1.45;
+    padding:8px 11px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25);
+  }
+  .tip b{font-size:13px}
+  .yoy{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px}
+  .yoy h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:8px}
+  .yoy table{border-collapse:collapse;font-size:13px;width:100%;max-width:640px}
+  .yoy td,.yoy th{border-bottom:1px solid var(--line);padding:5px 10px;text-align:left}
+  .yoy th{font-weight:600;color:var(--ink-soft);font-size:12px}
+  .yoy td.num{text-align:right;font-variant-numeric:tabular-nums}
+  /* deliberately neutral: a rise or fall in a fuel is not inherently good or bad */
+  .yoy .up,.yoy .down{color:var(--ink);font-weight:600}
+  .yoy .down{color:#6b737d}
+  details.method{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+  details.method summary{cursor:pointer;font-weight:600;font-size:14.5px;padding:14px 18px;list-style:none;display:flex;align-items:center;gap:8px}
+  details.method summary::-webkit-details-marker{display:none}
+  details.method summary::before{content:"▸";transition:transform .15s;color:var(--accent)}
+  details.method[open] summary::before{transform:rotate(90deg)}
+  details.method .inner{padding:2px 22px 20px;font-size:13.5px;color:#333a42}
+  details.method h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin:16px 0 6px}
+  details.method table{border-collapse:collapse;margin:6px 0;font-size:13px}
+  details.method td,details.method th{border:1px solid var(--line);padding:5px 12px;text-align:left}
+  details.method th{background:#f3f1ea;font-weight:600}
+  details.method td.num{text-align:right;font-variant-numeric:tabular-nums}
+  details.method ul{margin:4px 0 4px 20px}
+  details.method li{margin:3px 0}
+  details.method a{color:var(--accent)}
+  details.method code{background:#f3f1ea;padding:1px 5px;border-radius:4px;font-size:12.5px}
+  footer{margin-top:26px;color:var(--ink-soft);font-size:12.5px}
+  footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <h1>Energy Flow Diagrams — Sweden &amp; Japan</h1>
+  <p class="sub">Estimated national energy flows for <b>2023 and 2024</b>, drawn in the style of the
+  Lawrence Livermore National Laboratory energy flow charts and built directly from official statistics:
+  Eurostat energy balances (Sweden, calendar years) and METI Comprehensive Energy Statistics
+  (Japan, fiscal years). Choose a year from the dropdown, hover any flow for values, and switch
+  between PJ and TWh. Charts are scaled independently — Japan’s system is roughly 9× larger than Sweden’s.</p>
+</header>
+
+<nav class="tabs">
+  <button id="tab-se" class="on" onclick="showTab('se')">Sweden</button>
+  <button id="tab-jp" onclick="showTab('jp')">Japan</button>
+</nav>
+
+<!-- ═══════════ SWEDEN ═══════════ -->
+<div class="panel on" id="panel-se">
+  <div class="card">
+    <div class="toolbar">
+      <span class="hint">Hover flows for values · PNG exports at 4× resolution for print</span>
+      <span class="yearsel"><label for="year-se">Year</label>
+        <select id="year-se" onchange="setYear('se', this.value)">
+          <option value="2023">2023</option>
+          <option value="2024" selected>2024</option>
+        </select></span>
+      <div class="units" role="group" aria-label="Units">
+        <button class="unit-btn on" data-unit="PJ" onclick="setUnit('PJ')">PJ</button>
+        <button class="unit-btn" data-unit="TWh" onclick="setUnit('TWh')">TWh</button>
+      </div>
+      <button onclick="downloadSVG('se')">Download SVG</button>
+      <button class="primary" onclick="downloadPNG('se')">Download hi-res PNG</button>
+    </div>
+    <div id="chart-se"></div>
+  </div>
+  <div class="yoy" id="yoy-se"></div>
+  <details class="method">
+    <summary>Data sources, verification &amp; methodology — Sweden</summary>
+    <div class="inner">
+      <h3>Sources</h3>
+      <ul>
+        <li>Eurostat, <a href="https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_c/default/table" target="_blank" rel="noopener">Complete energy balances (nrg_bal_c)</a>, Sweden, 2023 and 2024, terajoules.</li>
+        <li>Eurostat, <a href="https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_peh/default/table" target="_blank" rel="noopener">Production of electricity and derived heat by fuel (nrg_bal_peh)</a>, Sweden, 2023 and 2024.</li>
+        <li>Retrieved from the Eurostat REST API; dataset update of 2 June 2026. Both years are final — no provisional or estimated flags.</li>
+        <li>Eurostat receives these figures from <b>Energimyndigheten</b> (Swedish Energy Agency), so they are the Agency’s own statistics in Eurostat’s harmonised structure.</li>
+      </ul>
+      <h3>Verified totals</h3>
+      <table>
+        <tr><th>Quantity</th><th>2023</th><th>2024</th></tr>
+        <tr><td>Gross electricity production</td><td class="num">597,935 TJ (166.1 TWh)</td><td class="num">620,521 TJ (172.4 TWh)</td></tr>
+        <tr><td>Gross derived-heat production</td><td class="num">217,869 TJ</td><td class="num">211,032 TJ</td></tr>
+        <tr><td>Net electricity export</td><td class="num">102,571 TJ (28.5 TWh)</td><td class="num">120,378 TJ (33.4 TWh)</td></tr>
+        <tr><td>Final energy consumption</td><td class="num">1,301,927 TJ</td><td class="num">1,311,379 TJ</td></tr>
+        <tr><td>Non-energy use</td><td class="num">77,313 TJ</td><td class="num">81,658 TJ</td></tr>
+      </table>
+      <p>Every conversion box closes exactly: box inputs equal box outputs to within 1 TJ in both years
+      (verified programmatically for all four datasets).</p>
+      <h3>How the numbers were derived</h3>
+      <ul>
+        <li><b>Only additive balance components are used.</b> Eurostat also publishes attributed memo
+        aggregates — <code>BIOE</code> (Bioenergy) and <code>FE</code> (Fossil energy) — which include the
+        fuel embodied in delivered heat and electricity. Using them would double-count: for Swedish
+        households in 2023, <code>BIOE</code> reads 106,436 TJ while the additive renewables component
+        <code>RA000</code> reads 34,156 TJ, because most Swedish district heat is biomass-fired. The
+        verified additive identity used here is
+        <code>E7000 + H8000 + RA000 + O4000XBIO + G3000 + solids = TOTAL</code>.</li>
+        <li><b>Bioenergy</b> is therefore taken as the residual of <code>RA000</code> after removing the
+        renewable carriers drawn as their own bands (hydro, wind, solar, ambient heat, geothermal).</li>
+        <li><b>CHP fuel inputs</b> are split between the electricity and district-heating boxes in
+        proportion to each fuel’s gross electricity vs. gross heat output (from nrg_bal_peh).</li>
+        <li><b>Ambient heat</b> (heat pumps): the part entering district heating comes from
+        <code>TI_EHG_E [RA600]</code>; the part captured by building heat pumps is reported by Eurostat
+        as non-specified and is allocated 80% residential / 20% commercial.</li>
+        <li><b>Industrial waste heat</b> is Eurostat fuel class <code>X9900</code> feeding district
+        heating (flue-gas condensation and recovered industrial heat); its input is taken equal to its output.</li>
+        <li><b>Commercial &amp; services</b> combines commercial/public services, agriculture, forestry and fishing.</li>
+        <li><b>Coal &amp; peat</b> includes manufactured gases (coke-oven and blast-furnace gas) and peat.
+        Non-energy use (feedstocks, lubricants, bitumen) is a separate terminal. Marine bunkers are
+        excluded per Eurostat convention; international aviation is included in transport.</li>
+        <li><b>End use</b> applies the LLNL efficiency assumptions: residential and commercial 65%,
+        industrial 49%, transport 21%.</li>
+      </ul>
+      <h3>Comparison with the IEA energy Sankey</h3>
+      <p>For 2023 the IEA reports a total energy supply of 1,892 PJ against 1,975 PJ here. The two agree
+      almost exactly where conventions coincide; the differences are accounting conventions, not data:</p>
+      <ul>
+        <li>Per fuel, IEA vs. this chart (PJ, 2023): biofuels &amp; waste 573.5 vs. 570.4; hydro 238.3 vs. 238.3;
+        wind + solar + other 177.1 vs. 177.1; oil 373.5 vs. 367.5; natural gas 30.1 vs. 28.2.</li>
+        <li><b>Nuclear:</b> the IEA imputes a fixed 33% reactor efficiency (529 PJ); Eurostat reports actual
+        Swedish reactor heat, about 36% (485 PJ). Both describe the same 48.5 TWh of electricity.</li>
+        <li><b>Electricity exports:</b> the IEA headline nets out net exports (−103 PJ); this chart draws them
+        as an explicit flow. The IEA’s own by-source total is 1,983 PJ — within 0.4% of this chart.</li>
+        <li><b>Coal:</b> the IEA reports supply (62 PJ, including stock change and the steelworks
+        coke/blast-furnace-gas chain); this chart shows use (35 PJ), with the remainder inside “Own use &amp; losses”.</li>
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!-- ═══════════ JAPAN ═══════════ -->
+<div class="panel" id="panel-jp">
+  <div class="card">
+    <div class="toolbar">
+      <span class="hint">Hover flows for values · PNG exports at 4× resolution for print</span>
+      <span class="yearsel"><label for="year-jp">Fiscal year</label>
+        <select id="year-jp" onchange="setYear('jp', this.value)">
+          <option value="2023">FY2023</option>
+          <option value="2024" selected>FY2024</option>
+        </select></span>
+      <div class="units" role="group" aria-label="Units">
+        <button class="unit-btn on" data-unit="PJ" onclick="setUnit('PJ')">PJ</button>
+        <button class="unit-btn" data-unit="TWh" onclick="setUnit('TWh')">TWh</button>
+      </div>
+      <button onclick="downloadSVG('jp')">Download SVG</button>
+      <button class="primary" onclick="downloadPNG('jp')">Download hi-res PNG</button>
+    </div>
+    <div id="chart-jp"></div>
+  </div>
+  <div class="yoy" id="yoy-jp"></div>
+  <details class="method">
+    <summary>Data sources, verification &amp; methodology — Japan</summary>
+    <div class="inner">
+      <h3>Sources</h3>
+      <ul>
+        <li>METI / Agency for Natural Resources and Energy,
+        <a href="https://www.enecho.meti.go.jp/statistics/total_energy/results.html" target="_blank" rel="noopener">総合エネルギー統計 — Comprehensive Energy Statistics</a>,
+        FY2023 and FY2024 balance tables (確報, revised), energy-unit sheet, terajoules
+        (<code>stte_2023.xlsx</code>, <code>stte_2024.xlsx</code>).</li>
+        <li>FY2023 press release of 25 April 2025:
+        <a href="https://www.meti.go.jp/press/2025/04/20250425004/20250425004.html" target="_blank" rel="noopener">令和5年度エネルギー需給実績（確報）</a>.</li>
+        <li>Japanese fiscal years run April–March; FY2024 covers April 2024 – March 2025.</li>
+      </ul>
+      <h3>Verified totals</h3>
+      <table>
+        <tr><th>Quantity</th><th>FY2023</th><th>FY2024</th></tr>
+        <tr><td>Domestic primary energy supply (国内供給)</td><td class="num">17,557,652 TJ</td><td class="num">17,461,344 TJ</td></tr>
+        <tr><td>Final energy consumption</td><td class="num">11,509,459 TJ</td><td class="num">11,280,435 TJ</td></tr>
+        <tr><td>Electricity generated (utility + auto)</td><td class="num">3,565,034 TJ</td><td class="num">3,583,272 TJ</td></tr>
+        <tr><td>Non-energy use</td><td class="num">1,233,909 TJ</td><td class="num">1,126,372 TJ</td></tr>
+      </table>
+      <p>The FY2023 figures match METI’s published headline (17,558 PJ supply, 11,509 PJ final consumption).
+      Every conversion box closes exactly in both years.</p>
+      <h3>How the numbers were derived</h3>
+      <ul>
+        <li><b>Sign convention:</b> in the METI table, transformation rows are negative for fuel consumed
+        and positive for energy produced. Primary supply is row <code>#190000</code> (国内供給), already
+        net of exports.</li>
+        <li><b>Aggregated bands net out product manufacture inside the band.</b> Coal covers coal and coal
+        products, oil covers crude and oil products, gas covers natural gas and city gas. Because city gas
+        is manufactured from natural gas (plus about 96 PJ of LPG feedstock from the oil band), the rows for
+        coke ovens, refineries, gas works and inter-product transfers
+        (<code>#210000, #220000, #230000, #280000</code>) are netted into each band — otherwise the natural
+        gas that becomes city gas would be counted twice. Stock change (<code>#350000</code>) is included as
+        supply, since a stock drawdown is energy supplied to the system that year.</li>
+        <li><b>Electricity generation</b> merges utility power (事業用発電, including pumped-storage losses)
+        and auto-producers (自家用発電, which contains most on-site and rooftop solar PV).</li>
+        <li><b>Steam &amp; heat supply</b> merges industrial auto-steam boilers (自家用蒸気) with the
+        district heat-supply business (熱供給); most of its output returns to manufacturing.</li>
+        <li><b>Sectors:</b> Industrial = 農林水産鉱建設業 + 製造業; Commercial &amp; services = 業務他;
+        each is shown net of the non-energy use booked inside it, which is drawn as its own terminal.</li>
+        <li><b>Waste &amp; recovered energy</b> is 未活用エネルギー (refuse-fired power, waste tyres and
+        plastics, recovered industrial heat).</li>
+        <li><b>Renewables</b> are split using METI’s <code>$N</code> detail columns: solar PV and solar heat,
+        wind, biomass, geothermal. Nuclear, hydro, geothermal and PV use METI’s primary-equivalent
+        accounting (thermal input for nuclear and geothermal; generated electricity for hydro, PV and wind).</li>
+        <li><b>Own use &amp; losses</b> is the residual of each band after conversion, final and non-energy
+        use, so it bundles transformation losses, energy-industry own use, transmission losses and the
+        statistical difference — matching how the LLNL charts present these.</li>
+        <li><b>End use</b> applies the LLNL efficiency assumptions: residential and commercial 65%,
+        industrial 49%, transport 21%.</li>
+      </ul>
+      <p>Because band widths represent throughput including stock change and intra-band transformation,
+      the bands sum to slightly more than METI’s domestic-supply headline (17,629 vs. 17,558 PJ in FY2023,
+      a 0.4% difference). The headline figure above is METI’s own and is the one to cite.</p>
+      <h3>Comparison with the IEA energy Sankey</h3>
+      <p>For 2023 the IEA reports a total energy supply of 15,844 PJ (calendar year) against METI’s
+      17,558 PJ (fiscal year). The ≈1,714 PJ gap is fully explained by four convention differences —
+      neither figure is wrong:</p>
+      <ul>
+        <li><b>Calorific basis (≈ +970 PJ):</b> METI books fuels at gross calorific value (HHV), the IEA at
+        net (LHV). This raises gas by about 354 PJ, oil 409 PJ and coal 204 PJ. Japanese national statistics
+        always sit a few percent above IEA figures for this reason.</li>
+        <li><b>Renewable electricity accounting (≈ +916 PJ):</b> METI converts hydro, solar and wind
+        electricity to primary equivalent by dividing by average fossil-plant efficiency (implied factor
+        41.8%: IEA hydro 271 PJ of actual electricity vs. 648 PJ here). The IEA counts these 1:1. Partly
+        offset by nuclear (METI actual ≈38.5% heat, 724 PJ, vs. IEA fixed 33%, 917 PJ: −193 PJ) and
+        geothermal (IEA imputes 10% efficiency: −93 PJ).</li>
+        <li><b>Recovered energy (≈ +273 PJ):</b> METI counts recovered industrial waste heat and electricity
+        (未活用エネルギー) as primary supply; the IEA does not.</li>
+        <li><b>Fiscal vs. calendar year</b> plus LHV conversion of biomass and waste: the remainder (≈ −150 PJ).</li>
+      </ul>
+      <p>A consequence of the substitution method: roughly 0.9 EJ of the rejected energy leaving the
+      electricity box is an accounting artefact for hydro, solar and wind rather than physical waste heat.
+      LLNL uses the same convention in its U.S. chart.</p>
+    </div>
+  </details>
+</div>
+
+<footer>
+  Built for the <b>MIRAI Research Group · Kyushu University</b>. Data compiled and verified August 2026.
+  Complete numbers for all four datasets, with the full derivation trail, are published alongside this page as
+  <a href="energy_sankey_data.xlsx">energy_sankey_data.xlsx</a>; the method is documented in the
+  <a href="https://github.com/roman-selyanchyn-kyushu/mirai-energy-sankey" target="_blank" rel="noopener">project README</a>.
+  Chart convention follows <a href="https://flowcharts.llnl.gov" target="_blank" rel="noopener">flowcharts.llnl.gov</a>.
+</footer>
+
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+"use strict";
+
+/* ══════════════════════════════════════════════════════════════════
+   Datasets are generated from official statistics by the derivation
+   scripts in the project repository (derive_se.py / derive_jp.py) and
+   embedded here verbatim, so this page, the Excel workbook and the
+   scripts always agree. All values in TJ.
+   ══════════════════════════════════════════════════════════════════ */
+const DATASETS = {"se2023":{"country":"Sweden","code":"se","year":2023,"yearLabel":"2023","title":"Estimated Energy Flows in Sweden, 2023","file":"Sweden_Energy_Flow_2023","source":"Data: Eurostat complete energy balances (nrg_bal_c) and production of electricity and derived heat by fuel (nrg_bal_peh), Sweden, calendar year 2023. End-use efficiency assumptions per LLNL: residential/commercial 65%, industrial 49%, transport 21%.","note":"Only additive Eurostat balance components are used; bioenergy is the residual of RA000 after removing hydro, wind, solar, ambient and geothermal. CHP fuel split by each fuel's gross electricity vs heat output. Ambient heat from building heat pumps allocated 80/20 residential/commercial.","nodes":[{"id":"nuclear","label":"Nuclear","col":0,"color":"#e0454e"},{"id":"hydro","label":"Hydro","col":0,"color":"#2268b0"},{"id":"wind","label":"Wind","col":0,"color":"#8161d1"},{"id":"solar","label":"Solar","col":0,"color":"#f2b21c"},{"id":"bio","label":"Biomass & biofuels","col":0,"color":"#4a9b52"},{"id":"amb","label":"Ambient heat","col":0,"color":"#31b5a6"},{"id":"wh","label":"Industrial waste heat","col":0,"color":"#d98a45"},{"id":"wst","label":"Non-renewable waste","col":0,"color":"#94953f"},{"id":"coal","label":"Coal & peat","col":0,"color":"#606066"},{"id":"gas","label":"Natural gas","col":0,"color":"#5aa7d6"},{"id":"oil","label":"Oil","col":0,"color":"#2c6b47"},{"id":"elec","label":"Electricity generation","col":1,"color":"#f08c1e","box":true},{"id":"heat","label":"District heating","col":1,"color":"#e07590","box":true},{"id":"own","label":"Own use & losses","col":2,"color":"#a9a9a9","box":true},{"id":"res","label":"Residential","col":2,"color":"#f0bac2","box":true,"eff":0.65},{"id":"com","label":"Commercial & services","col":2,"color":"#f0bac2","box":true,"eff":0.65},{"id":"ind","label":"Industrial","col":2,"color":"#f0bac2","box":true,"eff":0.49},{"id":"tpt","label":"Transport","col":2,"color":"#f0bac2","box":true,"eff":0.21},{"id":"ne","label":"Non-energy use","col":2,"color":"#b3a077","box":true,"terminal":true},{"id":"exp","label":"Net electricity export","col":3,"color":"#f08c1e","box":true,"terminal":true},{"id":"rej","label":"Rejected energy","col":3,"color":"#c4c4c0","box":true,"terminal":true},{"id":"svc","label":"Energy services","col":3,"color":"#77848f","box":true,"terminal":true}],"flows":[["nuclear","elec",484672],["hydro","elec",238273],["wind","elec",123282],["solar","elec",11210],["bio","elec",52406],["bio","heat",151921],["amb","heat",9922],["wst","elec",5703],["wst","heat",28065],["coal","elec",3000],["coal","heat",6157],["gas","elec",603],["gas","heat",3319],["oil","elec",898],["oil","heat",3489],["wh","heat",42257],["solar","res",399],["bio","res",33757],["bio","com",12638],["bio","ind",216275],["bio","tpt",65926],["wst","ind",3710],["coal","ind",15959],["gas","res",972],["gas","com",3212],["gas","ind",8293],["gas","tpt",600],["oil","res",5554],["oil","com",16822],["oil","ind",39215],["oil","tpt",189522],["amb","res",50655],["amb","com",12664],["coal","ne",870],["coal","own",9295],["gas","ne",7291],["gas","own",3882],["oil","ne",69152],["oil","own",42805],["elec","res",142380],["elec","com",114228],["elec","ind",160650],["elec","tpt",15883],["elec","heat",6257],["elec","own",55966],["elec","exp",102571],["elec","rej",322112],["heat","res",112108],["heat","com",53443],["heat","ind",27061],["heat","own",25257],["heat","rej",33518],["own","rej",137205],["res","svc",224786],["res","rej",121039],["com","svc",138455],["com","rej",74552],["ind","svc",230870],["ind","rej",240293],["tpt","svc",57106],["tpt","rej",214825]],"meta":{"gross_electricity_TJ":597935,"gross_heat_TJ":217869,"net_electricity_export_TJ":102571,"final_consumption_energy_TJ":1301927,"non_energy_use_TJ":77313}},"se2024":{"country":"Sweden","code":"se","year":2024,"yearLabel":"2024","title":"Estimated Energy Flows in Sweden, 2024","file":"Sweden_Energy_Flow_2024","source":"Data: Eurostat complete energy balances (nrg_bal_c) and production of electricity and derived heat by fuel (nrg_bal_peh), Sweden, calendar year 2024. End-use efficiency assumptions per LLNL: residential/commercial 65%, industrial 49%, transport 21%.","note":"Only additive Eurostat balance components are used; bioenergy is the residual of RA000 after removing hydro, wind, solar, ambient and geothermal. CHP fuel split by each fuel's gross electricity vs heat output. Ambient heat from building heat pumps allocated 80/20 residential/commercial.","nodes":[{"id":"nuclear","label":"Nuclear","col":0,"color":"#e0454e"},{"id":"hydro","label":"Hydro","col":0,"color":"#2268b0"},{"id":"wind","label":"Wind","col":0,"color":"#8161d1"},{"id":"solar","label":"Solar","col":0,"color":"#f2b21c"},{"id":"bio","label":"Biomass & biofuels","col":0,"color":"#4a9b52"},{"id":"amb","label":"Ambient heat","col":0,"color":"#31b5a6"},{"id":"wh","label":"Industrial waste heat","col":0,"color":"#d98a45"},{"id":"wst","label":"Non-renewable waste","col":0,"color":"#94953f"},{"id":"coal","label":"Coal & peat","col":0,"color":"#606066"},{"id":"gas","label":"Natural gas","col":0,"color":"#5aa7d6"},{"id":"oil","label":"Oil","col":0,"color":"#2c6b47"},{"id":"elec","label":"Electricity generation","col":1,"color":"#f08c1e","box":true},{"id":"heat","label":"District heating","col":1,"color":"#e07590","box":true},{"id":"own","label":"Own use & losses","col":2,"color":"#a9a9a9","box":true},{"id":"res","label":"Residential","col":2,"color":"#f0bac2","box":true,"eff":0.65},{"id":"com","label":"Commercial & services","col":2,"color":"#f0bac2","box":true,"eff":0.65},{"id":"ind","label":"Industrial","col":2,"color":"#f0bac2","box":true,"eff":0.49},{"id":"tpt","label":"Transport","col":2,"color":"#f0bac2","box":true,"eff":0.21},{"id":"ne","label":"Non-energy use","col":2,"color":"#b3a077","box":true,"terminal":true},{"id":"exp","label":"Net electricity export","col":3,"color":"#f08c1e","box":true,"terminal":true},{"id":"rej","label":"Rejected energy","col":3,"color":"#c4c4c0","box":true,"terminal":true},{"id":"svc","label":"Energy services","col":3,"color":"#77848f","box":true,"terminal":true}],"flows":[["nuclear","elec",506226],["hydro","elec",232614],["wind","elec",146236],["solar","elec",14987],["bio","elec",45368],["bio","heat",144000],["amb","heat",13295],["wst","elec",5255],["wst","heat",28393],["coal","elec",1919],["coal","heat",4943],["gas","elec",415],["gas","heat",2542],["oil","elec",1597],["oil","heat",4389],["wh","heat",43028],["solar","res",386],["bio","res",32575],["bio","com",9472],["bio","ind",215795],["bio","tpt",32618],["wst","ind",409],["coal","ind",13599],["gas","res",890],["gas","com",3398],["gas","ind",8627],["gas","tpt",803],["oil","res",6297],["oil","com",20601],["oil","ind",40257],["oil","tpt",235345],["amb","res",52061],["amb","com",13015],["bio","own",305],["coal","ne",72],["coal","own",9862],["gas","ne",10595],["gas","own",4131],["oil","ne",70990],["oil","own",46761],["elec","res",143179],["elec","com",116973],["elec","ind",160538],["elec","tpt",17924],["elec","heat",6253],["elec","own",55274],["elec","exp",120378],["elec","rej",334098],["heat","res",109570],["heat","com",51366],["heat","ind",25679],["heat","own",24418],["heat","rej",35810],["own","rej",140751],["res","svc",224223],["res","rej",120735],["com","svc",139636],["com","rej",75189],["ind","svc",227803],["ind","rej",237101],["tpt","svc",60205],["tpt","rej",226485]],"meta":{"gross_electricity_TJ":620521,"gross_heat_TJ":211032,"net_electricity_export_TJ":120378,"final_consumption_energy_TJ":1311379,"non_energy_use_TJ":81658}},"jp2023":{"country":"Japan","code":"jp","year":2023,"yearLabel":"FY2023","title":"Estimated Energy Flows in Japan, FY2023","file":"Japan_Energy_Flow_FY2023","source":"Data: METI Comprehensive Energy Statistics (総合エネルギー統計), Japan, fiscal year 2023 (確報 revised), energy-unit balance table stte_2023.xlsx. End-use efficiency assumptions per LLNL: residential/commercial 65%, industrial 49%, transport 21%.","note":"Utility and auto-producer generation merged; auto-steam boilers and the heat-supply business merged. Aggregated bands net out product manufacture inside the band (coke ovens, refineries, gas works), so natural gas converted to city gas is not counted twice.","nodes":[{"id":"nuclear","label":"Nuclear","col":0,"color":"#e0454e"},{"id":"hydro","label":"Hydro","col":0,"color":"#2268b0"},{"id":"wind","label":"Wind","col":0,"color":"#8161d1"},{"id":"solar","label":"Solar","col":0,"color":"#f2b21c"},{"id":"geo","label":"Geothermal","col":0,"color":"#a2643a"},{"id":"bio","label":"Biomass","col":0,"color":"#4a9b52"},{"id":"wst","label":"Waste & recovered energy","col":0,"color":"#94953f"},{"id":"coal","label":"Coal","col":0,"color":"#606066"},{"id":"gas","label":"Natural gas & city gas","col":0,"color":"#5aa7d6"},{"id":"oil","label":"Oil","col":0,"color":"#2c6b47"},{"id":"elec","label":"Electricity generation","col":1,"color":"#f08c1e","box":true},{"id":"heat","label":"Steam & heat supply","col":1,"color":"#e07590","box":true},{"id":"own","label":"Own use & losses","col":2,"color":"#a9a9a9","box":true},{"id":"res","label":"Residential","col":2,"color":"#f0bac2","box":true,"eff":0.65},{"id":"com","label":"Commercial & services","col":2,"color":"#f0bac2","box":true,"eff":0.65},{"id":"ind","label":"Industrial","col":2,"color":"#f0bac2","box":true,"eff":0.49},{"id":"tpt","label":"Transport","col":2,"color":"#f0bac2","box":true,"eff":0.21},{"id":"ne","label":"Non-energy use","col":2,"color":"#b3a077","box":true,"terminal":true},{"id":"rej","label":"Rejected energy","col":3,"color":"#c4c4c0","box":true,"terminal":true},{"id":"svc","label":"Energy services","col":3,"color":"#77848f","box":true,"terminal":true}],"flows":[["nuclear","elec",724001],["hydro","elec",647815],["solar","elec",830836],["solar","com",659],["solar","res",4797],["wind","elec",90344],["geo","elec",29383],["bio","elec",301794],["bio","heat",176018],["bio","ind",529],["bio","com",2978],["bio","own",292],["wst","elec",319231],["wst","heat",200387],["wst","ind",31260],["coal","elec",2760742],["coal","heat",249405],["coal","ind",1077910],["coal","com",5275],["coal","tpt",29],["coal","ne",16252],["coal","own",165247],["gas","elec",2528653],["gas","heat",246057],["gas","ind",290319],["gas","com",330637],["gas","res",384235],["gas","tpt",679],["gas","ne",9291],["gas","own",20538],["oil","elec",337924],["oil","heat",274542],["oil","ind",720990],["oil","com",357082],["oil","res",405985],["oil","tpt",2683964],["oil","ne",1208367],["oil","own",194793],["elec","ind",1156031],["elec","com",1034599],["elec","res",900865],["elec","tpt",59458],["elec","heat",3629],["elec","own",410452],["elec","rej",5005689],["heat","ind",785455],["heat","com",40818],["heat","res",995],["heat","rej",322770],["own","rej",791322],["res","svc",1102970],["res","rej",593907],["com","svc",1151831],["com","rej",620217],["ind","svc",1990622],["ind","rej",2071872],["tpt","svc",576267],["tpt","rej",2167863]],"meta":{"domestic_primary_supply_TJ":17557652,"final_consumption_TJ":11509459,"electricity_generated_TJ":3565034,"non_energy_use_TJ":1233909}},"jp2024":{"country":"Japan","code":"jp","year":2024,"yearLabel":"FY2024","title":"Estimated Energy Flows in Japan, FY2024","file":"Japan_Energy_Flow_FY2024","source":"Data: METI Comprehensive Energy Statistics (総合エネルギー統計), Japan, fiscal year 2024 (確報 revised), energy-unit balance table stte_2024.xlsx. End-use efficiency assumptions per LLNL: residential/commercial 65%, industrial 49%, transport 21%.","note":"Utility and auto-producer generation merged; auto-steam boilers and the heat-supply business merged. Aggregated bands net out product manufacture inside the band (coke ovens, refineries, gas works), so natural gas converted to city gas is not counted twice.","nodes":[{"id":"nuclear","label":"Nuclear","col":0,"color":"#e0454e"},{"id":"hydro","label":"Hydro","col":0,"color":"#2268b0"},{"id":"wind","label":"Wind","col":0,"color":"#8161d1"},{"id":"solar","label":"Solar","col":0,"color":"#f2b21c"},{"id":"geo","label":"Geothermal","col":0,"color":"#a2643a"},{"id":"bio","label":"Biomass","col":0,"color":"#4a9b52"},{"id":"wst","label":"Waste & recovered energy","col":0,"color":"#94953f"},{"id":"coal","label":"Coal","col":0,"color":"#606066"},{"id":"gas","label":"Natural gas & city gas","col":0,"color":"#5aa7d6"},{"id":"oil","label":"Oil","col":0,"color":"#2c6b47"},{"id":"elec","label":"Electricity generation","col":1,"color":"#f08c1e","box":true},{"id":"heat","label":"Steam & heat supply","col":1,"color":"#e07590","box":true},{"id":"own","label":"Own use & losses","col":2,"color":"#a9a9a9","box":true},{"id":"res","label":"Residential","col":2,"color":"#f0bac2","box":true,"eff":0.65},{"id":"com","label":"Commercial & services","col":2,"color":"#f0bac2","box":true,"eff":0.65},{"id":"ind","label":"Industrial","col":2,"color":"#f0bac2","box":true,"eff":0.49},{"id":"tpt","label":"Transport","col":2,"color":"#f0bac2","box":true,"eff":0.21},{"id":"ne","label":"Non-energy use","col":2,"color":"#b3a077","box":true,"terminal":true},{"id":"rej","label":"Rejected energy","col":3,"color":"#c4c4c0","box":true,"terminal":true},{"id":"svc","label":"Energy services","col":3,"color":"#77848f","box":true,"terminal":true}],"flows":[["nuclear","elec",793521],["hydro","elec",626015],["solar","elec",832941],["solar","com",642],["solar","res",4354],["wind","elec",99069],["geo","elec",32962],["bio","elec",303859],["bio","heat",172456],["bio","ind",2486],["bio","com",3085],["bio","own",207],["wst","elec",324882],["wst","heat",205079],["wst","ind",39733],["coal","elec",2821179],["coal","heat",246982],["coal","ind",1038656],["coal","com",4184],["coal","tpt",29],["coal","ne",14236],["coal","own",110134],["gas","elec",2403845],["gas","heat",237140],["gas","ind",293804],["gas","com",353470],["gas","res",390172],["gas","tpt",597],["gas","ne",10517],["gas","own",52700],["oil","elec",278507],["oil","heat",264459],["oil","ind",702338],["oil","com",329945],["oil","res",394102],["oil","tpt",2642527],["oil","ne",1101620],["oil","own",189395],["elec","ind",1148450],["elec","com",1055302],["elec","res",907557],["elec","tpt",59458],["elec","heat",3884],["elec","own",408620],["elec","rej",4933509],["heat","ind",737229],["heat","com",44947],["heat","res",993],["heat","rej",346831],["own","rej",761056],["res","svc",1103166],["res","rej",594012],["com","svc",1164524],["com","rej",627051],["ind","svc",1941721],["ind","rej",2020975],["tpt","svc",567548],["tpt","rej",2135063]],"meta":{"domestic_primary_supply_TJ":17461344,"final_consumption_TJ":11280435,"electricity_generated_TJ":3583272,"non_energy_use_TJ":1126372}}};
+
+const STATE = { se: 2024, jp: 2024 };
+let UNIT = "PJ";
+
+const W = 1560, H = 900;
+const CHART_TOP = 132, CHART_BOT = 772;
+const COL_X = {0: 56, 1: 600, 2: 1010, 3: 1372};
+const BOX_W = 118, GAP = 10, MIN_H = 28;
+const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+
+const conv = tj => UNIT === "PJ" ? tj/1000 : tj/3600;
+function fmtV(tj){
+  const v = conv(tj);
+  const d = v >= 100 ? 0 : v >= 1 ? 1 : 2;
+  return v.toLocaleString("en-US", {maximumFractionDigits: d});
+}
+const fmtU = tj => fmtV(tj) + " " + UNIT;
+function tipBoth(tj){
+  const pj  = (tj/1000).toLocaleString("en-US", {maximumFractionDigits: tj >= 100000 ? 0 : 1});
+  const twh = (tj/3600).toLocaleString("en-US", {maximumFractionDigits: tj >= 360000 ? 0 : 1});
+  return `${pj} PJ  ·  ${twh} TWh`;
+}
+function textColor(hex){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return (0.299*r+0.587*g+0.114*b)/255 > 0.55 ? "#1d232a" : "#ffffff";
+}
+function shade(hex,f){
+  const c=i=>Math.round(parseInt(hex.slice(i,i+2),16)*(1-f));
+  return "#"+[c(1),c(3),c(5)].map(v=>v.toString(16).padStart(2,"0")).join("");
+}
+function wrapName(label){
+  if (label.length <= 14 || !label.includes(" ")) return [label];
+  const w = label.split(" ");
+  let best=1, diff=1e9;
+  for (let i=1;i<w.length;i++){
+    const a=w.slice(0,i).join(" ").length, b=w.slice(i).join(" ").length;
+    if (Math.abs(a-b)<diff){diff=Math.abs(a-b);best=i;}
+  }
+  return [w.slice(0,best).join(" "), w.slice(best).join(" ")];
+}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+const ds = key => DATASETS[key + STATE[key]];
+
+function layout(d){
+  const nodes = {};
+  d.nodes.forEach((n,i) => nodes[n.id] = Object.assign({}, n, {order:i, in:0, out:0}));
+  d.flows.forEach(([s,t,v]) => { nodes[s].out += v; nodes[t].in += v; });
+  const cols = [0,1,2,3].map(c => d.nodes.filter(n=>n.col===c).map(n=>nodes[n.id]));
+  const avail = CHART_BOT - CHART_TOP;
+  let scale = Infinity;
+  cols.forEach(list => {
+    if (!list.length) return;
+    const tot = list.reduce((a,n)=>a+Math.max(n.in,n.out),0);
+    scale = Math.min(scale, (avail - GAP*(list.length-1))/tot);
+  });
+  for (let i=0;i<100;i++){
+    const over = cols.some(list =>
+      list.reduce((a,n)=>a+Math.max(MIN_H,Math.max(n.in,n.out)*scale),0)+GAP*(list.length-1) > avail);
+    if (!over) break;
+    scale *= 0.98;
+  }
+  cols.forEach(list => {
+    const tot = list.reduce((a,n)=>a+Math.max(MIN_H,Math.max(n.in,n.out)*scale),0)+GAP*(list.length-1);
+    let y = CHART_TOP + (avail-tot)/2;
+    list.forEach(n => {
+      n.h = Math.max(MIN_H, Math.max(n.in,n.out)*scale);
+      n.y = y; y += n.h + GAP; n.x = COL_X[n.col];
+    });
+  });
+  const flows = d.flows.map(([s,t,v]) => ({s:nodes[s], t:nodes[t], v, h:Math.max(1, v*scale)}));
+  const oc={}, ic={};
+  Object.values(nodes).forEach(n => {
+    oc[n.id] = n.y + Math.max(0,(n.h-n.out*scale)/2);
+    ic[n.id] = n.y + Math.max(0,(n.h-n.in*scale)/2);
+  });
+  Object.values(nodes).forEach(n => {
+    flows.filter(f=>f.s===n).sort((a,b)=>(a.t.y-b.t.y)||(a.t.col-b.t.col))
+      .forEach(f => { f.y0 = oc[n.id]; oc[n.id] += f.h; });
+  });
+  Object.values(nodes).forEach(n => {
+    flows.filter(f=>f.t===n).sort((a,b)=>(a.s.y-b.s.y)||(a.s.col-b.s.col))
+      .forEach(f => { f.y1 = ic[n.id]; ic[n.id] += f.h; });
+  });
+  return {nodes, flows};
+}
+
+function render(key){
+  const d = ds(key);
+  const {nodes, flows} = layout(d);
+  const rejOut = {};
+  d.flows.forEach(([s,t,v]) => { if (t==="rej") rejOut[s] = (rejOut[s]||0)+v; });
+  const P = d.nodes.filter(n=>n.col===0).reduce((a,n)=>a+nodes[n.id].out,0);
+  const E = nodes.elec.out - (rejOut.elec||0);
+  const F = ["res","com","ind","tpt","ne"].reduce((a,id)=>a+(nodes[id]?nodes[id].in:0),0);
+
+  const p = [];
+  p.push(`<svg class="sankey" id="svg-${key}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" font-family='${FONT}'>`);
+  p.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>`);
+  p.push(`<text x="${W/2}" y="46" font-size="26" font-weight="700" fill="#1d232a" text-anchor="middle">${esc(d.title)}: ${fmtU(P)}</text>`);
+  p.push(`<text x="${W/2}" y="74" font-size="14.5" fill="#5a636e" text-anchor="middle">Primary energy supply ${fmtU(P)}  ·  Electricity generated ${fmtU(E)}  ·  Final energy consumption ${fmtU(F)} (incl. non-energy use)</text>`);
+  [["PRIMARY SUPPLY",0],["CONVERSION",1],["FINAL SECTORS",2],["END USE",3]].forEach(([t,c]) =>
+    p.push(`<text x="${COL_X[c]+BOX_W/2}" y="${CHART_TOP-16}" font-size="12" font-weight="700" letter-spacing="2.5" fill="#9aa0a8" text-anchor="middle">${t}</text>`));
+
+  const labels = [];
+  flows.forEach(f => {
+    const x0=f.s.x+BOX_W, x1=f.t.x, ya=f.y0, yb=f.y0+f.h, yc=f.y1, yd=f.y1+f.h, mx=(x0+x1)/2;
+    const path=`M${x0},${ya} C${mx},${ya} ${mx},${yc} ${x1},${yc} L${x1},${yd} C${mx},${yd} ${mx},${yb} ${x0},${yb} Z`;
+    let color=f.s.color;
+    if (f.t.id==="svc") color="#77848f";
+    if (f.t.id==="rej") color="#c4c4c0";
+    if (f.s.id==="own") color="#c4c4c0";
+    p.push(`<path d="${path}" fill="${color}" opacity="0.55" data-tip="${esc(f.s.label+" → "+f.t.label)}|${tipBoth(f.v)}" class="flow"/>`);
+    if (f.h >= 11) labels.push({x:x0+7, y:ya+f.h/2+3.5, v:f.v, c:shade(color,0.35)});
+  });
+
+  Object.values(nodes).forEach(n => {
+    const tp = Math.max(n.in,n.out), tc = textColor(n.color), cx = n.x+BOX_W/2;
+    p.push(`<rect x="${n.x}" y="${n.y}" width="${BOX_W}" height="${n.h}" fill="${n.color}" stroke="#00000038" stroke-width="0.8" data-tip="${esc(n.label)}|${tipBoth(tp)}" class="nodeRect"/>`);
+    const isConv = (n.id==="elec"||n.id==="heat");
+    const nameLines = (n.h>=52) ? wrapName(n.label) : [n.label];
+    const valLines = (isConv && n.h>=66) ? [`${fmtV(n.in)} in`, `${fmtV(n.out-(rejOut[n.id]||0))} out`] : [fmtV(tp)];
+    const fs = Math.min(12, 205/Math.max.apply(null, nameLines.map(l=>l.length)));
+    const lh = 13.5, all = nameLines.length+valLines.length;
+    let ty = n.y + n.h/2 - (all-1)*lh/2 + 4;
+    nameLines.forEach(l => { p.push(`<text x="${cx}" y="${ty}" font-size="${fs.toFixed(1)}" font-weight="700" fill="${tc}" text-anchor="middle">${esc(l)}</text>`); ty+=lh; });
+    valLines.forEach(l => { p.push(`<text x="${cx}" y="${ty}" font-size="11" fill="${tc}" text-anchor="middle">${l}</text>`); ty+=lh; });
+  });
+
+  labels.forEach(L => p.push(`<text x="${L.x}" y="${L.y}" font-size="10.5" font-weight="600" fill="${L.c}" paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">${fmtV(L.v)}</text>`));
+
+  p.push(`<text x="28" y="${H-46}" font-size="10.5" fill="#8b9199">${esc(d.source)}</text>`);
+  p.push(`<text x="28" y="${H-30}" font-size="10.5" fill="#8b9199">${esc(d.note)}</text>`);
+  p.push(`<text x="28" y="${H-14}" font-size="10.5" fill="#8b9199">All values in ${UNIT==="PJ"?"petajoules (PJ); 1 PJ = 0.2778 TWh":"terawatt-hours (TWh); 1 TWh = 3.6 PJ"}. Larger flows are labelled; hover any flow for exact values.</text>`);
+  p.push(`</svg>`);
+  document.getElementById("chart-"+key).innerHTML = p.join("");
+  attachTips(key);
+  renderYoY(key);
+}
+
+/* ── year-on-year comparison table ─────────────────────────────── */
+function renderYoY(key){
+  const a = DATASETS[key+"2023"], b = DATASETS[key+"2024"];
+  const bands = d => {
+    const m = {};
+    const ids = new Set(d.nodes.filter(n=>n.col===0).map(n=>n.id));
+    const lab = {};
+    d.nodes.forEach(n => lab[n.id]=n.label);
+    d.flows.forEach(([s,t,v]) => { if (ids.has(s)) m[s]=(m[s]||0)+v; });
+    return {m, lab};
+  };
+  const A = bands(a), B = bands(b);
+  const keys = Array.from(new Set(Object.keys(A.m).concat(Object.keys(B.m))))
+    .sort((x,y) => (B.m[y]||0)-(B.m[x]||0));
+  const cur = STATE[key];
+  let html = `<h3>Change from ${a.yearLabel} to ${b.yearLabel} — primary supply by source`
+           + `<span style="text-transform:none;letter-spacing:0;font-weight:400"> (currently showing ${cur===2023?a.yearLabel:b.yearLabel})</span></h3>`;
+  html += `<table><tr><th>Source</th><th style="text-align:right">${a.yearLabel}</th><th style="text-align:right">${b.yearLabel}</th><th style="text-align:right">Change</th></tr>`;
+  keys.forEach(k => {
+    const x = A.m[k]||0, y = B.m[k]||0, dpc = x ? (y-x)/x*100 : 0;
+    const cls = (y-x) > 0 ? "up" : "down";
+    const sign = (y-x) >= 0 ? "+" : "−";
+    html += `<tr><td>${esc(B.lab[k]||A.lab[k]||k)}</td><td class="num">${fmtV(x)}</td><td class="num">${fmtV(y)}</td>`
+         +  `<td class="num ${cls}">${sign}${Math.abs(dpc).toFixed(1)}%</td></tr>`;
+  });
+  const ta = Object.values(A.m).reduce((s,v)=>s+v,0), tb = Object.values(B.m).reduce((s,v)=>s+v,0);
+  html += `<tr><td><b>Total</b></td><td class="num"><b>${fmtV(ta)}</b></td><td class="num"><b>${fmtV(tb)}</b></td>`
+       +  `<td class="num"><b>${tb>=ta?"+":"−"}${Math.abs((tb-ta)/ta*100).toFixed(1)}%</b></td></tr></table>`;
+  html += `<p style="font-size:12px;color:#5a636e;margin-top:8px">Values in ${UNIT}.</p>`;
+  document.getElementById("yoy-"+key).innerHTML = html;
+}
+
+/* ── tooltips ──────────────────────────────────────────────────── */
+const tip = document.getElementById("tip");
+function attachTips(key){
+  document.querySelectorAll(`#svg-${key} [data-tip]`).forEach(el => {
+    el.addEventListener("mousemove", e => {
+      const parts = el.getAttribute("data-tip").split("|");
+      tip.innerHTML = `<b>${parts[0]}</b><br>${parts[1]}`;
+      tip.style.display = "block";
+      tip.style.left = Math.min(e.clientX+14, window.innerWidth-350) + "px";
+      tip.style.top  = (e.clientY+16) + "px";
+      if (el.classList.contains("flow")) el.setAttribute("opacity","0.85");
+    });
+    el.addEventListener("mouseleave", () => {
+      tip.style.display = "none";
+      if (el.classList.contains("flow")) el.setAttribute("opacity","0.55");
+    });
+  });
+}
+
+/* ── export ────────────────────────────────────────────────────── */
+function svgString(key){
+  const svg = document.getElementById("svg-"+key).cloneNode(true);
+  svg.removeAttribute("class");
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(svg);
+}
+function triggerDownload(url, name){
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function downloadSVG(key){
+  const url = URL.createObjectURL(new Blob([svgString(key)], {type:"image/svg+xml;charset=utf-8"}));
+  triggerDownload(url, ds(key).file + ".svg");
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function downloadPNG(key, scale){
+  scale = scale || 4;
+  const url = URL.createObjectURL(new Blob([svgString(key)], {type:"image/svg+xml;charset=utf-8"}));
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement("canvas");
+    c.width = W*scale; c.height = H*scale;
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,c.width,c.height);
+    ctx.drawImage(img,0,0,c.width,c.height);
+    URL.revokeObjectURL(url);
+    c.toBlob(b => {
+      const u = URL.createObjectURL(b);
+      triggerDownload(u, ds(key).file + "_" + (W*scale) + "px.png");
+      setTimeout(() => URL.revokeObjectURL(u), 4000);
+    }, "image/png");
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); alert("PNG export failed — try the SVG download instead."); };
+  img.src = url;
+}
+
+/* ── controls ──────────────────────────────────────────────────── */
+function setUnit(u){
+  UNIT = u;
+  document.querySelectorAll(".unit-btn").forEach(b => b.classList.toggle("on", b.dataset.unit===u));
+  render("se"); render("jp");
+}
+function setYear(key, y){
+  STATE[key] = parseInt(y,10);
+  render(key);
+}
+function showTab(key){
+  tip.style.display = "none";
+  ["se","jp"].forEach(k => {
+    document.getElementById("panel-"+k).classList.toggle("on", k===key);
+    document.getElementById("tab-"+k).classList.toggle("on", k===key);
+  });
+}
+window.addEventListener("scroll", () => { tip.style.display = "none"; }, {passive:true});
+
+render("se");
+render("jp");
+</script>
+</body>
+</html>
