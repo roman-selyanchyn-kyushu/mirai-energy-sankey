@@ -22,9 +22,8 @@ COLORS = {
 
 LABELS = {
     "se": {"nuclear": "Nuclear", "hydro": "Hydro", "wind": "Wind", "solar": "Solar",
-           "geo": "Geothermal", "bio": "Biomass & biofuels", "amb": "Ambient heat",
-           "wh": "Industrial waste heat", "wst": "Non-renewable waste",
-           "coal": "Coal & peat", "gas": "Natural gas", "oil": "Oil",
+           "bio": "Biomass & biofuels", "amb": "Ambient & recovered heat",
+           "wst": "Other fuels & waste", "coal": "Coal & coke", "gas": "Natural gas", "oil": "Oil",
            "elec": "Electricity generation", "heat": "District heating"},
     "jp": {"nuclear": "Nuclear", "hydro": "Hydro", "wind": "Wind", "solar": "Solar",
            "geo": "Geothermal", "bio": "Biomass", "wst": "Waste & recovered energy",
@@ -37,17 +36,17 @@ BAND_ORDER = ["nuclear", "hydro", "wind", "solar", "geo", "bio", "amb", "wh",
               "wst", "coal", "gas", "oil"]
 
 SOURCES = {
-    "se": ("Data: Eurostat complete energy balances (nrg_bal_c) and production of electricity "
-           "and derived heat by fuel (nrg_bal_peh), Sweden, calendar year {year}. "
+    "se": ("Data: Energimyndigheten (Swedish Energy Agency), official annual energy balance, table EN0202_A, "
+           "calendar year {year}, terajoules. "
            "End-use efficiency assumptions per LLNL: residential/commercial 65%, industrial 49%, transport 21%."),
     "jp": ("Data: METI Comprehensive Energy Statistics (総合エネルギー統計), Japan, fiscal year {year} "
            "(確報 revised), energy-unit balance table stte_{year}.xlsx. "
            "End-use efficiency assumptions per LLNL: residential/commercial 65%, industrial 49%, transport 21%."),
 }
 NOTES = {
-    "se": ("Only additive Eurostat balance components are used; bioenergy is the residual of RA000 after "
-           "removing hydro, wind, solar, ambient and geothermal. CHP fuel split by each fuel's gross "
-           "electricity vs heat output. Ambient heat from building heat pumps allocated 80/20 residential/commercial."),
+    "se": ("Only top-level commodities are summed, so the source hierarchy is never double-counted. CHP fuel "
+           "is split between electricity and district heating by the plants' own reported output shares. "
+           "Ambient heat includes the heat-pump input the national balance does not book as a supply item."),
     "jp": ("Utility and auto-producer generation merged; auto-steam boilers and the heat-supply business merged. "
            "Aggregated bands net out product manufacture inside the band (coke ovens, refineries, gas works), "
            "so natural gas converted to city gas is not counted twice."),
@@ -67,23 +66,25 @@ def footnotes(country, ds_flows, meta):
 
     if country == "se":
         nuc = band_out.get("nuclear", 0) / 1000
+        nel = (meta.get("nuclear_electricity_TJ") or 0) / 1000
+        eff = (nel / nuc * 100) if nuc else 0
         notes.append({
             "marker": "†", "nodes": ["nuclear"],
-            "text": (f"† Primary-energy convention (Eurostat physical energy content method): nuclear is shown as "
-                     f"reactor heat, {nuc:,.0f} PJ, of which about 36% becomes electricity; hydro, wind and solar are "
+            "text": (f"† Primary-energy convention (physical energy content method): nuclear is shown as reactor heat, "
+                     f"{nuc:,.0f} PJ, of which {nel:,.0f} PJ ({eff:.1f}%) becomes electricity; hydro, wind and solar are "
                      f"shown as generated electricity (1:1). Band widths are therefore not comparable across source "
                      f"types, and the rejected energy leaving the electricity node reflects this accounting "
                      f"convention rather than the relative efficiency of the sources.")
         })
-        msw = (meta.get("renewable_municipal_waste_TJ") or 0) / 1000
+        msw = (meta.get("biogenic_municipal_waste_TJ") or 0) / 1000
         tbf = (meta.get("transport_biofuel_TJ") or 0) / 1000
         notes.append({
             "marker": "‡", "nodes": ["bio", "wst"],
-            "text": (f"‡ Biomass and waste scope: Eurostat splits municipal waste, so the biogenic half ({msw:,.0f} PJ) "
-                     f"sits inside this biomass band while the fossil half is drawn separately as non-renewable waste. "
-                     f"Biomass here also includes {tbf:,.0f} PJ of liquid transport biofuels. Japan does not split "
-                     f"municipal waste and excludes it from biomass altogether, so neither the biomass nor the waste "
-                     f"bands mean the same thing in the two charts.")
+            "text": (f"‡ Biomass and waste scope: the Swedish balance splits municipal waste, so the biogenic half "
+                     f"({msw:,.0f} PJ) sits inside this biomass band while the fossil half sits in other fuels & waste "
+                     f"together with peat. Biomass here also includes {tbf:,.0f} PJ of liquid transport biofuels. Japan "
+                     f"does not split municipal waste and excludes it from biomass altogether, so neither the biomass "
+                     f"nor the waste bands mean the same thing in the two charts.")
         })
     else:
         f = meta.get("primary_equivalent_factor") or 0.418

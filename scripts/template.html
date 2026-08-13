@@ -91,9 +91,9 @@
 <header class="page">
   <h1>Energy Flow Diagrams — Sweden &amp; Japan</h1>
   <p class="sub">Estimated national energy flows for <b>2023 and 2024</b>, drawn in the style of the
-  Lawrence Livermore National Laboratory energy flow charts and built directly from official statistics:
-  Eurostat energy balances (Sweden, calendar years) and METI Comprehensive Energy Statistics
-  (Japan, fiscal years). Choose a year from the dropdown, hover any flow for values, and switch
+  Lawrence Livermore National Laboratory energy flow charts and built directly from each country's
+  national statistics: the Energimyndigheten annual energy balance (Sweden, calendar years) and METI
+  Comprehensive Energy Statistics (Japan, fiscal years). Choose a year from the dropdown, hover any flow for values, and switch
   between PJ and TWh. Charts are scaled independently — Japan’s system is roughly 9× larger than Sweden’s.</p>
 </header>
 
@@ -126,85 +126,87 @@
   <details class="method">
     <summary>Data sources, verification &amp; methodology — Sweden</summary>
     <div class="inner">
-      <h3>Sources</h3>
+      <h3>Source</h3>
       <ul>
-        <li>Eurostat, <a href="https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_c/default/table" target="_blank" rel="noopener">Complete energy balances (nrg_bal_c)</a>, Sweden, 2023 and 2024, terajoules.</li>
-        <li>Eurostat, <a href="https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_peh/default/table" target="_blank" rel="noopener">Production of electricity and derived heat by fuel (nrg_bal_peh)</a>, Sweden, 2023 and 2024.</li>
-        <li>Retrieved from the Eurostat REST API; dataset update of 2 June 2026. Both years are final — no provisional or estimated flags.</li>
-        <li>Eurostat receives these figures from <b>Energimyndigheten</b> (Swedish Energy Agency), so they
-        originate as the Agency’s own statistics — but Eurostat republishes them in a harmonised structure,
-        and the harmonisation shifts some aggregates. Checked against the Agency’s official annual energy
-        balance (<a href="https://pxexternal.energimyndigheten.se/pxweb/en/Energimyndighetens_statistikdatabas/" target="_blank" rel="noopener">statistics database</a>, table EN0202_A, 2023 and 2024):</li>
+        <li><b>Energimyndigheten</b> (Swedish Energy Agency), official annual energy balance
+        <b>EN0202_A</b> “Energy balance, 2005–”, calendar years 2023 and 2024, in terajoules, retrieved from the
+        <a href="https://pxexternal.energimyndigheten.se/pxweb/en/Energimyndighetens_statistikdatabas/" target="_blank" rel="noopener">Agency’s statistics database</a> (PxWeb API); table updated 30 April 2026.</li>
+        <li>This is Sweden’s <b>national primary source</b>, matching the use of METI’s national statistics for
+        Japan. Earlier versions of this chart used Eurostat, which republishes the same underlying statistics
+        in a harmonised structure; see the note on the two below.</li>
+        <li>The source table is 96 hierarchical balance rows × 44 energy commodities. Only <b>top-level
+        commodities</b> are summed into bands, so the hierarchy is never double-counted.</li>
       </ul>
+      <h3>Verified totals</h3>
       <table>
-        <tr><th>Quantity (2023)</th><th>Energimyndigheten</th><th>Eurostat (used here)</th><th>Difference</th></tr>
+        <tr><th>Quantity</th><th>2023</th><th>2024</th></tr>
+        <tr><td>Gross electricity production</td><td class="num">597,188 TJ (165.9 TWh)</td><td class="num">619,653 TJ (172.1 TWh)</td></tr>
+        <tr><td>… of which nuclear</td><td class="num">174,492 TJ</td><td class="num">182,395 TJ</td></tr>
+        <tr><td>Gross district-heat production</td><td class="num">220,352 TJ</td><td class="num">213,120 TJ</td></tr>
+        <tr><td>Net electricity export</td><td class="num">102,650 TJ (28.5 TWh)</td><td class="num">120,242 TJ (33.4 TWh)</td></tr>
+        <tr><td>Final energy consumption</td><td class="num">1,271,729 TJ</td><td class="num">1,271,753 TJ</td></tr>
+        <tr><td>Non-energy use</td><td class="num">73,178 TJ</td><td class="num">90,111 TJ</td></tr>
+      </table>
+      <p>Both conversion boxes reconcile to the Agency’s published production figures to within 2 TJ
+      (0.000%), and every node balances exactly. The electricity balance closes as
+      production = final consumption + own use + grid losses + net export + heat-plant use + statistical
+      difference; derived heat closes as production = final consumption + distribution losses + statistical
+      difference.</p>
+      <h3>How the numbers were derived</h3>
+      <ul>
+        <li><b>CHP split</b> — combined heat and power plants report their electricity and heat output
+        separately, so fuel input is divided by those actual output shares (26.6% electricity in 2023,
+        24.5% in 2024) rather than by an assumption.</li>
+        <li><b>Ambient &amp; recovered heat</b> — the balance books 18.9 PJ (2023) of primary heat into CHP and
+        heat-only plants. Swedish heat-only plants deliver more heat than their booked fuel input because the
+        ambient heat that heat pumps draw from air, water and sewage is not recorded as a supply item; that
+        implicit ambient heat (4.8 PJ in 2023) is added so the box closes. Unlike Eurostat, the national
+        balance does <b>not</b> count ambient heat captured by <i>building</i> heat pumps at all, so no ambient
+        heat reaches the final sectors here.</li>
+        <li><b>Sectors</b> — Industrial = industry + construction; Commercial &amp; services = commercial,
+        public administration, agriculture, forestry and fishing.</li>
+        <li><b>Own use &amp; losses</b> is each band’s residual, so it bundles energy-sector own use,
+        distribution losses, refinery, coke-oven and blast-furnace losses, pumped-storage consumption and the
+        statistical difference.</li>
+        <li><b>Oil</b> combines crude oil and refinery feedstocks with petroleum products; Sweden is a net
+        exporter of refined products, so the band is net of that trade.</li>
+        <li><b>End use</b> applies the LLNL efficiency assumptions: residential and commercial 65%,
+        industrial 49%, transport 21%.</li>
+      </ul>
+      <h3>Primary-energy convention (important when reading band widths)</h3>
+      <p>The balance uses the <b>physical energy content</b> method, which does not treat all generating
+      sources alike:</p>
+      <table>
+        <tr><th>Source</th><th>Input to generation</th><th>Electricity out</th><th>Implied</th></tr>
+        <tr><td>Nuclear (2023 / 2024)</td><td class="num">488,248 / 510,026 TJ</td><td class="num">174,492 / 182,395 TJ</td><td class="num">35.7% / 35.8%</td></tr>
+        <tr><td>Hydro</td><td class="num">237,927 / 232,337 TJ</td><td class="num">237,927 / 232,337 TJ</td><td class="num">100%</td></tr>
+        <tr><td>Wind</td><td class="num">122,669 / 145,508 TJ</td><td class="num">122,669 / 145,508 TJ</td><td class="num">100%</td></tr>
+        <tr><td>Solar</td><td class="num">11,167 / 14,928 TJ</td><td class="num">11,167 / 14,928 TJ</td><td class="num">100%</td></tr>
+      </table>
+      <p>Nuclear therefore enters as <b>reactor heat</b>, roughly 2.8× the electricity it yields, while hydro,
+      wind and solar enter as generated electricity. <b>Band widths are not comparable across source types</b>,
+      and the rejected energy leaving the electricity node is largely a consequence of this convention rather
+      than a measure of the relative efficiency of the sources. Japan applies a different convention again
+      (a single 41.8–42.4% factor to <i>all</i> generating sources), so band widths must not be compared
+      between the two charts.</p>
+      <h3>Relationship to Eurostat</h3>
+      <p>Eurostat republishes these Swedish statistics in a harmonised structure. Nuclear electricity is
+      identical in both (174,492 TJ in 2023, to 1 TJ), confirming common origin, but harmonisation shifts
+      other aggregates — Eurostat implies a 36.00% nuclear thermal efficiency against the Agency’s 35.74%,
+      and differs in the scope of derived heat, final consumption and non-energy use:</p>
+      <table>
+        <tr><th>Quantity (2023)</th><th>Energimyndigheten (used here)</th><th>Eurostat</th><th>Difference</th></tr>
         <tr><td><b>Nuclear electricity</b></td><td class="num">174,492 TJ</td><td class="num">174,492 TJ</td><td class="num"><b>0.00%</b></td></tr>
         <tr><td>Gross electricity, total</td><td class="num">597,188 TJ</td><td class="num">597,935 TJ</td><td class="num">−0.12%</td></tr>
-        <tr><td>Hydro / wind / solar electricity</td><td class="num">237,927 / 122,669 / 11,167</td><td class="num">238,464 / 123,282 / 11,210</td><td class="num">−0.2 to −0.5%</td></tr>
         <tr><td>Nuclear reactor heat</td><td class="num">488,248 TJ</td><td class="num">484,672 TJ</td><td class="num">+0.74%</td></tr>
         <tr><td>Gross derived heat</td><td class="num">220,352 TJ</td><td class="num">217,869 TJ</td><td class="num">+1.14%</td></tr>
         <tr><td>Final energy consumption</td><td class="num">1,271,729 TJ</td><td class="num">1,301,927 TJ</td><td class="num">−2.32%</td></tr>
         <tr><td>Non-energy use</td><td class="num">73,178 TJ</td><td class="num">77,313 TJ</td><td class="num">−5.35%</td></tr>
       </table>
-      <p><b>Nuclear electricity matches exactly</b> (to 1 TJ in both years), confirming a common origin.
-      The remaining gaps are harmonisation, not disagreement: Eurostat implies a 36.00% nuclear thermal
-      efficiency where the Agency reports about 35.74%, and Eurostat’s definitions of derived heat, final
-      consumption and non-energy use differ slightly in scope. Figures on this chart are Eurostat’s;
-      the Agency’s own publication will differ by the amounts above.</p>
-      <h3>Verified totals</h3>
-      <table>
-        <tr><th>Quantity</th><th>2023</th><th>2024</th></tr>
-        <tr><td>Gross electricity production</td><td class="num">597,935 TJ (166.1 TWh)</td><td class="num">620,521 TJ (172.4 TWh)</td></tr>
-        <tr><td>Gross derived-heat production</td><td class="num">217,869 TJ</td><td class="num">211,032 TJ</td></tr>
-        <tr><td>Net electricity export</td><td class="num">102,571 TJ (28.5 TWh)</td><td class="num">120,378 TJ (33.4 TWh)</td></tr>
-        <tr><td>Final energy consumption</td><td class="num">1,301,927 TJ</td><td class="num">1,311,379 TJ</td></tr>
-        <tr><td>Non-energy use</td><td class="num">77,313 TJ</td><td class="num">81,658 TJ</td></tr>
-      </table>
-      <p>Every conversion box closes exactly: box inputs equal box outputs to within 1 TJ in both years
-      (verified programmatically for all four datasets).</p>
-      <h3>How the numbers were derived</h3>
-      <ul>
-        <li><b>Only additive balance components are used.</b> Eurostat also publishes attributed memo
-        aggregates — <code>BIOE</code> (Bioenergy) and <code>FE</code> (Fossil energy) — which include the
-        fuel embodied in delivered heat and electricity. Using them would double-count: for Swedish
-        households in 2023, <code>BIOE</code> reads 106,436 TJ while the additive renewables component
-        <code>RA000</code> reads 34,156 TJ, because most Swedish district heat is biomass-fired. The
-        verified additive identity used here is
-        <code>E7000 + H8000 + RA000 + O4000XBIO + G3000 + solids = TOTAL</code>.</li>
-        <li><b>Bioenergy</b> is therefore taken as the residual of <code>RA000</code> after removing the
-        renewable carriers drawn as their own bands (hydro, wind, solar, ambient heat, geothermal).</li>
-        <li><b>CHP fuel inputs</b> are split between the electricity and district-heating boxes in
-        proportion to each fuel’s gross electricity vs. gross heat output (from nrg_bal_peh).</li>
-        <li><b>Ambient heat</b> (heat pumps): the part entering district heating comes from
-        <code>TI_EHG_E [RA600]</code>; the part captured by building heat pumps is reported by Eurostat
-        as non-specified and is allocated 80% residential / 20% commercial.</li>
-        <li><b>Industrial waste heat</b> is Eurostat fuel class <code>X9900</code> feeding district
-        heating (flue-gas condensation and recovered industrial heat); its input is taken equal to its output.</li>
-        <li><b>Commercial &amp; services</b> combines commercial/public services, agriculture, forestry and fishing.</li>
-        <li><b>Coal &amp; peat</b> includes manufactured gases (coke-oven and blast-furnace gas) and peat.
-        Non-energy use (feedstocks, lubricants, bitumen) is a separate terminal. Marine bunkers are
-        excluded per Eurostat convention; international aviation is included in transport.</li>
-        <li><b>End use</b> applies the LLNL efficiency assumptions: residential and commercial 65%,
-        industrial 49%, transport 21%.</li>
-      </ul>
-      <h3>Primary-energy convention (important when reading band widths)</h3>
-      <p>Eurostat uses the <b>physical energy content</b> method, which does not treat all generating
-      sources alike. Verified from the balance tables:</p>
-      <table>
-        <tr><th>Source</th><th>Input to generation</th><th>Electricity out</th><th>Implied</th></tr>
-        <tr><td>Nuclear (2023 / 2024)</td><td class="num">484,672 / 506,226 TJ</td><td class="num">174,492 / 182,394 TJ</td><td class="num">36.0% / 36.0%</td></tr>
-        <tr><td>Hydro</td><td class="num">238,273 / 232,614 TJ</td><td class="num">238,464 / 232,787 TJ</td><td class="num">100%</td></tr>
-        <tr><td>Wind</td><td class="num">123,282 / 146,236 TJ</td><td class="num">123,282 / 146,236 TJ</td><td class="num">100%</td></tr>
-        <tr><td>Solar PV</td><td class="num">11,210 / 14,987 TJ</td><td class="num">11,210 / 14,987 TJ</td><td class="num">100%</td></tr>
-      </table>
-      <p>Nuclear therefore enters the chart as <b>reactor heat</b>, roughly 2.8× the electricity it yields,
-      while hydro, wind and solar enter as generated electricity. <b>Band widths are not comparable across
-      source types</b>, and the rejected energy leaving the electricity node is largely a consequence of this
-      convention rather than a measure of the relative efficiency of the sources. Japan applies a different
-      convention again (a single 41.8–42.4% factor to <i>all</i> generating sources), so band widths must not
-      be compared between the two charts.</p>
+      <p>The largest single cause of the final-consumption gap is ambient heat: Eurostat books ~63 PJ of heat
+      captured by building heat pumps as final consumption, which the national balance does not record.</p>
       <h3>Comparison with the IEA energy Sankey</h3>
-      <p>For 2023 the IEA reports a total energy supply of 1,892 PJ against 1,975 PJ here. The two agree
+      <p>For 2023 the IEA reports a total energy supply of 1,892 PJ against 1,951 PJ here. The two agree
       almost exactly where conventions coincide; the differences are accounting conventions, not data:</p>
       <ul>
         <li>Per fuel, IEA vs. this chart (PJ, 2023): biofuels &amp; waste 573.5 vs. 570.4; hydro 238.3 vs. 238.3;
@@ -339,7 +341,7 @@
 
 <footer>
   Built for the <b>MIRAI Research Group · Kyushu University</b>. Data compiled and verified August 2026.
-  Complete numbers for all four datasets, with the full derivation trail, are published alongside this page as
+  Sources: Energimyndigheten (Sweden) and METI (Japan). Complete numbers for all four datasets, with the full derivation trail, are published alongside this page as
   <a href="energy_sankey_data.xlsx">energy_sankey_data.xlsx</a>; the method is documented in the
   <a href="https://github.com/roman-selyanchyn-kyushu/mirai-energy-sankey" target="_blank" rel="noopener">project README</a>.
   Chart convention follows <a href="https://flowcharts.llnl.gov" target="_blank" rel="noopener">flowcharts.llnl.gov</a>.
