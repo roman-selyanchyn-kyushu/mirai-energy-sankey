@@ -326,10 +326,15 @@ Nuclear rose +9.7% (724 → 794 PJ) as reactor restarts continued, while hydro f
 
 - Country tabs (Sweden / Japan) with an independent **year dropdown** on each — 20 years for Sweden,
   35 for Japan
-- **Trend chart** under each diagram: primary supply by source across the whole series as a stacked area,
-  in the Sankey's own colours, with the selected year marked. Click it to jump the diagram to that year.
-  Points are positioned by calendar year, so any gap in a series shows as a real gap, and a caption names
-  missing years rather than letting the chart imply data that is not there
+- **Trend chart** under each diagram, with two views:
+  - *All sources* — the whole balance as a stacked area in the Sankey's own colours
+  - *A single source* — picked from the chips, the table or by clicking a band, drawn alone against its
+    **own rescaled y-axis**. This is the only way growth in a small source is visible: Japanese solar is
+    1/20th of the stack but goes 51.5 → 838 PJ, and only shows that shape on its own scale
+  A headline gives first → last, the change, the peak and its year, and today's share of supply. The
+  selected year is marked, clicking the chart jumps the diagram to a year, and the chart exports to
+  PNG (4×) or SVG on its own. Points are positioned by calendar year, so a gap in a series shows as a
+  real gap, and a caption names missing years rather than letting the chart imply data that is not there
 - **Click-to-trace**: clicking any box dims the rest of the chart and keeps only the flows touching that
   box, with a breakdown table underneath giving each flow's value and its share of the box's total
   (both directions for the conversion boxes). Clicking a ribbon selects the box it leaves from; clicking

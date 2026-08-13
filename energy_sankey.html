@@ -100,6 +100,27 @@
   svg.trend{width:100%;min-width:640px;height:auto;display:block}
   svg.trend .thit{cursor:pointer}
   svg.trend .thit:hover{fill:rgba(29,35,42,.05)}
+  svg.trend .tband{cursor:pointer}
+  svg.trend .tband:hover{opacity:1}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+  .chips .chip{
+    display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:12.5px;font-weight:600;
+    padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+    cursor:pointer;transition:all .13s;
+  }
+  .chips .chip i{width:9px;height:9px;border-radius:2px;background:var(--c,#9aa0a8);flex:none}
+  .chips .chip:hover{border-color:var(--c,var(--accent));color:var(--ink)}
+  .chips .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chips .tsave{margin-left:auto;display:inline-flex;gap:6px}
+  .chips .tdl{
+    font-family:var(--f-ui);font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;transition:all .13s;
+  }
+  .chips .tdl:hover{border-color:var(--accent);color:var(--accent)}
+  .yoy p.thead{font-size:13.5px;color:var(--ink);margin:6px 0 2px}
+  .yoy tr.trow{cursor:pointer}
+  .yoy tr.trow:hover td{background:#f7f6f2}
+  .yoy tr.trow.sel td{background:#eef4f6;font-weight:600}
   /* deliberately neutral: a rise or fall in a fuel is not inherently good or bad */
   .yoy .up,.yoy .down{color:var(--ink);font-weight:600}
   .yoy .down{color:#6b737d}
@@ -634,11 +655,18 @@ function renderNotes(key){
   el.innerHTML = h;
 }
 
-/* ── trend: primary supply by source across every published year ──
-   With twenty years a wide table stops being readable, so the whole series is
-   drawn as a stacked area chart and the table collapses to first / selected /
-   latest. Clicking the chart jumps the Sankey to that year. */
-const TR = {W: 1200, H: 300, ML: 68, MR: 14, MT: 14, MB: 28};
+/* ── trend: how supply changed across every published year ────────
+   Two views. "All sources" stacks the whole balance, which shows the size and
+   shape of the system but hides anything small. Picking a single source draws
+   it alone against its OWN y-scale, which is the only way growth in solar or
+   wind is visible next to oil. Clicking the chart jumps the Sankey to a year. */
+const TR = {W: 1200, H: 300, ML: 74, MR: 14, MT: 30, MB: 28};
+const TREND_BAND = {se: null, jp: null};   // null = stacked, otherwise a band id
+
+function setTrendBand(key, id){
+  TREND_BAND[key] = (id && TREND_BAND[key] === id) ? null : id;
+  renderTrend(key);
+}
 
 function trendBands(d){
   const m = {};
@@ -659,6 +687,15 @@ function trendOrder(sets){
   return {order, meta};
 }
 
+/* round the axis top up to a readable step, aiming for about four gridlines */
+function niceTicks(maxV){
+  if (!(maxV > 0)) return {step: 1, top: 1};
+  const mag = Math.pow(10, Math.floor(Math.log10(maxV/4)));
+  const n = (maxV/4)/mag;
+  const step = (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * mag;
+  return {step, top: Math.ceil(maxV/step)*step};
+}
+
 function renderTrend(key){
   const el = document.getElementById("yoy-"+key);
   const years = YEARS_BY[key];
@@ -668,112 +705,162 @@ function renderTrend(key){
   const {order, meta} = trendOrder(sets);
   const cur = STATE[key], curIdx = Math.max(0, years.indexOf(cur));
   const totals = B.map(m => Object.values(m).reduce((a,v)=>a+v, 0));
-  const peak = Math.max.apply(null, totals);
+  const sel = TREND_BAND[key];
+  const series = sel ? B.map(m => m[sel]||0) : null;
 
   const {W:CW, H:CH, ML, MR, MT, MB} = TR;
   const pw = CW-ML-MR, ph = CH-MT-MB;
   // position by the year itself, not by its index — the series may have gaps
   const y0 = years[0], y1 = years[years.length-1], span = (y1-y0) || 1;
   const X = i => ML + pw*(years[i]-y0)/span;
-  const Y = v => MT + ph*(1 - v/peak);
+  // the axis is rescaled to whichever series is on screen: that is the point of
+  // the single-source view, and why solar becomes legible at all
+  const t = niceTicks(conv(sel ? Math.max.apply(null, series) : Math.max.apply(null, totals)));
+  const Y = d => MT + ph*(1 - d/t.top);
 
-  // cumulative upper edge per year as bands are stacked
-  const acc = years.map(() => 0);
-  const p = [`<svg class="trend" viewBox="0 0 ${CW} ${CH}" width="${CW}" height="${CH}" xmlns="http://www.w3.org/2000/svg">`];
+  const p = [`<svg class="trend" viewBox="0 0 ${CW} ${CH}" width="${CW}" height="${CH}" xmlns="http://www.w3.org/2000/svg" font-family='${FONT}'>`];
+  p.push(`<rect x="0" y="0" width="${CW}" height="${CH}" fill="#ffffff"/>`);
 
-  // y grid
-  const step = Math.pow(10, Math.floor(Math.log10(conv(peak)))) * (conv(peak)/Math.pow(10, Math.floor(Math.log10(conv(peak)))) > 5 ? 2 : 1);
-  for (let g = 0; g <= conv(peak); g += step){
-    const y = Y(UNIT === "PJ" ? g*1000 : g*3600);
+  for (let g = 0; g <= t.top + 1e-9; g += t.step){
+    const y = Y(g);
     p.push(`<line x1="${ML}" y1="${y.toFixed(1)}" x2="${CW-MR}" y2="${y.toFixed(1)}" stroke="#e8e5dc" stroke-width="1"/>`);
-    p.push(`<text x="${ML-8}" y="${(y+3.5).toFixed(1)}" font-size="10.5" fill="#9aa0a8" text-anchor="end">${g.toLocaleString("en-US")}</text>`);
+    p.push(`<text x="${ML-8}" y="${(y+3.5).toFixed(1)}" font-size="10.5" fill="#9aa0a8" text-anchor="end">${g.toLocaleString("en-US", {maximumFractionDigits: t.step < 1 ? 2 : t.step < 10 ? 1 : 0})}</text>`);
   }
-  p.push(`<text x="${ML-8}" y="${MT-2}" font-size="10" font-weight="700" fill="#9aa0a8" text-anchor="end">${UNIT}</text>`);
+  p.push(`<text x="${ML-8}" y="${MT-10}" font-size="10" font-weight="700" fill="#9aa0a8" text-anchor="end">${UNIT}</text>`);
 
-  order.forEach(id => {
-    const top = years.map((_, i) => acc[i] + (B[i][id] || 0));
-    const upper = top.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" L");
-    const lower = acc.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).reverse().join(" L");
-    p.push(`<path d="M${upper} L${lower} Z" fill="${meta[id].color}" opacity="0.88" class="tband" data-band="${id}">`
-         + `<title>${esc(meta[id].label)}</title></path>`);
-    years.forEach((_, i) => acc[i] = top[i]);
-  });
+  if (sel){
+    const c = meta[sel].color;
+    const pts = series.map((v,i) => `${X(i).toFixed(1)},${Y(conv(v)).toFixed(1)}`);
+    p.push(`<path d="M${pts.join(" L")} L${X(years.length-1).toFixed(1)},${Y(0).toFixed(1)} L${X(0).toFixed(1)},${Y(0).toFixed(1)} Z" fill="${c}" opacity="0.18"/>`);
+    p.push(`<path d="M${pts.join(" L")}" fill="none" stroke="${c}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`);
+    series.forEach((v,i) => p.push(`<circle cx="${X(i).toFixed(1)}" cy="${Y(conv(v)).toFixed(1)}" r="${years[i]===cur?4.5:2.4}" fill="${years[i]===cur?"#fff":c}" stroke="${c}" stroke-width="${years[i]===cur?2.4:0}"/>`));
+  } else {
+    const acc = years.map(() => 0);
+    order.forEach(id => {
+      const top = years.map((_, i) => acc[i] + (B[i][id] || 0));
+      const upper = top.map((v, i) => `${X(i).toFixed(1)},${Y(conv(v)).toFixed(1)}`).join(" L");
+      const lower = acc.map((v, i) => `${X(i).toFixed(1)},${Y(conv(v)).toFixed(1)}`).reverse().join(" L");
+      p.push(`<path d="M${upper} L${lower} Z" fill="${meta[id].color}" opacity="0.88" class="tband" data-band="${id}" data-key="${key}">`
+           + `<title>${esc(meta[id].label)} — click to see this source on its own</title></path>`);
+      years.forEach((_, i) => acc[i] = top[i]);
+    });
+  }
 
-  // x axis: first, last, and every fifth calendar year in between that is far
-  // enough from the ends not to collide with them
+  // x axis: first, last, and every fifth calendar year far enough from the ends
   years.forEach((y, i) => {
     const edge = i === 0 || i === years.length-1;
     if (!edge && (y % 5 !== 0 || Math.abs(X(i)-X(0)) < 26 || Math.abs(X(years.length-1)-X(i)) < 26)) return;
     p.push(`<text x="${X(i).toFixed(1)}" y="${CH-8}" font-size="10.5" fill="#9aa0a8" text-anchor="middle">${y}</text>`);
   });
 
-  // marker on the year the Sankey is showing
-  p.push(`<line x1="${X(curIdx).toFixed(1)}" y1="${MT}" x2="${X(curIdx).toFixed(1)}" y2="${MT+ph}" stroke="#1d232a" stroke-width="1.6" stroke-dasharray="3 3"/>`);
-  p.push(`<circle cx="${X(curIdx).toFixed(1)}" cy="${Y(totals[curIdx]).toFixed(1)}" r="4.5" fill="#fff" stroke="#1d232a" stroke-width="2"/>`);
-  p.push(`<text x="${X(curIdx).toFixed(1)}" y="${(Y(totals[curIdx])-11).toFixed(1)}" font-size="11.5" font-weight="700" fill="#1d232a" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3.5" stroke-linejoin="round">${fmtU(totals[curIdx])}</text>`);
+  // marker on the year the Sankey is showing; the label is clamped inside the
+  // canvas and flips below the point near the top so it can never be cut off
+  const mv = sel ? series[curIdx] : totals[curIdx];
+  const my = Y(conv(mv));
+  const above = my > MT + 18;
+  const lx = Math.min(Math.max(X(curIdx), ML+34), CW-MR-34);
+  p.push(`<line x1="${X(curIdx).toFixed(1)}" y1="${MT}" x2="${X(curIdx).toFixed(1)}" y2="${MT+ph}" stroke="#1d232a" stroke-width="1.4" stroke-dasharray="3 3"/>`);
+  if (!sel) p.push(`<circle cx="${X(curIdx).toFixed(1)}" cy="${my.toFixed(1)}" r="4.5" fill="#fff" stroke="#1d232a" stroke-width="2"/>`);
+  p.push(`<text x="${lx.toFixed(1)}" y="${(above ? my-11 : my+18).toFixed(1)}" font-size="11.5" font-weight="700" fill="#1d232a" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3.5" stroke-linejoin="round">${sets[curIdx].yearLabel} · ${fmtU(mv)}</text>`);
 
   // invisible hit strips, each reaching halfway to its neighbours so a click
   // always lands on the nearest year even where the series has gaps
   years.forEach((y, i) => {
     const a = i === 0 ? ML : (X(i-1)+X(i))/2;
     const b = i === years.length-1 ? CW-MR : (X(i)+X(i+1))/2;
-    p.push(`<rect x="${a.toFixed(1)}" y="${MT}" width="${Math.max(1,b-a).toFixed(1)}" height="${ph}" fill="transparent" class="thit" data-year="${y}" data-key="${key}"><title>${sets[i].yearLabel} — ${fmtU(totals[i])}</title></rect>`);
+    const v = sel ? series[i] : totals[i];
+    const share = totals[i] ? ` · ${(v/totals[i]*100).toFixed(1)}% of supply` : "";
+    p.push(`<rect x="${a.toFixed(1)}" y="${MT}" width="${Math.max(1,b-a).toFixed(1)}" height="${ph}" fill="transparent" class="thit" data-year="${y}" data-key="${key}">`
+         + `<title>${sets[i].yearLabel} — ${fmtU(v)}${sel ? share : ""}</title></rect>`);
   });
   p.push(`</svg>`);
 
-  // If the series has holes, say so rather than letting the area chart imply
-  // data we do not hold: the bands are drawn straight across any missing years.
+  // ── source chips: the control that makes a single series visible ──
+  const chip = (id, label, color) =>
+    `<button class="chip${(sel===id)||(!sel&&!id)?" on":""}" data-band="${id||""}" data-key="${key}"`
+    + `${color?` style="--c:${color}"`:""}>${color?`<i></i>`:""}${esc(label)}</button>`;
+  const chips = `<div class="chips">` + chip(null, "All sources", null)
+    + order.slice().sort((a,b) => (B[years.length-1][b]||0) - (B[years.length-1][a]||0))
+           .map(id => chip(id, meta[id].label, meta[id].color)).join("")
+    + `<span class="tsave"><button class="tdl" data-fmt="png">PNG</button>`
+    + `<button class="tdl" data-fmt="svg">SVG</button></span>`
+    + `</div>`;
+
+  // ── headline for the selected series ──
+  const change = (x, y) => {
+    if (!x && !y) return "—";
+    if (!x) return "from zero";
+    if (!y) return "to zero";
+    if (y/x >= 10) return "×" + (y/x).toFixed(0);
+    const d = (y-x)/x*100;
+    return (d>=0?"+":"−") + (Math.abs(d)>=100?Math.abs(d).toFixed(0):Math.abs(d).toFixed(1)) + "%";
+  };
+  const lastI = years.length-1;
+  let headline;
+  if (sel){
+    const pk = series.indexOf(Math.max.apply(null, series));
+    headline = `<b style="color:${meta[sel].color}">${esc(meta[sel].label)}</b> in ${sets[0].yearLabel} `
+      + `<b>${fmtU(series[0])}</b> → ${sets[lastI].yearLabel} <b>${fmtU(series[lastI])}</b> `
+      + `(<b>${change(series[0], series[lastI])}</b>) · peak ${fmtU(series[pk])} in ${sets[pk].yearLabel} `
+      + `· ${(series[lastI]/totals[lastI]*100).toFixed(1)}% of supply today`;
+  } else {
+    headline = `Total primary supply ${sets[0].yearLabel} <b>${fmtU(totals[0])}</b> → ${sets[lastI].yearLabel} `
+      + `<b>${fmtU(totals[lastI])}</b> (<b>${change(totals[0], totals[lastI])}</b>). `
+      + `<b>Pick a source to see it on its own scale</b> — small ones are invisible in the stack.`;
+  }
+
+  // If the series has holes, say so rather than letting the chart imply
+  // data we do not hold: it is drawn straight across any missing years.
   const missing = [];
-  for (let y = years[0]; y <= years[years.length-1]; y++) if (years.indexOf(y) < 0) missing.push(y);
+  for (let y = years[0]; y <= years[lastI]; y++) if (years.indexOf(y) < 0) missing.push(y);
   const gapNote = missing.length
     ? ` <b>${missing.length} year${missing.length>1?"s":""} in this range ${missing.length>1?"are":"is"} not yet loaded`
       + ` (${missing.length > 12 ? missing[0]+"–"+missing[missing.length-1] : missing.join(", ")});`
       + ` the chart draws straight across ${missing.length>1?"those gaps":"that gap"}.</b>`
     : "";
 
-  // compact table: first, the year on screen, latest, and the change across the span
-  const first = 0, lastI = years.length-1;
-  const change = (x, y) => {
-    if (!x && !y) return {txt:"—", cls:""};
-    if (!x) return {txt:"from zero", cls:"up"};
-    if (!y) return {txt:"to zero", cls:"down"};
-    if (y/x >= 10) return {txt:"×"+(y/x).toFixed(0), cls:"up"};
-    const d = (y-x)/x*100;
-    return {txt:(d>=0?"+":"−") + (Math.abs(d)>=100?Math.abs(d).toFixed(0):Math.abs(d).toFixed(1)) + "%",
-            cls: d>0?"up":"down"};
-  };
-  const showCur = curIdx !== first && curIdx !== lastI;
-  const rows = order.slice().sort((a,b) => (B[lastI][b]||0) - (B[lastI][a]||0)).map(id => {
-    const c = change(B[first][id]||0, B[lastI][id]||0);
-    return `<tr><td><i class="sw" style="background:${meta[id].color}"></i>${esc(meta[id].label)}</td>`
-         + `<td class="num${curIdx===first?" cur":""}">${fmtV(B[first][id]||0)}</td>`
-         + (showCur ? `<td class="num cur">${fmtV(B[curIdx][id]||0)}</td>` : "")
-         + `<td class="num${curIdx===lastI?" cur":""}">${fmtV(B[lastI][id]||0)}</td>`
-         + `<td class="num ${c.cls}">${c.txt}</td></tr>`;
-  }).join("");
-  const ct = change(totals[first], totals[lastI]);
+  const rows = order.slice().sort((a,b) => (B[lastI][b]||0) - (B[lastI][a]||0)).map(id =>
+      `<tr class="trow${sel===id?" sel":""}" data-band="${id}" data-key="${key}">`
+    + `<td><i class="sw" style="background:${meta[id].color}"></i>${esc(meta[id].label)}</td>`
+    + `<td class="num">${fmtV(B[0][id]||0)}</td>`
+    + (curIdx!==0 && curIdx!==lastI ? `<td class="num cur">${fmtV(B[curIdx][id]||0)}</td>` : "")
+    + `<td class="num">${fmtV(B[lastI][id]||0)}</td>`
+    + `<td class="num">${change(B[0][id]||0, B[lastI][id]||0)}</td></tr>`).join("");
 
   el.innerHTML =
-      `<h3>Primary supply by source, ${sets[first].yearLabel} to ${sets[lastI].yearLabel}`
+      `<h3>Primary supply by source, ${sets[0].yearLabel} to ${sets[lastI].yearLabel}`
     + `<span style="text-transform:none;letter-spacing:0;font-weight:400"> — ${years.length} years, `
     + `each derived from its own national balance by the same script. Click the chart to jump to a year.</span></h3>`
+    + chips
+    + `<p class="thead">${headline}</p>`
     + `<div class="trendwrap">${p.join("")}</div>`
-    + `<table><tr><th>Source</th><th class="num${curIdx===first?" cur":""}">${sets[first].yearLabel}</th>`
-    + (showCur ? `<th class="num cur">${sets[curIdx].yearLabel}</th>` : "")
-    + `<th class="num${curIdx===lastI?" cur":""}">${sets[lastI].yearLabel}</th>`
-    + `<th class="num">${sets[first].yearLabel} → ${sets[lastI].yearLabel}</th></tr>`
+    + `<table><tr><th>Source</th><th class="num">${sets[0].yearLabel}</th>`
+    + (curIdx!==0 && curIdx!==lastI ? `<th class="num cur">${sets[curIdx].yearLabel}</th>` : "")
+    + `<th class="num">${sets[lastI].yearLabel}</th>`
+    + `<th class="num">${sets[0].yearLabel} → ${sets[lastI].yearLabel}</th></tr>`
     + rows
-    + `<tr><td><b>Total</b></td><td class="num${curIdx===first?" cur":""}"><b>${fmtV(totals[first])}</b></td>`
-    + (showCur ? `<td class="num cur"><b>${fmtV(totals[curIdx])}</b></td>` : "")
-    + `<td class="num${curIdx===lastI?" cur":""}"><b>${fmtV(totals[lastI])}</b></td>`
-    + `<td class="num"><b>${ct.txt}</b></td></tr></table>`
+    + `<tr><td><b>Total</b></td><td class="num"><b>${fmtV(totals[0])}</b></td>`
+    + (curIdx!==0 && curIdx!==lastI ? `<td class="num cur"><b>${fmtV(totals[curIdx])}</b></td>` : "")
+    + `<td class="num"><b>${fmtV(totals[lastI])}</b></td>`
+    + `<td class="num"><b>${change(totals[0], totals[lastI])}</b></td></tr></table>`
     + `<p style="font-size:12px;color:#5a636e;margin-top:8px">Values in ${UNIT}. Years are directly `
     + `comparable within a country, but not between the two countries — see the notes above.`
     + gapNote + `</p>`;
 
-  el.querySelectorAll(".thit").forEach(r => {
-    r.addEventListener("click", () => setYear(key, r.getAttribute("data-year")));
-  });
+  el.querySelectorAll(".thit").forEach(r =>
+    r.addEventListener("click", () => setYear(key, r.getAttribute("data-year"))));
+  el.querySelectorAll(".tband").forEach(r =>
+    r.addEventListener("click", () => setTrendBand(key, r.getAttribute("data-band"))));
+  el.querySelectorAll(".chip").forEach(b =>
+    b.addEventListener("click", () => setTrendBand(key, b.getAttribute("data-band") || null)));
+  el.querySelectorAll(".trow").forEach(r =>
+    r.addEventListener("click", () => setTrendBand(key, r.getAttribute("data-band"))));
+  el.querySelectorAll(".tdl").forEach(b => b.addEventListener("click", () => {
+    const svg = el.querySelector("svg.trend");
+    const name = `${sets[0].country}_${sel ? meta[sel].label.replace(/[^A-Za-z]+/g, "_") : "Primary_supply"}`
+               + `_${sets[0].yearLabel}_${sets[lastI].yearLabel}`;
+    if (b.dataset.fmt === "svg") saveSVG(svg, name); else savePNG(svg, name, 4);
+  }));
 }
 
 /* ── tooltips ──────────────────────────────────────────────────── */
@@ -884,9 +971,11 @@ function renderFocusPanel(key){
 }
 
 /* ── export ────────────────────────────────────────────────────── */
-function svgString(key){
-  const svg = document.getElementById("svg-"+key).cloneNode(true);
+function svgString(key){ return svgStringOf(document.getElementById("svg-"+key)); }
+function svgStringOf(el){
+  const svg = el.cloneNode(true);
   svg.removeAttribute("class");
+  svg.querySelectorAll(".thit").forEach(n => n.remove());   // invisible click targets
   return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(svg);
 }
 function triggerDownload(url, name){
@@ -894,16 +983,19 @@ function triggerDownload(url, name){
   a.href = url; a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
 }
-function downloadSVG(key){
-  const url = URL.createObjectURL(new Blob([svgString(key)], {type:"image/svg+xml;charset=utf-8"}));
-  triggerDownload(url, ds(key).file + ".svg");
+function downloadSVG(key){ saveSVG(document.getElementById("svg-"+key), ds(key).file); }
+function saveSVG(el, name){
+  const url = URL.createObjectURL(new Blob([svgStringOf(el)], {type:"image/svg+xml;charset=utf-8"}));
+  triggerDownload(url, name + ".svg");
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 function downloadPNG(key, scale){
+  savePNG(document.getElementById("svg-"+key), ds(key).file, scale);
+}
+function savePNG(svgEl, name, scale){
   scale = scale || 4;
-  const svgEl = document.getElementById("svg-"+key);
   const w = +svgEl.getAttribute("width"), h = +svgEl.getAttribute("height");
-  const url = URL.createObjectURL(new Blob([svgString(key)], {type:"image/svg+xml;charset=utf-8"}));
+  const url = URL.createObjectURL(new Blob([svgStringOf(svgEl)], {type:"image/svg+xml;charset=utf-8"}));
   const img = new Image();
   img.onload = () => {
     const c = document.createElement("canvas");
@@ -914,7 +1006,7 @@ function downloadPNG(key, scale){
     URL.revokeObjectURL(url);
     c.toBlob(b => {
       const u = URL.createObjectURL(b);
-      triggerDownload(u, ds(key).file + "_" + (w*scale) + "px.png");
+      triggerDownload(u, name + "_" + (w*scale) + "px.png");
       setTimeout(() => URL.revokeObjectURL(u), 4000);
     }, "image/png");
   };
