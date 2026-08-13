@@ -62,6 +62,10 @@
   /* deliberately neutral: a rise or fall in a fuel is not inherently good or bad */
   .yoy .up,.yoy .down{color:var(--ink);font-weight:600}
   .yoy .down{color:#6b737d}
+  .notes{margin-top:14px;background:#fffdf5;border:1px solid #e8dfc2;border-left:4px solid #d9b64e;border-radius:12px;padding:15px 20px}
+  .notes h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#8a7326;margin-bottom:8px}
+  .notes p{font-size:13px;color:#413c2c;margin:7px 0;max-width:1080px}
+  .notes .mk{font-weight:700;color:#8a7326}
   details.method{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px}
   details.method summary{cursor:pointer;font-weight:600;font-size:14.5px;padding:14px 18px;list-style:none;display:flex;align-items:center;gap:8px}
   details.method summary::-webkit-details-marker{display:none}
@@ -117,6 +121,7 @@
     </div>
     <div id="chart-se"></div>
   </div>
+  <div class="notes" id="notes-se"></div>
   <div class="yoy" id="yoy-se"></div>
   <details class="method">
     <summary>Data sources, verification &amp; methodology — Sweden</summary>
@@ -164,6 +169,22 @@
         <li><b>End use</b> applies the LLNL efficiency assumptions: residential and commercial 65%,
         industrial 49%, transport 21%.</li>
       </ul>
+      <h3>Primary-energy convention (important when reading band widths)</h3>
+      <p>Eurostat uses the <b>physical energy content</b> method, which does not treat all generating
+      sources alike. Verified from the balance tables:</p>
+      <table>
+        <tr><th>Source</th><th>Input to generation</th><th>Electricity out</th><th>Implied</th></tr>
+        <tr><td>Nuclear (2023 / 2024)</td><td class="num">484,672 / 506,226 TJ</td><td class="num">174,492 / 182,394 TJ</td><td class="num">36.0% / 36.0%</td></tr>
+        <tr><td>Hydro</td><td class="num">238,273 / 232,614 TJ</td><td class="num">238,464 / 232,787 TJ</td><td class="num">100%</td></tr>
+        <tr><td>Wind</td><td class="num">123,282 / 146,236 TJ</td><td class="num">123,282 / 146,236 TJ</td><td class="num">100%</td></tr>
+        <tr><td>Solar PV</td><td class="num">11,210 / 14,987 TJ</td><td class="num">11,210 / 14,987 TJ</td><td class="num">100%</td></tr>
+      </table>
+      <p>Nuclear therefore enters the chart as <b>reactor heat</b>, roughly 2.8× the electricity it yields,
+      while hydro, wind and solar enter as generated electricity. <b>Band widths are not comparable across
+      source types</b>, and the rejected energy leaving the electricity node is largely a consequence of this
+      convention rather than a measure of the relative efficiency of the sources. Japan applies a different
+      convention again (a single 41.8–42.4% factor to <i>all</i> generating sources), so band widths must not
+      be compared between the two charts.</p>
       <h3>Comparison with the IEA energy Sankey</h3>
       <p>For 2023 the IEA reports a total energy supply of 1,892 PJ against 1,975 PJ here. The two agree
       almost exactly where conventions coincide; the differences are accounting conventions, not data:</p>
@@ -200,6 +221,7 @@
     </div>
     <div id="chart-jp"></div>
   </div>
+  <div class="notes" id="notes-jp"></div>
   <div class="yoy" id="yoy-jp"></div>
   <details class="method">
     <summary>Data sources, verification &amp; methodology — Japan</summary>
@@ -253,6 +275,23 @@
         <li><b>End use</b> applies the LLNL efficiency assumptions: residential and commercial 65%,
         industrial 49%, transport 21%.</li>
       </ul>
+      <h3>Primary-energy convention (important when reading band widths)</h3>
+      <p>METI uses the <b>substitution method</b>: every electricity-generating primary source is converted
+      to primary-energy equivalent at a <i>single</i> reference efficiency. Recovered from METI’s own
+      natural-units sheet (generation in GWh × 3.6 ÷ the primary energy booked):</p>
+      <table>
+        <tr><th>Source</th><th>Generated (FY2023)</th><th>Primary booked</th><th>Implied factor</th></tr>
+        <tr><td>Nuclear</td><td class="num">84,055 GWh</td><td class="num">724,001 TJ</td><td class="num">41.80%</td></tr>
+        <tr><td>Hydro</td><td class="num">75,210 GWh</td><td class="num">647,815 TJ</td><td class="num">41.80%</td></tr>
+        <tr><td>Solar PV</td><td class="num">96,458 GWh</td><td class="num">830,836 TJ</td><td class="num">41.80%</td></tr>
+        <tr><td>Wind</td><td class="num">10,489 GWh</td><td class="num">90,344 TJ</td><td class="num">41.80%</td></tr>
+      </table>
+      <p>The factor is 41.80% in FY2023 and 42.41% in FY2024, applied identically to all four sources.
+      Their band widths are therefore <b>mutually comparable</b>, but each is about 2.4× the electricity
+      actually generated. Geothermal is the exception, reported directly as heat. Rejected energy leaving
+      the electricity node consequently includes this accounting artefact rather than only physical losses.
+      Sweden uses a different convention (nuclear as reactor heat at 36%, renewables as electricity at 100%),
+      so band widths must not be compared between the two charts.</p>
       <p>Because band widths represent throughput including stock change and intra-band transformation,
       the bands sum to slightly more than METI’s domestic-supply headline (17,629 vs. 17,558 PJ in FY2023,
       a 0.4% difference). The headline figure above is METI’s own and is the one to cite.</p>
@@ -305,7 +344,7 @@ const DATASETS = __DATA__;
 const STATE = { se: 2024, jp: 2024 };
 let UNIT = "PJ";
 
-const W = 1560, H = 900;
+const W = 1560, BASE_H = 900;
 const CHART_TOP = 132, CHART_BOT = 772;
 const COL_X = {0: 56, 1: 600, 2: 1010, 3: 1372};
 const BOX_W = 118, GAP = 10, MIN_H = 28;
@@ -343,6 +382,24 @@ function wrapName(label){
 }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 const ds = key => DATASETS[key + STATE[key]];
+
+/* wrap a footnote into lines that fit the SVG width (no auto-wrap in SVG text) */
+function wrapText(text, maxChars){
+  const words = text.split(" ");
+  const lines = [];
+  let cur = "";
+  words.forEach(w => {
+    if ((cur + " " + w).trim().length > maxChars && cur){ lines.push(cur); cur = w; }
+    else cur = (cur ? cur + " " : "") + w;
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
+/* markers flagged against a node id, e.g. "†" */
+function markersFor(d, id){
+  return (d.footnotes || []).filter(f => (f.nodes||[]).indexOf(id) >= 0)
+                            .map(f => f.marker).join("");
+}
 
 function layout(d){
   const nodes = {};
@@ -396,6 +453,18 @@ function render(key){
   const E = nodes.elec.out - (rejOut.elec||0);
   const F = ["res","com","ind","tpt","ne"].reduce((a,id)=>a+(nodes[id]?nodes[id].in:0),0);
 
+  // footnote lines are laid out first so the canvas can be sized to fit them
+  const fnLines = [];
+  (d.footnotes || []).forEach(f => {
+    wrapText(f.text, 168).forEach((l, i) => fnLines.push({t: l, indent: i > 0}));
+    fnLines.push({t: "", indent: false});
+  });
+  if (fnLines.length) fnLines.pop();
+  const FN_TOP = BASE_H - 62;
+  // footnote block ends here; the three source lines then sit at H-46/-30/-14
+  const FN_END = FN_TOP + 16 + fnLines.length * 13;
+  const H = fnLines.length ? FN_END + 62 : BASE_H;
+
   const p = [];
   p.push(`<svg class="sankey" id="svg-${key}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" font-family='${FONT}'>`);
   p.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>`);
@@ -420,7 +489,9 @@ function render(key){
     const tp = Math.max(n.in,n.out), tc = textColor(n.color), cx = n.x+BOX_W/2;
     p.push(`<rect x="${n.x}" y="${n.y}" width="${BOX_W}" height="${n.h}" fill="${n.color}" stroke="#00000038" stroke-width="0.8" data-tip="${esc(n.label)}|${tipBoth(tp)}" class="nodeRect"/>`);
     const isConv = (n.id==="elec"||n.id==="heat");
-    const nameLines = (n.h>=52) ? wrapName(n.label) : [n.label];
+    const mk = markersFor(d, n.id);
+    const shown = n.label + (mk ? " " + mk : "");
+    const nameLines = (n.h>=52) ? wrapName(shown) : [shown];
     const valLines = (isConv && n.h>=66) ? [`${fmtV(n.in)} in`, `${fmtV(n.out-(rejOut[n.id]||0))} out`] : [fmtV(tp)];
     const fs = Math.min(12, 205/Math.max.apply(null, nameLines.map(l=>l.length)));
     const lh = 13.5, all = nameLines.length+valLines.length;
@@ -431,13 +502,39 @@ function render(key){
 
   labels.forEach(L => p.push(`<text x="${L.x}" y="${L.y}" font-size="10.5" font-weight="600" fill="${L.c}" paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">${fmtV(L.v)}</text>`));
 
+  // ── comparability footnotes, inside the SVG so they travel with the exported figure ──
+  if (fnLines.length){
+    p.push(`<line x1="28" y1="${FN_TOP-16}" x2="${W-28}" y2="${FN_TOP-16}" stroke="#e0ddd4" stroke-width="1"/>`);
+    p.push(`<text x="28" y="${FN_TOP-2}" font-size="10.5" font-weight="700" letter-spacing="1.2" fill="#8b9199">NOTES ON COMPARABILITY</text>`);
+    let fy = FN_TOP + 16;
+    fnLines.forEach(l => {
+      if (l.t) p.push(`<text x="${28 + (l.indent ? 10 : 0)}" y="${fy}" font-size="10.5" fill="#4d545c">${esc(l.t)}</text>`);
+      fy += 13;
+    });
+  }
+
   p.push(`<text x="28" y="${H-46}" font-size="10.5" fill="#8b9199">${esc(d.source)}</text>`);
   p.push(`<text x="28" y="${H-30}" font-size="10.5" fill="#8b9199">${esc(d.note)}</text>`);
   p.push(`<text x="28" y="${H-14}" font-size="10.5" fill="#8b9199">All values in ${UNIT==="PJ"?"petajoules (PJ); 1 PJ = 0.2778 TWh":"terawatt-hours (TWh); 1 TWh = 3.6 PJ"}. Larger flows are labelled; hover any flow for exact values.</text>`);
   p.push(`</svg>`);
   document.getElementById("chart-"+key).innerHTML = p.join("");
   attachTips(key);
+  renderNotes(key);
   renderYoY(key);
+}
+
+/* ── comparability notes, shown on the page in readable size ────── */
+function renderNotes(key){
+  const d = ds(key);
+  const el = document.getElementById("notes-"+key);
+  if (!d.footnotes || !d.footnotes.length){ el.style.display = "none"; return; }
+  el.style.display = "";
+  let h = "<h3>Notes on comparability</h3>";
+  d.footnotes.forEach(f => {
+    const body = f.text.replace(/^[\u2020\u2021]\s*/, "");
+    h += `<p><span class="mk">${f.marker}</span> ${esc(body)}</p>`;
+  });
+  el.innerHTML = h;
 }
 
 /* ── year-on-year comparison table ─────────────────────────────── */
@@ -509,18 +606,20 @@ function downloadSVG(key){
 }
 function downloadPNG(key, scale){
   scale = scale || 4;
+  const svgEl = document.getElementById("svg-"+key);
+  const w = +svgEl.getAttribute("width"), h = +svgEl.getAttribute("height");
   const url = URL.createObjectURL(new Blob([svgString(key)], {type:"image/svg+xml;charset=utf-8"}));
   const img = new Image();
   img.onload = () => {
     const c = document.createElement("canvas");
-    c.width = W*scale; c.height = H*scale;
+    c.width = w*scale; c.height = h*scale;
     const ctx = c.getContext("2d");
     ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,c.width,c.height);
     ctx.drawImage(img,0,0,c.width,c.height);
     URL.revokeObjectURL(url);
     c.toBlob(b => {
       const u = URL.createObjectURL(b);
-      triggerDownload(u, ds(key).file + "_" + (W*scale) + "px.png");
+      triggerDownload(u, ds(key).file + "_" + (w*scale) + "px.png");
       setTimeout(() => URL.revokeObjectURL(u), 4000);
     }, "image/png");
   };
@@ -536,6 +635,8 @@ function setUnit(u){
 }
 function setYear(key, y){
   STATE[key] = parseInt(y,10);
+  const sel = document.getElementById("year-"+key);   // keep the control in sync
+  if (sel && sel.value !== String(y)) sel.value = String(y);
   render(key);
 }
 function showTab(key){

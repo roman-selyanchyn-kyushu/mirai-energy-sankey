@@ -123,7 +123,45 @@ Other Japanese conventions:
 Because band widths represent throughput, the bands sum slightly above METI's domestic-supply headline
 (17,629 vs 17,558 PJ in FY2023, +0.4%). **Cite METI's headline**, which appears in the methodology panel.
 
-### 2.3 End use (both countries)
+### 2.3 Primary-energy conventions — why band widths are not comparable
+
+**The two countries do not put generating sources on the same basis, and Sweden does not even do so
+internally.** This is flagged as a footnote on every chart (marker †) and stated in each methodology panel,
+because a reader of the figure would otherwise misread band widths as relative resource size or efficiency.
+
+**Sweden — Eurostat physical energy content method.** Nuclear enters as *reactor heat*; hydro, wind and
+solar enter as *generated electricity*. Verified from the balance tables:
+
+| Source | Input to generation (2023 / 2024) | Electricity out | Implied |
+|---|---|---|---|
+| Nuclear | 484,672 / 506,226 TJ | 174,492 / 182,394 TJ | **36.0%** |
+| Hydro | 238,273 / 232,614 TJ | 238,464 / 232,787 TJ | 100% |
+| Wind | 123,282 / 146,236 TJ | 123,282 / 146,236 TJ | 100% |
+| Solar PV | 11,210 / 14,987 TJ | 11,210 / 14,987 TJ | 100% |
+
+So the nuclear band is ~2.8× the electricity it yields while the renewable bands are 1:1. **Band widths are
+therefore not comparable across source types within the Swedish chart**, and the rejected energy leaving the
+electricity node reflects this convention rather than the relative efficiency of the sources.
+
+**Japan — METI substitution method.** Every generating source is converted at a *single* reference
+efficiency, recovered from METI's own natural-units sheet (GWh × 3.6 ÷ primary energy booked):
+
+| Source | Generated FY2023 | Primary booked | Implied factor |
+|---|---|---|---|
+| Nuclear | 84,055 GWh | 724,001 TJ | 41.80% |
+| Hydro | 75,210 GWh | 647,815 TJ | 41.80% |
+| Solar PV | 96,458 GWh | 830,836 TJ | 41.80% |
+| Wind | 10,489 GWh | 90,344 TJ | 41.80% |
+
+The factor is 41.80% in FY2023 and 42.41% in FY2024, applied identically to all four. Japan's bands are
+therefore **mutually comparable with each other** — unlike Sweden's — but each is about 2.4× the electricity
+actually generated. Geothermal is the exception, reported directly as heat.
+
+> **Consequence for the manuscript:** a given amount of wind or solar electricity appears at 1.0× on the
+> Swedish chart and about 2.4× on the Japanese one. Never compare band widths, totals or shares between the
+> two charts without adjustment.
+
+### 2.4 End use (both countries)
 
 Each sector is split into *energy services* and *rejected energy* using the LLNL efficiency assumptions:
 **residential 65%, commercial 65%, industrial 49%, transport 21%**. These are assumptions carried over from
@@ -196,7 +234,10 @@ Nuclear rose +9.7% (724 → 794 PJ) as reactor restarts continued, while hydro f
 - LLNL-style rendering: labelled boxes with values inside, value labels on major flows, pink sector boxes,
   grey Rejected energy / Energy services terminals
 - **Hi-res PNG export** at 6240 × 3600 px (4×), white background, print-ready; **SVG export** for Illustrator
-- Collapsible per-country methodology panel with sources, verified totals and the IEA reconciliation
+- **Comparability footnotes** drawn inside the SVG (so they travel with the exported figure), with markers
+  on the affected bands, plus a readable notes card on the page
+- Collapsible per-country methodology panel with sources, verified totals, primary-energy conventions and
+  the IEA reconciliation
 - Single self-contained file — no external libraries, fonts or network calls
 
 ## 6. Repository layout

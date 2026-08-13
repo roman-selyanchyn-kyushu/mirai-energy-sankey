@@ -54,6 +54,47 @@ NOTES = {
 }
 
 
+# ── comparability footnotes ────────────────────────────────────────────────
+# Each entry: marker, the node ids it flags on the chart, and the note text.
+# These document places where Sweden and Japan are NOT drawn on the same basis,
+# so a reader of the figure is not misled by band widths. Verified against the
+# source tables (see scripts/derive_*.py); they hold for both years.
+def footnotes(country, ds_flows, meta):
+    band_out = {}
+    for s, t, v in ds_flows:
+        band_out[s] = band_out.get(s, 0) + v
+    notes = []
+
+    if country == "se":
+        nuc = band_out.get("nuclear", 0) / 1000
+        notes.append({
+            "marker": "†", "nodes": ["nuclear"],
+            "text": (f"† Primary-energy convention (Eurostat physical energy content method): nuclear is shown as "
+                     f"reactor heat, {nuc:,.0f} PJ, of which about 36% becomes electricity; hydro, wind and solar are "
+                     f"shown as generated electricity (1:1). Band widths are therefore not comparable across source "
+                     f"types, and the rejected energy leaving the electricity node reflects this accounting "
+                     f"convention rather than the relative efficiency of the sources.")
+        })
+    else:
+        f = meta.get("primary_equivalent_factor") or 0.418
+        notes.append({
+            "marker": "†", "nodes": ["nuclear", "hydro", "solar", "wind"],
+            "text": (f"† Primary-energy convention (METI substitution method): nuclear, hydro, solar PV and wind are all "
+                     f"converted to primary-energy equivalent at one uniform reference efficiency of {f*100:.1f}%, so "
+                     f"their band widths are mutually comparable but are about {1/f:.1f}x the electricity actually "
+                     f"generated. Geothermal is reported directly as heat. Rejected energy leaving the electricity node "
+                     f"therefore includes this accounting artefact rather than only physical losses.")
+        })
+
+    notes.append({
+        "marker": "‡", "nodes": [],
+        "text": ("‡ Cross-country comparison: the Swedish and Japanese charts follow different statistical conventions "
+                 "(see † above; Sweden also uses net calorific value, Japan gross). Band widths, totals and shares must "
+                 "not be compared between the two countries without adjustment — see the methodology panel.")
+    })
+    return notes
+
+
 def build(country, year):
     if country == "se":
         flows, audit, meta = derive_se.derive(year)
@@ -113,6 +154,7 @@ def build(country, year):
         "nodes": nodes,
         "flows": [[s, t, v] for s, t, v in flows],
         "meta": meta,
+        "footnotes": footnotes(country, flows, meta),
         "audit": audit,
     }
 

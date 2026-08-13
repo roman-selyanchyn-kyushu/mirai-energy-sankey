@@ -60,6 +60,27 @@ ROW = {
 ELEC_COL, HEAT_COL = "$1200", "$1300"
 
 
+def primary_equivalent_factor(year):
+    """METI converts every electricity-generating primary source to primary-energy equivalent
+    at one uniform reference efficiency. Recover it from the natural-units sheet, which reports
+    the same rows in GWh: factor = generated electricity (GWh x 3.6 TJ) / primary energy (TJ).
+    Verified identical for nuclear, hydro, solar PV and wind (41.80% FY2023, 42.41% FY2024)."""
+    wb = load_workbook(os.path.join(HERE, f"stte_{year}.xlsx"), read_only=True, data_only=True)
+    ws = wb["固有単位表"]
+    rows = list(ws.iter_rows(values_only=True))
+    col = {str(c).strip(): j for j, c in enumerate(rows[0])
+           if c and str(c).strip().startswith("$")}
+    ridx = {}
+    for i, r in enumerate(rows):
+        if r[0] and str(r[0]).strip().startswith("#"):
+            ridx.setdefault(str(r[0]).strip(), i)
+    gwh = float(rows[ridx["#190000"]][col["$0800"]])       # hydro, in 10^6 kWh
+    wb.close()
+    val = read_table(year)
+    primary = val("#190000", "$0800")
+    return (gwh * 3.6) / primary if primary else None
+
+
 def read_table(year):
     wb = load_workbook(os.path.join(HERE, f"stte_{year}.xlsx"), read_only=True, data_only=True)
     ws = wb["ｴﾈﾙｷﾞｰ単位表（本表）"]
@@ -148,6 +169,7 @@ def derive(year):
         "final_consumption_TJ": round(val("#500000", "$1400")),
         "electricity_generated_TJ": round(val("#240000", ELEC_COL) + val("#250000", ELEC_COL)),
         "non_energy_use_TJ": round(val("#950000", "$1400")),
+        "primary_equivalent_factor": round(primary_equivalent_factor(year), 5),
     }
     return flows, audit, meta
 

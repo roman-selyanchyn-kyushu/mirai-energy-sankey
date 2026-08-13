@@ -217,7 +217,24 @@ def sheet_reconciliation(wb):
             r += 1
     r += 1
 
-    ws.cell(row=r, column=1, value="3. Why these charts differ from the IEA energy Sankey").font = H2_FONT
+    ws.cell(row=r, column=1, value="3. Comparability notes — primary-energy conventions (these appear as "
+                                   "footnotes on each chart)").font = H2_FONT
+    r += 1
+    seen = set()
+    for k in ORDER:
+        for fn in DATA[k].get("footnotes", []):
+            txt = fn["text"]
+            if txt in seen:
+                continue
+            seen.add(txt)
+            ws.cell(row=r, column=1, value=DATA[k]["country"] + " " + DATA[k]["yearLabel"]).font = Font(bold=True)
+            c = ws.cell(row=r, column=2, value=txt)
+            c.alignment = Alignment(wrap_text=True, vertical="top")
+            ws.row_dimensions[r].height = 46
+            r += 1
+    r += 1
+
+    ws.cell(row=r, column=1, value="4. Why these charts differ from the IEA energy Sankey").font = H2_FONT
     r += 1
     notes = [
         ("Sweden 2023", "IEA total energy supply 1,892 PJ vs 1,975 PJ here. Per fuel the two agree closely "
