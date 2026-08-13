@@ -47,6 +47,40 @@
   .units button:hover{transform:none;box-shadow:none;color:var(--accent)}
   .units button.on{background:var(--accent);color:#fff}
   svg.sankey{width:100%;height:auto;display:block}
+  /* ── click-to-trace: dimming is done in CSS only, so the exported SVG/PNG,
+        which carries no page stylesheet, is always the complete chart ── */
+  svg.sankey g.node{cursor:pointer}
+  svg.sankey .flow{cursor:pointer;transition:opacity .16s}
+  svg.sankey.focused .flow{opacity:.06}
+  svg.sankey.focused .flow.hit{opacity:.85}
+  svg.sankey.focused .flowlabel{opacity:.08}
+  svg.sankey.focused .flowlabel.hit{opacity:1}
+  svg.sankey.focused g.node{opacity:.22;transition:opacity .16s}
+  svg.sankey.focused g.node.hit{opacity:1}
+  svg.sankey.focused g.node.sel rect{stroke:#1d232a;stroke-width:2.6}
+  .focus{display:none;margin:2px 0 10px;border:1px solid var(--line);border-radius:12px;background:#fbfaf7}
+  .focus.on{display:block}
+  .focus .fhead{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .focus .fhead i{width:13px;height:13px;border-radius:3px;flex:none}
+  .focus .fhead b{font-size:15px}
+  .focus .fhead .tot{color:var(--ink-soft);font-size:13px}
+  .focus .fhead button{
+    margin-left:auto;font-family:var(--f-ui);font-size:12.5px;font-weight:600;padding:5px 12px;
+    border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;
+  }
+  .focus .fhead button:hover{border-color:var(--accent);color:var(--accent)}
+  .focus .fcols{display:flex;gap:26px;padding:12px 16px 14px;flex-wrap:wrap}
+  .focus .fcol{flex:1 1 340px;min-width:0}
+  .focus h4{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);margin-bottom:6px}
+  .focus table{border-collapse:collapse;width:100%;font-size:13px}
+  .focus td{padding:4px 8px 4px 0;border-bottom:1px solid #eeece5;vertical-align:middle}
+  .focus tr:last-child td{border-bottom:none}
+  .focus td.sw{white-space:nowrap}
+  .focus td.sw i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px}
+  .focus td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .focus td.pc{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;padding-right:10px}
+  .focus td.barc{width:34%;min-width:80px}
+  .focus td.barc span{display:block;height:8px;border-radius:2px;min-width:1px}
   .tip{
     position:fixed;pointer-events:none;z-index:50;display:none;max-width:340px;
     background:rgba(22,26,30,.94);color:#fff;font-size:12.5px;line-height:1.45;
@@ -96,8 +130,9 @@
   <p class="sub">Estimated national energy flows for <b>2023 and 2024</b>, drawn in the style of the
   Lawrence Livermore National Laboratory energy flow charts and built directly from each country's
   national statistics: the Energimyndigheten annual energy balance (Sweden, calendar years) and METI
-  Comprehensive Energy Statistics (Japan, fiscal years). Choose a year from the dropdown, hover any flow for values, and switch
-  between PJ and TWh. Charts are scaled independently — Japan’s system is roughly 9× larger than Sweden’s.</p>
+  Comprehensive Energy Statistics (Japan, fiscal years). Choose a year from the dropdown, <b>click any box to trace where
+  its energy goes and in what proportions</b>, hover a flow for exact values, and switch between PJ and TWh.
+  Charts are scaled independently — Japan’s system is roughly 9× larger than Sweden’s.</p>
 </header>
 
 <nav class="tabs">
@@ -109,7 +144,7 @@
 <div class="panel on" id="panel-se">
   <div class="card">
     <div class="toolbar">
-      <span class="hint">Hover flows for values · PNG exports at 4× resolution for print</span>
+      <span class="hint"><b>Click any box</b> to trace its flows · hover for values · PNG exports at 4× resolution for print</span>
       <span class="yearsel"><label for="year-se">Year</label>
         <select id="year-se" onchange="setYear('se', this.value)">
           <option value="2023">2023</option>
@@ -123,6 +158,7 @@
       <button class="primary" onclick="downloadPNG('se')">Download hi-res PNG</button>
     </div>
     <div id="chart-se"></div>
+    <div class="focus" id="focus-se"></div>
   </div>
   <div class="notes" id="notes-se"></div>
   <div class="yoy" id="yoy-se"></div>
@@ -229,7 +265,7 @@
 <div class="panel" id="panel-jp">
   <div class="card">
     <div class="toolbar">
-      <span class="hint">Hover flows for values · PNG exports at 4× resolution for print</span>
+      <span class="hint"><b>Click any box</b> to trace its flows · hover for values · PNG exports at 4× resolution for print</span>
       <span class="yearsel"><label for="year-jp">Fiscal year</label>
         <select id="year-jp" onchange="setYear('jp', this.value)">
           <option value="2023">FY2023</option>
@@ -243,6 +279,7 @@
       <button class="primary" onclick="downloadPNG('jp')">Download hi-res PNG</button>
     </div>
     <div id="chart-jp"></div>
+    <div class="focus" id="focus-jp"></div>
   </div>
   <div class="notes" id="notes-jp"></div>
   <div class="yoy" id="yoy-jp"></div>
@@ -512,12 +549,13 @@ function render(key){
     if (f.t.id==="svc") color="#77848f";
     if (f.t.id==="rej") color="#c4c4c0";
     if (f.s.id==="own") color="#c4c4c0";
-    p.push(`<path d="${path}" fill="${color}" opacity="0.55" data-tip="${esc(f.s.label+" → "+f.t.label)}|${tipBoth(f.v)}" class="flow"/>`);
-    if (f.h >= 11) labels.push({x:x0+7, y:ya+f.h/2+3.5, v:f.v, c:shade(color,0.35)});
+    p.push(`<path d="${path}" fill="${color}" opacity="0.55" data-tip="${esc(f.s.label+" → "+f.t.label)}|${tipBoth(f.v)}" data-s="${f.s.id}" data-t="${f.t.id}" class="flow"/>`);
+    if (f.h >= 11) labels.push({x:x0+7, y:ya+f.h/2+3.5, v:f.v, c:shade(color,0.35), s:f.s.id, t:f.t.id});
   });
 
   Object.values(nodes).forEach(n => {
     const tp = Math.max(n.in,n.out), tc = textColor(n.color), cx = n.x+BOX_W/2;
+    p.push(`<g class="node" data-node="${n.id}">`);
     p.push(`<rect x="${n.x}" y="${n.y}" width="${BOX_W}" height="${n.h}" fill="${n.color}" stroke="#00000038" stroke-width="0.8" data-tip="${esc(n.label)}|${tipBoth(tp)}" class="nodeRect"/>`);
     const isConv = (n.id==="elec"||n.id==="heat");
     const mk = markersFor(d, n.id);
@@ -529,9 +567,10 @@ function render(key){
     let ty = n.y + n.h/2 - (all-1)*lh/2 + 4;
     nameLines.forEach(l => { p.push(`<text x="${cx}" y="${ty}" font-size="${fs.toFixed(1)}" font-weight="700" fill="${tc}" text-anchor="middle">${esc(l)}</text>`); ty+=lh; });
     valLines.forEach(l => { p.push(`<text x="${cx}" y="${ty}" font-size="11" fill="${tc}" text-anchor="middle">${l}</text>`); ty+=lh; });
+    p.push(`</g>`);
   });
 
-  labels.forEach(L => p.push(`<text x="${L.x}" y="${L.y}" font-size="10.5" font-weight="600" fill="${L.c}" paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round">${fmtV(L.v)}</text>`));
+  labels.forEach(L => p.push(`<text x="${L.x}" y="${L.y}" font-size="10.5" font-weight="600" fill="${L.c}" paint-order="stroke" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" class="flowlabel" data-s="${L.s}" data-t="${L.t}">${fmtV(L.v)}</text>`));
 
   // ── comparability footnotes, inside the SVG so they travel with the exported figure ──
   if (fnLines.length){
@@ -550,6 +589,8 @@ function render(key){
   p.push(`</svg>`);
   document.getElementById("chart-"+key).innerHTML = p.join("");
   attachTips(key);
+  attachFocus(key);
+  applyFocus(key);
   renderNotes(key);
   renderYoY(key);
 }
@@ -619,6 +660,94 @@ function attachTips(key){
   });
 }
 
+/* ── click a box to trace its flows ─────────────────────────────
+   Selecting a node dims everything except the flows that touch it and the
+   boxes at their other end, and opens a breakdown of those flows with the
+   share each one takes. Clicking a ribbon selects the box it comes from;
+   clicking empty canvas, the Clear button or Esc releases the selection.
+   The dimming lives entirely in CSS, so it never reaches the SVG/PNG export. */
+const FOCUS = { se: null, jp: null };
+
+function attachFocus(key){
+  const svg = document.getElementById("svg-"+key);
+  svg.querySelectorAll("g.node").forEach(g => {
+    g.addEventListener("click", e => {
+      e.stopPropagation();
+      setFocus(key, g.getAttribute("data-node"));
+    });
+  });
+  svg.querySelectorAll(".flow").forEach(f => {
+    f.addEventListener("click", e => {
+      e.stopPropagation();
+      setFocus(key, f.getAttribute("data-s"));
+    });
+  });
+  svg.addEventListener("click", () => setFocus(key, null));
+}
+
+function setFocus(key, id){
+  FOCUS[key] = (id && FOCUS[key] === id) ? null : id;   // clicking the same box again releases it
+  applyFocus(key);
+}
+
+function applyFocus(key){
+  const svg = document.getElementById("svg-"+key);
+  if (!svg) return;
+  const id = FOCUS[key];
+  svg.classList.toggle("focused", !!id);
+  svg.querySelectorAll(".flow, .flowlabel").forEach(el => {
+    el.classList.toggle("hit",
+      !!id && (el.getAttribute("data-s") === id || el.getAttribute("data-t") === id));
+  });
+  const linked = new Set();
+  if (id){
+    linked.add(id);
+    ds(key).flows.forEach(([s,t]) => { if (s === id) linked.add(t); if (t === id) linked.add(s); });
+  }
+  svg.querySelectorAll("g.node").forEach(g => {
+    const nid = g.getAttribute("data-node");
+    g.classList.toggle("hit", linked.has(nid));
+    g.classList.toggle("sel", nid === id);
+  });
+  renderFocusPanel(key);
+}
+
+function renderFocusPanel(key){
+  const el = document.getElementById("focus-"+key);
+  const id = FOCUS[key];
+  if (!id){ el.className = "focus"; el.innerHTML = ""; return; }
+  const d = ds(key);
+  const meta = i => d.nodes.find(n => n.id === i) || {label:i, color:"#9aa0a8"};
+  const self = meta(id);
+  const outs = d.flows.filter(f => f[0] === id).sort((a,b) => b[2]-a[2]);
+  const ins  = d.flows.filter(f => f[1] === id).sort((a,b) => b[2]-a[2]);
+  const sum  = a => a.reduce((s,f) => s+f[2], 0);
+  const to = sum(outs), fr = sum(ins);
+
+  const table = (list, dir, tot) => {
+    const rows = list.map(f => {
+      const o = meta(dir === "out" ? f[1] : f[0]);
+      const pc = tot ? f[2]/tot*100 : 0;
+      return `<tr><td class="sw"><i style="background:${o.color}"></i>${esc(o.label)}</td>`
+           + `<td class="num">${fmtU(f[2])}</td>`
+           + `<td class="pc">${pc.toFixed(1)}%</td>`
+           + `<td class="barc"><span style="width:${Math.max(pc,0.4).toFixed(2)}%;background:${self.color}"></span></td></tr>`;
+    }).join("");
+    return `<table>${rows}</table>`;
+  };
+
+  let cols = "";
+  if (outs.length) cols += `<div class="fcol"><h4>Goes to — ${outs.length} flow${outs.length>1?"s":""}, ${fmtU(to)}</h4>${table(outs,"out",to)}</div>`;
+  if (ins.length)  cols += `<div class="fcol"><h4>Comes from — ${ins.length} flow${ins.length>1?"s":""}, ${fmtU(fr)}</h4>${table(ins,"in",fr)}</div>`;
+
+  el.className = "focus on";
+  el.innerHTML =
+      `<div class="fhead"><i style="background:${self.color}"></i><b>${esc(self.label)}</b>`
+    + `<span class="tot">${fmtU(Math.max(to,fr))}${(to && fr && Math.abs(to-fr) > 1) ? " out · " + fmtU(fr) + " in" : ""}</span>`
+    + `<button onclick="setFocus('${key}', null)">Clear selection</button></div>`
+    + `<div class="fcols">${cols}</div>`;
+}
+
 /* ── export ────────────────────────────────────────────────────── */
 function svgString(key){
   const svg = document.getElementById("svg-"+key).cloneNode(true);
@@ -678,6 +807,9 @@ function showTab(key){
   });
 }
 window.addEventListener("scroll", () => { tip.style.display = "none"; }, {passive:true});
+window.addEventListener("keydown", e => {
+  if (e.key === "Escape") ["se","jp"].forEach(k => setFocus(k, null));
+});
 
 render("se");
 render("jp");

@@ -282,6 +282,11 @@ Nuclear rose +9.7% (724 → 794 PJ) as reactor restarts continued, while hydro f
 ## 5. Features of the page
 
 - Country tabs (Sweden / Japan) with an independent **year dropdown** on each
+- **Click-to-trace**: clicking any box dims the rest of the chart and keeps only the flows touching that
+  box, with a breakdown table underneath giving each flow's value and its share of the box's total
+  (both directions for the conversion boxes). Clicking a ribbon selects the box it leaves from; clicking
+  empty canvas, the Clear button or <kbd>Esc</kbd> releases it. The selection survives unit and year
+  changes. The dimming is applied in CSS only, so **exports are always the complete chart**
 - **PJ ⇄ TWh switch** re-rendering titles, box values, flow labels and footnotes; tooltips always show both
 - Year-on-year comparison table under each chart, in the selected unit
 - LLNL-style rendering: labelled boxes with values inside, value labels on major flows, pink sector boxes,
