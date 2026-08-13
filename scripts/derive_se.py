@@ -171,6 +171,11 @@ def derive(year, amb_split=(0.8, 0.2)):
             sum(g(bal, b, ["TOTAL"]) for bls in SECTORS.values() for b in bls)
             + g(bal, "FC_OTH_NSP_E", ["TOTAL"])),
         "non_energy_use_TJ": round(g(bal, "FC_NE", ["TOTAL"])),
+        # scope of the biomass band, for the comparability footnote:
+        # Eurostat splits municipal waste into a renewable half (inside bioenergy)
+        # and a non-renewable half (drawn as its own band)
+        "renewable_municipal_waste_TJ": round(g(bal, "GIC", ["W6210"])),
+        "transport_biofuel_TJ": round(g(bal, "FC_TRA_E", ["RA000"])),
     }
     return flows, audit, meta
 

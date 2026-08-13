@@ -170,6 +170,12 @@ def derive(year):
         "electricity_generated_TJ": round(val("#240000", ELEC_COL) + val("#250000", ELEC_COL)),
         "non_energy_use_TJ": round(val("#950000", "$1400")),
         "primary_equivalent_factor": round(primary_equivalent_factor(year), 5),
+        # scope of the biomass / waste bands, for the comparability footnote:
+        # METI keeps municipal waste (biogenic and fossil alike) out of biomass, and
+        # books recovered industrial steam and electricity inside the waste band
+        "recovered_heat_elec_TJ": round(val("#190000", "$N250")),
+        "refuse_energy_TJ": round(val("#190000", "$N200") - val("#190000", "$N250")),
+        "liquid_biofuel_TJ": round(val("#190000", "$N133")),
     }
     return flows, audit, meta
 

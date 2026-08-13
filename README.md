@@ -161,7 +161,47 @@ actually generated. Geothermal is the exception, reported directly as heat.
 > Swedish chart and about 2.4× on the Japanese one. Never compare band widths, totals or shares between the
 > two charts without adjustment.
 
-### 2.4 End use (both countries)
+### 2.4 Biomass and waste scope — also not comparable
+
+The biomass bands (Sweden 533 PJ, Japan 502 PJ in 2023) look similar but count different things.
+Flagged on both charts as footnote ‡.
+
+**Sweden** — Eurostat *splits municipal waste* into a renewable and a non-renewable half:
+
+| Inside the biomass band | 2023 | 2024 |
+|---|---|---|
+| Primary solid biofuels (wood, black liquor, residues) | 408,679 TJ | 396,695 TJ |
+| **Renewable municipal waste (W6210)** | 35,951 TJ | 36,154 TJ |
+| Biogases | 7,448 TJ | 7,949 TJ |
+| Liquid transport biofuels (delivered to transport) | 65,926 TJ | 32,618 TJ |
+
+The non-renewable half of municipal waste (W6220, ~33 PJ) plus industrial waste is the separate
+*Non-renewable waste* band.
+
+**Japan** — METI does **not** split municipal waste, and keeps all of it out of biomass:
+
+| Band | Contents | FY2023 |
+|---|---|---|
+| Biomass (`$N130`) | wood 179.6, waste wood 42.1, black liquor 141.6, other 118.9, liquid biofuel 19.8, biogas 0.1 PJ | 502,061 TJ |
+| Waste & recovered (`$N200`) | refuse fuels — biogenic *and* fossil together, unsplit | 282,074 TJ |
+| … of which **not a waste fuel at all** | recovered industrial steam 218.5 + recovered electricity 52.1 PJ | 273,020 TJ |
+
+Three consequences:
+
+1. **Waste-to-energy sits on opposite sides.** Sweden's biomass includes ~36 PJ of biogenic municipal
+   waste; Japan's excludes municipal waste entirely.
+2. **Japan's waste band is half not-waste.** 273 of its 555 PJ is recovered industrial steam and
+   electricity. Sweden's nearest equivalent is the separate 42 PJ *Industrial waste heat* band, and that
+   only counts heat delivered *to district heating*, not internal industrial recovery.
+3. **Transport biofuels are invisible in Japan.** Sweden shows 66 PJ (2023) of biomass flowing to
+   transport. Japan's ~20 PJ of bioethanol is blended upstream (into ETBE/gasoline) and reaches transport
+   inside the *oil* band — `#800000 [$N133]` is exactly zero — so Japan's chart shows no biomass to transport.
+
+Coincidentally the totals nearly match after adjustment: removing biogenic waste from Sweden's band gives
+497 PJ against Japan's 502 PJ. **That closeness is a coincidence of composition, not evidence of
+comparability.**
+
+### 2.5 End use (both countries)
 
 Each sector is split into *energy services* and *rejected energy* using the LLNL efficiency assumptions:
 **residential 65%, commercial 65%, industrial 49%, transport 21%**. These are assumptions carried over from

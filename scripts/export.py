@@ -75,6 +75,16 @@ def footnotes(country, ds_flows, meta):
                      f"types, and the rejected energy leaving the electricity node reflects this accounting "
                      f"convention rather than the relative efficiency of the sources.")
         })
+        msw = (meta.get("renewable_municipal_waste_TJ") or 0) / 1000
+        tbf = (meta.get("transport_biofuel_TJ") or 0) / 1000
+        notes.append({
+            "marker": "‡", "nodes": ["bio", "wst"],
+            "text": (f"‡ Biomass and waste scope: Eurostat splits municipal waste, so the biogenic half ({msw:,.0f} PJ) "
+                     f"sits inside this biomass band while the fossil half is drawn separately as non-renewable waste. "
+                     f"Biomass here also includes {tbf:,.0f} PJ of liquid transport biofuels. Japan does not split "
+                     f"municipal waste and excludes it from biomass altogether, so neither the biomass nor the waste "
+                     f"bands mean the same thing in the two charts.")
+        })
     else:
         f = meta.get("primary_equivalent_factor") or 0.418
         notes.append({
@@ -85,12 +95,24 @@ def footnotes(country, ds_flows, meta):
                      f"generated. Geothermal is reported directly as heat. Rejected energy leaving the electricity node "
                      f"therefore includes this accounting artefact rather than only physical losses.")
         })
+        rec = (meta.get("recovered_heat_elec_TJ") or 0) / 1000
+        ref = (meta.get("refuse_energy_TJ") or 0) / 1000
+        lbf = (meta.get("liquid_biofuel_TJ") or 0) / 1000
+        notes.append({
+            "marker": "‡", "nodes": ["bio", "wst"],
+            "text": (f"‡ Biomass and waste scope: biomass here excludes municipal waste, which sits — biogenic and "
+                     f"fossil fractions alike, unsplit — in waste & recovered energy ({ref:,.0f} PJ of refuse fuels). "
+                     f"That band also holds {rec:,.0f} PJ of recovered industrial steam and electricity, which is not a "
+                     f"waste fuel at all. The {lbf:,.0f} PJ of bioethanol is blended upstream and reaches transport "
+                     f"inside the oil band, so no biomass flows to transport here. Sweden splits municipal waste and "
+                     f"shows transport biofuels within biomass, so neither band means the same thing in the two charts.")
+        })
 
     notes.append({
-        "marker": "‡", "nodes": [],
-        "text": ("‡ Cross-country comparison: the Swedish and Japanese charts follow different statistical conventions "
-                 "(see † above; Sweden also uses net calorific value, Japan gross). Band widths, totals and shares must "
-                 "not be compared between the two countries without adjustment — see the methodology panel.")
+        "marker": "§", "nodes": [],
+        "text": ("§ Cross-country comparison: the Swedish and Japanese charts follow different statistical conventions "
+                 "(see † and ‡ above; Sweden also uses net calorific value, Japan gross). Band widths, totals and "
+                 "shares must not be compared between the two countries without adjustment — see the methodology panel.")
     })
     return notes
 
