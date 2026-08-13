@@ -13,6 +13,13 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);line-height:1.5;padding:28px 20px 60px}
   .wrap{max-width:1480px;margin:0 auto}
+  .sitenav{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:0}
+  .sitenav a{
+    font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:8px 8px 0 0;text-decoration:none;
+    color:var(--ink-soft);border:1px solid transparent;border-bottom:none;position:relative;top:1px;
+  }
+  .sitenav a:hover{color:var(--accent)}
+  .sitenav a.on{background:var(--card);border-color:var(--line);color:var(--ink)}
   header.page h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
   header.page p.sub{color:var(--ink-soft);font-size:14px;margin-top:6px;max-width:940px}
   .tabs{display:flex;gap:8px;margin:22px 0 14px}
@@ -152,6 +159,11 @@
 </head>
 <body>
 <div class="wrap">
+
+<nav class="sitenav">
+  <a href="energy_sankey.html" class="on">Energy flow diagrams</a>
+  <a href="evidence.html">Supporting data</a>
+</nav>
 
 <header class="page">
   <h1>Energy Flow Diagrams — Sweden &amp; Japan</h1>

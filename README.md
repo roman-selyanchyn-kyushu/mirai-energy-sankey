@@ -13,6 +13,7 @@ Created for the **MIRAI Research Group · Kyushu University**.
 | `energy_sankey.html` | **Main deliverable.** All 55 datasets, country tabs + year dropdown, trend chart, click-to-trace, PJ/TWh switch, hi-res PNG and SVG export. Self-contained, no external dependencies. |
 | `energy_sankey_data.xlsx` | All numbers for all 55 datasets (3,170 flows), with the full derivation trail and balance checks. |
 | `scripts/` | The extraction and build pipeline — the authoritative record of how every number was produced. `derive_se.py` reads the Swedish PxWeb API, `derive_jp.py` the METI workbook. |
+| `evidence.html` | **Supporting data.** One card per factual claim in the manuscript: the claim as drafted, a verdict tested against the statistics, a figure, the numbers, the derivation, caveats and a full citation. Each card has a permalink the paper can cite. |
 | `energy_sankey_2023.html` | Frozen 2023-only earlier version, kept so existing links and citations stay valid. |
 
 ---
@@ -397,7 +398,34 @@ trend. Nuclear rose +9.6% (724 → 794 PJ) as reactor restarts continued, while 
   the IEA reconciliation
 - Single self-contained file — no external libraries, fonts or network calls
 
-## 6. Repository layout
+## 6. Supporting data page
+
+`evidence.html` is a **claims register** for the manuscript, separate from the Sankey page because it
+answers a different question: not "what does the energy system look like" but "does this specific sentence
+survive contact with the data". The two are linked by a shared nav bar.
+
+Each claim is one card with a fixed anatomy — the claim as drafted, a **verdict** (Supported / Supported
+with revision / Not supported) reached from the data rather than asserted, a figure with PNG and SVG
+export, the endpoint numbers, how they were derived, the caveats, any independent cross-check, and a full
+citation with the exact table. Every card carries a stable anchor, so the manuscript can cite
+`evidence.html#se-heating-fossil` rather than "see the website".
+
+Claims are generated, never hand-typed: `scripts/derive_claims.py` reads each figure out of a file in
+`sources/` and emits `claims.json`. Adding a claim means writing one `build_<id>()` function and listing
+it in `CLAIMS`.
+
+```bash
+python3 scripts/derive_claims.py && python3 scripts/build_evidence.py
+```
+
+**Claim 1 — fossil fuel in Swedish residential heating.** Drafted as "biomass has almost entirely removed
+fossil fuel from residential heating in Sweden". The fossil collapse is real (oil for dwellings
+21.7 → 0.45 TWh, −98% from 1990 to 2024) but the attribution is not: biomass burned *in the building* went
+10.0 → 8.3 TWh, **−17%**. The substitution ran through district heating (+42% delivered, its own fuel input
+moving from 13% to 64% biomass) and a 24% fall in total heating demand. Verdict: supported with revision,
+with suggested wording on the card.
+
+## 7. Repository layout
 
 ```
 energy_sankey.html         published page (generated — edit scripts/template.html, not this)
@@ -411,13 +439,19 @@ scripts/
   export.py                discovers years in sources/, builds all 55 datasets -> datasets.json
   build_html.py            injects datasets into template.html -> energy_sankey.html
   build_xlsx.py            builds the Excel workbook
-  template.html            page source (layout, styling, renderer)
+  derive_claims.py         reads sources/ -> claims.json (one entry per manuscript claim)
+  build_evidence.py        injects claims into template_evidence.html -> evidence.html
+  template.html            Sankey page source (layout, styling, renderer)
+  template_evidence.html   supporting-data page source
 sources/                   raw source files, gitignored (~67 MB)
   se_em_<year>.json        Energimyndigheten json-stat2 dumps, 2005-2024
   stte_<FY>.xlsx           METI balance workbooks, FY1990-FY2024
   download_missing.html    generated helper: lists and downloads whatever METI years are absent
+  energy-in-sweden-facts-and-figures-2026.xlsx   Energimyndigheten compendium, backs the claims page
+  claims/                  source files behind individual claims
+evidence.html              supporting-data page (generated)
 energy_sankey_2023.html    frozen earlier 2023-only version
 ```
 
-`energy_sankey.html` and `energy_sankey_data.xlsx` are **generated artefacts** — to change the charts,
+`energy_sankey.html`, `energy_sankey_data.xlsx` and `evidence.html` are **generated artefacts** — to change the charts,
 edit `scripts/template.html` or the derivation scripts and re-run the pipeline.

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supporting Data — Sweden &amp; Japan Energy Manuscript</title>
+<style>
+  :root{
+    --ink:#1d232a; --ink-soft:#5a636e; --bg:#f7f6f2; --card:#ffffff;
+    --line:#e4e1d8; --accent:#0f6f8e;
+    --f-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);line-height:1.55;padding:28px 20px 60px}
+  .wrap{max-width:1180px;margin:0 auto}
+  .sitenav{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:0}
+  .sitenav a{
+    font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:8px 8px 0 0;text-decoration:none;
+    color:var(--ink-soft);border:1px solid transparent;border-bottom:none;position:relative;top:1px;
+  }
+  .sitenav a:hover{color:var(--accent)}
+  .sitenav a.on{background:var(--card);border-color:var(--line);color:var(--ink)}
+  header.page h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+  header.page p.sub{color:var(--ink-soft);font-size:14px;margin-top:6px;max-width:940px}
+  .toc{margin:22px 0 6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+  .toc h2{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);margin-bottom:8px}
+  .toc ol{list-style:none;display:flex;flex-direction:column;gap:5px}
+  .toc a{color:var(--ink);text-decoration:none;font-size:14px;font-weight:600}
+  .toc a:hover{color:var(--accent)}
+  .toc .v{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:999px;margin-right:9px}
+
+  .claim{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:20px;
+         box-shadow:0 1px 3px rgba(30,30,20,.05);overflow:hidden;scroll-margin-top:14px}
+  .claim > .body{padding:20px 22px 22px}
+  .claim h2{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .claim .num{color:var(--ink-soft);font-weight:700;margin-right:8px}
+  .quote{border-left:4px solid var(--accent);background:#f4f8f9;border-radius:0 10px 10px 0;
+         padding:12px 16px;margin:14px 0 6px;font-size:15px}
+  .quote .lbl{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;
+              color:var(--ink-soft);font-weight:700;margin-bottom:4px}
+  .quote.fix{border-left-color:#3f8f5b;background:#f2f8f4}
+  .v{font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
+  .v.supported{background:#e6f3ea;color:#276a3c}
+  .v.revised{background:#fdf3e0;color:#8a6216}
+  .v.unsupported{background:#fbeaea;color:#973030}
+  .verdict{display:flex;gap:12px;align-items:flex-start;margin:14px 0 2px}
+  .verdict p{font-size:14px;margin:0}
+  h3.sec{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);
+         margin:22px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
+  .chartwrap{overflow-x:auto;margin:2px 0 4px}
+  svg.fig{width:100%;min-width:660px;height:auto;display:block}
+  svg.fig .hit{cursor:pointer}
+  svg.fig .hit:hover{fill:rgba(29,35,42,.05)}
+  .figbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 8px}
+  .figbar .cap{font-size:12.5px;color:var(--ink-soft);margin-right:auto}
+  .figbar button{
+    font-family:var(--f-ui);font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;transition:all .13s;
+  }
+  .figbar button:hover{border-color:var(--accent);color:var(--accent)}
+  table{border-collapse:collapse;font-size:13.5px;width:100%;max-width:760px;margin:4px 0 14px}
+  caption{text-align:left;font-size:13px;font-weight:600;color:var(--ink);padding-bottom:6px}
+  th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:left}
+  th{font-size:12px;font-weight:600;color:var(--ink-soft)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  td.sw i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:8px}
+  tr.tot td{font-weight:700;border-top:1px solid var(--ink);border-bottom:none}
+  ul.pts{margin:2px 0 6px 20px;font-size:13.5px}
+  ul.pts li{margin:5px 0}
+  .cite{background:#fbfaf7;border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:6px 0;
+        font-size:13.5px}
+  .cite b{display:block;margin-bottom:2px}
+  .cite .d{color:var(--ink-soft);font-size:12.5px;margin:3px 0}
+  .cite a{color:var(--accent);word-break:break-all;font-size:12.5px}
+  .xcheck{background:#fffdf5;border:1px solid #e8dfc2;border-left:4px solid #d9b64e;border-radius:10px;
+          padding:13px 17px;font-size:13.5px;color:#413c2c;margin:4px 0}
+  .permalink{font-size:12px;color:var(--ink-soft);margin-top:16px}
+  .permalink code{background:#f3f1ea;padding:2px 7px;border-radius:4px;user-select:all}
+  footer{margin-top:26px;color:var(--ink-soft);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  footer a{color:var(--accent)}
+  footer p{margin:0 0 8px}
+  footer p.credits{font-size:13.5px;color:var(--ink);line-height:1.7}
+  footer p.credits a{font-weight:600}
+  .tip{position:fixed;pointer-events:none;z-index:50;display:none;max-width:340px;
+       background:rgba(22,26,30,.94);color:#fff;font-size:12.5px;line-height:1.45;
+       padding:8px 11px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="sitenav">
+  <a href="energy_sankey.html">Energy flow diagrams</a>
+  <a href="evidence.html" class="on">Supporting data</a>
+</nav>
+
+<header class="page">
+  <h1>Supporting Data</h1>
+  <p class="sub">Each card below takes one factual claim from the manuscript, states it as written, and
+  tests it against the published statistics. The verdict comes from the data rather than from the draft,
+  so a claim that does not survive is marked and rewritten rather than quietly dropped. Every number is
+  read from a source file by <code>scripts/derive_claims.py</code>; nothing is typed in by hand. Each card
+  has its own permalink, so the manuscript can cite the exact evidence.</p>
+</header>
+
+<div class="toc" id="toc"></div>
+<div id="claims"></div>
+
+<footer>
+  <p class="credits">
+    Built for the <a href="https://www.mirai.nu/" target="_blank" rel="noopener">Sweden–Japan MIRAI Project</a>
+    · <a href="https://www.mirai.nu/pages/materials" target="_blank" rel="noopener">GCT for Materials for Energy Conversion and Storage</a>
+    · Designed by <a href="https://q-pit.kyushu-u.ac.jp/roman_selyanchyn/" target="_blank" rel="noopener">Roman Selyanchyn</a> (Kyushu University)
+    · Data extraction, preparation and coding with Claude Code
+  </p>
+  <p>
+    Companion to the <a href="energy_sankey.html">energy flow diagrams</a>. Method and source files are
+    documented in the <a href="https://github.com/roman-selyanchyn-kyushu/mirai-energy-sankey" target="_blank" rel="noopener">project README</a>.
+  </p>
+</footer>
+
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+"use strict";
+
+/* Claims are generated by scripts/derive_claims.py and embedded verbatim. */
+const CLAIMS = __CLAIMS__;
+
+const VERDICT = {supported: "Supported", revised: "Supported with revision", unsupported: "Not supported"};
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const fmt = (v, d) => v == null ? "—" :
+  v.toLocaleString("en-US", {minimumFractionDigits: d, maximumFractionDigits: d});
+
+/* ── figure: stacked area over years, same conventions as the Sankey page ── */
+const FG = {W: 1080, H: 330, ML: 62, MR: 12, MT: 26, MB: 46};
+
+function niceTicks(maxV){
+  if (!(maxV > 0)) return {step: 1, top: 1};
+  const mag = Math.pow(10, Math.floor(Math.log10(maxV/4)));
+  const n = (maxV/4)/mag;
+  const step = (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * mag;
+  return {step, top: Math.ceil(maxV/step)*step};
+}
+
+function figure(ch, id){
+  const {W:CW, H:CH, ML, MR, MT, MB} = FG;
+  const pw = CW-ML-MR, ph = CH-MT-MB;
+  const ys = ch.years, y0 = ys[0], y1 = ys[ys.length-1], span = (y1-y0) || 1;
+  const X = i => ML + pw*(ys[i]-y0)/span;
+  const totals = ys.map((_, i) => ch.series.reduce((a, s) => a + s.values[i], 0));
+  const t = niceTicks(Math.max.apply(null, totals));
+  const Y = v => MT + ph*(1 - v/t.top);
+
+  const p = [`<svg class="fig" id="${id}" viewBox="0 0 ${CW} ${CH}" width="${CW}" height="${CH}" xmlns="http://www.w3.org/2000/svg" font-family='"Helvetica Neue", Helvetica, Arial, sans-serif'>`];
+  p.push(`<rect x="0" y="0" width="${CW}" height="${CH}" fill="#ffffff"/>`);
+  for (let g = 0; g <= t.top + 1e-9; g += t.step){
+    const y = Y(g);
+    p.push(`<line x1="${ML}" y1="${y.toFixed(1)}" x2="${CW-MR}" y2="${y.toFixed(1)}" stroke="#e8e5dc" stroke-width="1"/>`);
+    p.push(`<text x="${ML-8}" y="${(y+3.5).toFixed(1)}" font-size="10.5" fill="#9aa0a8" text-anchor="end">${g.toLocaleString("en-US")}</text>`);
+  }
+  p.push(`<text x="${ML-8}" y="${MT-9}" font-size="10" font-weight="700" fill="#9aa0a8" text-anchor="end">${esc(ch.unit)}</text>`);
+
+  const acc = ys.map(() => 0);
+  ch.series.forEach(s => {
+    const top = ys.map((_, i) => acc[i] + s.values[i]);
+    const up = top.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" L");
+    const lo = acc.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).reverse().join(" L");
+    p.push(`<path d="M${up} L${lo} Z" fill="${s.color}" opacity="0.9"><title>${esc(s.label)}</title></path>`);
+    ys.forEach((_, i) => acc[i] = top[i]);
+  });
+
+  ys.forEach((y, i) => {
+    const edge = i === 0 || i === ys.length-1;
+    if (!edge && (y % 5 !== 0 || Math.abs(X(i)-X(0)) < 26 || Math.abs(X(ys.length-1)-X(i)) < 26)) return;
+    p.push(`<text x="${X(i).toFixed(1)}" y="${CH-MB+16}" font-size="10.5" fill="#9aa0a8" text-anchor="middle">${y}</text>`);
+  });
+
+  // legend along the bottom, in stacking order
+  let lx = ML;
+  ch.series.forEach(s => {
+    p.push(`<rect x="${lx}" y="${CH-16}" width="9" height="9" rx="2" fill="${s.color}"/>`);
+    p.push(`<text x="${lx+14}" y="${CH-8}" font-size="11" fill="#5a636e">${esc(s.label)}</text>`);
+    lx += 22 + s.label.length*6.1;
+  });
+
+  ys.forEach((y, i) => {
+    const a = i === 0 ? ML : (X(i-1)+X(i))/2;
+    const b = i === ys.length-1 ? CW-MR : (X(i)+X(i+1))/2;
+    const lines = ch.series.map(s => `${s.label} ${fmt(s.values[i], 2)}`).reverse().join("<br>");
+    p.push(`<rect x="${a.toFixed(1)}" y="${MT}" width="${Math.max(1,b-a).toFixed(1)}" height="${ph}" fill="transparent" class="hit"`
+         + ` data-tip="${esc(y + " — total " + fmt(totals[i],2) + " " + ch.unit)}|${esc(lines)}"></rect>`);
+  });
+  p.push(`</svg>`);
+  return p.join("");
+}
+
+/* ── cards ── */
+function tableHTML(t, series){
+  const colorOf = l => {
+    const s = (series||[]).find(s => l.toLowerCase().indexOf(s.label.toLowerCase().split(",")[0]) === 0);
+    return s ? s.color : null;
+  };
+  let h = `<table><caption>${esc(t.title)}</caption><tr><th>Item</th>`
+        + t.cols.map(c => `<th class="num">${esc(c)}${c==="change"?"":" ("+esc(t.unit)+")"}</th>`).join("")
+        + `<th class="num">%</th></tr>`;
+  t.rows.forEach(r => {
+    const c = colorOf(r.label);
+    const u = r.unit || t.unit;
+    const last = r.label.toLowerCase().indexOf("total") === 0;
+    h += `<tr${last?' class="tot"':''}><td class="sw">${c?`<i style="background:${c}"></i>`:""}${esc(r.label)}</td>`
+       + `<td class="num">${fmt(r.a, u==="%"?1:2)}</td><td class="num">${fmt(r.b, u==="%"?1:2)}</td>`
+       + `<td class="num">${r.delta>0?"+":"−"}${fmt(Math.abs(r.delta), u==="%"?1:2)}${u==="%"?" pp":""}</td>`
+       + `<td class="num">${r.pct==null?"—":(r.pct>0?"+":"−")+fmt(Math.abs(r.pct),1)+"%"}</td></tr>`;
+  });
+  return h + `</table>`;
+}
+
+function card(c){
+  const figId = `fig-${c.id}`;
+  return `<section class="claim" id="${esc(c.id)}"><div class="body">
+    <h2><span class="num">${c.number}.</span>${esc(c.title)}</h2>
+
+    <div class="quote"><span class="lbl">Claim as drafted</span>${esc(c.claim)}</div>
+
+    <div class="verdict"><span class="v ${c.verdict}">${VERDICT[c.verdict]}</span>
+      <p>${c.verdictLine}</p></div>
+
+    ${c.rewrite ? `<div class="quote fix"><span class="lbl">Suggested wording</span>${esc(c.rewrite)}</div>` : ""}
+
+    <h3 class="sec">Evidence</h3>
+    <div class="figbar"><span class="cap">${esc(c.chart.title)}${c.chart.note ? " · " + esc(c.chart.note) : ""}</span>
+      <button data-fig="${figId}" data-name="${esc(c.id)}" data-fmt="png">PNG</button>
+      <button data-fig="${figId}" data-name="${esc(c.id)}" data-fmt="svg">SVG</button></div>
+    <div class="chartwrap">${figure(c.chart, figId)}</div>
+
+    ${c.tables.map(t => tableHTML(t, c.chart.series)).join("")}
+
+    <h3 class="sec">How this was derived</h3>
+    <ul class="pts">${c.derivation.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
+
+    <h3 class="sec">Caveats</h3>
+    <ul class="pts">${c.caveats.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
+
+    ${c.crosscheck ? `<h3 class="sec">Independent cross-check</h3><div class="xcheck">${esc(c.crosscheck)}</div>` : ""}
+
+    <h3 class="sec">Sources</h3>
+    ${c.sources.map(s => `<div class="cite"><b>${esc(s.author)} (${esc(s.year)}). ${esc(s.title)}.</b>
+      <div class="d">${esc(s.detail)}</div>
+      <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>`).join("")}
+
+    <p class="permalink">Cite this card: <code>evidence.html#${esc(c.id)}</code></p>
+  </div></section>`;
+}
+
+document.getElementById("claims").innerHTML = CLAIMS.map(card).join("");
+document.getElementById("toc").innerHTML = "<h2>Claims tested</h2><ol>"
+  + CLAIMS.map(c => `<li><span class="v ${c.verdict}">${VERDICT[c.verdict]}</span>`
+    + `<a href="#${esc(c.id)}">${c.number}. ${esc(c.title)}</a></li>`).join("") + "</ol>";
+
+/* ── tooltips ── */
+const tip = document.getElementById("tip");
+document.querySelectorAll("[data-tip]").forEach(el => {
+  el.addEventListener("mousemove", e => {
+    const p = el.getAttribute("data-tip").split("|");
+    tip.innerHTML = `<b>${p[0]}</b><br>${p[1]}`;
+    tip.style.display = "block";
+    tip.style.left = Math.min(e.clientX+14, window.innerWidth-350) + "px";
+    tip.style.top = (e.clientY+16) + "px";
+  });
+  el.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+});
+window.addEventListener("scroll", () => { tip.style.display = "none"; }, {passive:true});
+
+/* ── figure export, same behaviour as the Sankey page ── */
+function svgStringOf(el){
+  const s = el.cloneNode(true);
+  s.removeAttribute("class");
+  s.querySelectorAll(".hit").forEach(n => n.remove());
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(s);
+}
+function triggerDownload(url, name){
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+document.querySelectorAll(".figbar button").forEach(b => b.addEventListener("click", () => {
+  const el = document.getElementById(b.dataset.fig), name = b.dataset.name;
+  if (b.dataset.fmt === "svg"){
+    const u = URL.createObjectURL(new Blob([svgStringOf(el)], {type:"image/svg+xml;charset=utf-8"}));
+    triggerDownload(u, name + ".svg");
+    setTimeout(() => URL.revokeObjectURL(u), 4000);
+    return;
+  }
+  const w = +el.getAttribute("width"), h = +el.getAttribute("height"), scale = 4;
+  const url = URL.createObjectURL(new Blob([svgStringOf(el)], {type:"image/svg+xml;charset=utf-8"}));
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement("canvas");
+    c.width = w*scale; c.height = h*scale;
+    const x = c.getContext("2d");
+    x.fillStyle = "#ffffff"; x.fillRect(0, 0, c.width, c.height);
+    x.drawImage(img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(url);
+    c.toBlob(bl => {
+      const u = URL.createObjectURL(bl);
+      triggerDownload(u, `${name}_${w*scale}px.png`);
+      setTimeout(() => URL.revokeObjectURL(u), 4000);
+    }, "image/png");
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); alert("PNG export failed — try the SVG download instead."); };
+  img.src = url;
+}));
+</script>
+</body>
+</html>
