@@ -499,21 +499,32 @@ type = total, and the Swedish categories against their published total).
 **The note was then checked against the primary publications.** Each source it names was fetched and the
 figure read back out of it; the results are recorded in
 `sources/claims/biomass_primary_verification.md`, parsed by the same reader and shown on the card.
-**18 figures were checked and every one matched** — Japan's forest area against the Forestry Agency's own
-table (総数 2,502 万ha, split 1,009 / 1,355 / 138), the pellet and PKS import series and their origin
-countries, the 436,000 km road network and 25.2 m/ha density, forestry households, wood demand and
-self-sufficiency, and on the Swedish side the 55,500 GWh wood-fuel total with its three categories, the
-27.9 / 23.5 / 40.7 Mha forest areas and the 87.7 million m³sk gross felling.
+**32 figures were checked and every one matched** — nothing outstanding.
 
-Two independent cross-checks came out of that reading. The domestic share of Japanese pellet supply
+Three groups resisted a first pass and were reached on a second, which is worth recording because the
+route matters more than the result:
+
+| Blocked by | Route that worked |
+|---|---|
+| e-Stat survey tables render through JavaScript | loaded them in a real browser and read the rendered table |
+| Swedish price table is a PxWeb application | queried the PxWeb **JSON API** directly, as `fetch_se.py` already does for the energy balance |
+| Three Japanese PDFs returned no text through a converting proxy | downloaded them with `curl` and ran `pdftotext -layout` locally |
+
+Reading the sources rather than the note also produced facts the note did not carry, and one of them is
+the sharpest result on the card: **the MAFF survey splits the fuel by what the plant is.** Japanese
+establishments that only generate electricity take **98.6%** of their pellets from imports; those that
+only run heat boilers take **99.5%** of theirs from domestic mills, and take no imported chips at all.
+Japan does not have one biomass supply chain, it has two that barely touch. The reading also dated the
+slope statistics to the 1999–2003 monitoring survey, established that the Swedish prices are the
+*district-heating* purchase price (industry pays 577 and 324 SEK/MWh), gave the METI cost figures their
+sample sizes, and confirmed that no chips are made in Japan from imported logs — so there is no third
+import channel hidden inside the domestic categories.
+
+Two independent cross-checks came out of it as well. The domestic share of Japanese pellet supply
 recomputes from the Forestry Agency's own production and customs series — 152,000 t produced against
 6,381,000 t imported, a 2.3% domestic share — against the 2.3% the combustion survey reports, the same
 answer from a different statistical system. And the Forestry Agency's growing-stock figure of
 5,560 million m³ puts Japan's 22.3 million m³ annual harvest at 0.40% of standing stock per year.
-
-Three groups could not be reached and remain sourced but unchecked: the Swedish price table and the
-e-Stat survey tables are JavaScript applications, and the slope, fuel-cost and energy-balance PDFs
-yielded no readable text. The card says so in its caveats and lists them.
 
 Population comes from `scripts/fetch_pop.py` — SCB's PxWeb API for Sweden and the Statistics Bureau's
 published 人口推計 table for Japan, both put on a mid-period basis so the denominator matches the energy
@@ -547,6 +558,7 @@ sources/                   raw source files, gitignored (~67 MB)
   jp_population_2024_stat_go_jp.xlsx             Statistics Bureau population table
   claims/                  source files behind individual claims
     japan_forest_biomass_verified_statistics.md   compiled research note behind card 3
+    biomass_primary_verification.md               card 3 checked back against the primary sources
 evidence.html              supporting-data page (generated)
 energy_sankey_2023.html    frozen earlier 2023-only version
 ```

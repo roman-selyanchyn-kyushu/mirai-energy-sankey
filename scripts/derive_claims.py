@@ -574,6 +574,15 @@ def build_se_jp_biomass():
     pel_use_2017 = V.num("wood pellets used in 2017")
     pel_dom_prod = V.num("domestic pellet production in 2024")
     se_rec_imp = V.num("imported raw-material share of the recycled wood fuel")
+    # the survey splits the fuel by what the plant is, which is the sharpest cut in the card
+    eq = [("Power generation only", 3638251, 50572, 3587679),
+          ("Both generator and boiler", 1615558, 39947, 1575611),
+          ("Heat boilers only", 31377, 31216, 161)]
+    eq = [(lab, V.num(f"pellets burned by establishments owning {k}") and tot, dom, imp)
+          for (lab, tot, dom, imp), k in
+          zip(eq, ("generators only", "both generators and boilers", "boilers only"))]
+    chip_gen_imp = V.num("imported chips burned by generator-only establishments")
+    chip_pulp = V.num("chips diverted from pulp raw material")
     se_peak = V.num("the 2022 peak in Swedish unprocessed wood fuel")
     jp_stock = V.num("forest growing stock in the same table")
 
@@ -632,7 +641,10 @@ def build_se_jp_biomass():
             f"Sweden's wood fuel is imported, and about half of it is residue from its own sawmills and "
             f"pulp mills. In Japan <b>{jp_imp_pc:.0f}% of the solid biomass fuel burned in 2024 was "
             f"imported</b> by mass, and the single largest fuel is not wood at all but "
-            f"<b>palm kernel shell from Indonesia and Malaysia</b>."),
+            f"<b>palm kernel shell from Indonesia and Malaysia</b>. The split runs along the use: "
+            f"Japanese plants that only generate electricity take {eq[0][3]/eq[0][1]*100:.1f}% of their "
+            f"pellets from imports, while plants that only run heat boilers take "
+            f"{eq[2][2]/eq[2][1]*100:.1f}% of theirs from domestic mills."),
         "rewrite": (
             f"Sweden and Japan hold comparable forests \u2014 {se_forest} and {jp_forest} Mha, about "
             f"{se_forest/se_land*100:.0f}% and {jp_forest/jp_land*100:.0f}% of their land area \u2014 but "
@@ -690,6 +702,17 @@ def build_se_jp_biomass():
                       {"label": "Imported wood pellets", "value": pel_imp, "color": BC["imp_pellet"]},
                       {"label": "Imported palm kernel shell", "value": pks, "color": BC["pks"]}]},
              ]},
+            {"title": "Japan: who burns the imported pellets, 2024", "scale": "share",
+             "note": (f"The imported fuel is not spread across the system: it is what the power stations "
+                      f"run on. Establishments that only generate electricity took "
+                      f"{eq[0][3]/eq[0][1]*100:.1f}% of their pellets from imports; establishments that "
+                      f"only run heat boilers took {eq[2][2]/eq[2][1]*100:.1f}% of theirs from domestic "
+                      f"mills. Wood chips split the same way \u2014 {chip_gen_imp/1e6:.2f} Mt of imported "
+                      f"chips went to generator-only plants and none at all to boiler-only plants."),
+             "bars": [{"label": lab, "sub": f"{tot/1e6:.2f} Mt of pellets", "segments": [
+                 {"label": "Domestic raw material", "value": dom, "color": BC["dom"]},
+                 {"label": "Imported raw material", "value": imp, "color": BC["imp_pellet"]}]}
+                 for lab, tot, dom, imp in eq]},
             {"title": "Japan's imported biomass fuel, 2015 \u2192 2024", "scale": "absolute",
              "unit": "Mt, customs basis",
              "note": ("Customs entries rather than survey-reported combustion, so these differ from the "
@@ -726,17 +749,18 @@ def build_se_jp_biomass():
                 M("Wood chips", cost["se_chip"], cost["jp_chip"], "US$/GJ"),
                 M("Pellets / refined wood fuel", cost["se_ref"], cost["jp_pellet"], "US$/GJ")],
              "note": ("Japanese chips are the cheaper fuel of the two, which is the point: cost is not "
-                      "what holds domestic mobilisation back. Currency-converted, and the delivery point "
-                      "is not identically defined in the two sources.")},
+                      "what holds domestic mobilisation back. The Swedish figures are the "
+                      "district-heating purchase price free to plant excluding tax; Swedish industry pays "
+                      "less for chips and more for refined fuel. The Japanese figures are project-"
+                      "reported averages over 134 chip and 86 pellet cost records. Currency-converted, "
+                      "and the delivery point is not identically defined in the two sources.")},
         ]},
 
         "verification": {
-            "checked": len(VS["Verified \u2014 Japan"]) + len(VS["Verified \u2014 Sweden"]),
-            "missed": len(VS["Not reached"]),
-            "rows": [[r["lead"], r["text"]] for r in
-                     VS["Verified \u2014 Japan"] + VS["Verified \u2014 Sweden"]],
-            "gaps": [r["lead"] + (". " + r["text"] if r["text"] else "")
-                     for r in VS["Not reached"]],
+            "checked": sum(len(v) for k, v in VS.items() if k.startswith("Verified")),
+            "rows": [[r["lead"], r["text"]] for k, v in VS.items()
+                     if k.startswith("Verified") for r in v],
+            "gaps": [[r["lead"], r["text"]] for r in VS["Not reached"]],
         },
 
         "tables": [
@@ -814,11 +838,11 @@ def build_se_jp_biomass():
         ],
         "caveats": [
             f"Provenance runs through a compiled research note rather than an extraction this pipeline "
-            f"performs. {len(VS['Verified \u2014 Japan']) + len(VS['Verified \u2014 Sweden'])} of its "
-            f"figures were afterwards read back out of the primary publications and all of them matched "
-            f"(see the verification section). {len(VS['Not reached'])} groups could not be reached: the "
-            f"Swedish price table and the e-Stat survey tables are JavaScript applications, and three "
-            f"Japanese PDFs yielded no readable text. Those figures remain sourced but unchecked.",
+            f"performs. Every figure it carries has since been read back out of its own primary "
+            f"publication \u2014 {sum(len(VS[k]) for k in VS if k.startswith('Verified'))} checks, all "
+            f"of them matching, listed in the verification section. What the note could not tell us and "
+            f"the sources could is recorded there too, including the vintage of the slope statistics and "
+            f"which user the Swedish prices refer to.",
             "The two countries' fuel figures are in different units and cannot be added or ranked against "
             "each other. Sweden publishes wood fuel in GWh of energy; Japan publishes physical tonnes, and "
             "mixes dry-tonne chips with as-received pellets and PKS. Only the shares are comparable.",
@@ -830,6 +854,10 @@ def build_se_jp_biomass():
             "Japan's harvest-to-growth ratio compares industrial roundwood supply with growing-stock "
             "increase. The two have different boundaries, and the roundwood figure excludes fuelwood and "
             "residues, so the true removal share is somewhat higher than shown.",
+            "The 30\u00b0 and 40\u00b0 slope shares come from the 森林資源モニタリング調査 of 1999\u2013"
+            "2003, so they are a picture of the estate a generation ago; the 21\u00b0 average is quoted "
+            "by the Forestry Agency from a forestry-extension publication rather than from a government "
+            "survey. Terrain changes slowly, but the vintage should be stated when the figure is quoted.",
             "The often-quoted claim that a quarter of Japanese forest parcels have unknown owners refers "
             "to owners not locatable from the land register alone. After further tracing the unresolved "
             "share in the surveyed sample was 0.57%.",
@@ -913,6 +941,20 @@ def build_se_jp_biomass():
              "detail": "Gross felling 87.7 million m\u00b3sk (2024) and preliminary net felling with its "
                        "sawlog, pulpwood and firewood split (2025).",
              "url": "https://www.skogsstyrelsen.se/en/statistics/felling/fellings/"},
+            {"author": "\u8cc7\u6e90\u30a8\u30cd\u30eb\u30ae\u30fc\u5e81 (ANRE, Japan)",
+             "year": "2026",
+             "title": "\u4ee4\u548c6\u5e74\u5ea6\u30a8\u30cd\u30eb\u30ae\u30fc\u9700\u7d66"
+                      "\u5b9f\u7e3e (Energy Supply and Demand Report, FY2024)",
+             "detail": "Biomass in primary energy supply with its wood, waste wood, black liquor, "
+                       "biofuel and other components, FY2023 and FY2024.",
+             "url": "https://www.enecho.meti.go.jp/statistics/total_energy/pdf/honbun2024fykaku.pdf"},
+            {"author": "\u6797\u91ce\u5e81 (Forestry Agency, Japan)", "year": "n.d.",
+             "title": "\u6797\u696d\u751f\u7523\u6027\u5411\u4e0a\u306e\u305f\u3081\u306e"
+                      "\u30ac\u30a4\u30c9\u30d6\u30c3\u30af (Guidebook for improving forestry "
+                      "productivity)",
+             "detail": "Average forest slope of 21\u00b0 and the shares of managed forest above 30\u00b0, "
+                       "35\u00b0 and 40\u00b0, with the 1999\u20132003 monitoring survey behind them.",
+             "url": "https://www.rinya.maff.go.jp/j/gyoumu/gijutu/attach/pdf/torikumi-11.pdf"},
             {"author": "\u7d4c\u6e08\u7523\u696d\u7701 (METI, Japan)", "year": "2025",
              "title": "\u8abf\u9054\u4fa1\u683c\u7b49\u7b97\u5b9a\u59d4\u54e1\u4f1a "
                       "(Procurement Price Calculation Committee), \u8cc7\u65991",
