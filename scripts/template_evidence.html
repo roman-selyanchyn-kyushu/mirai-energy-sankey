@@ -23,7 +23,15 @@
   header.page h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
   header.page p.sub{color:var(--ink-soft);font-size:14px;margin-top:6px;max-width:940px}
   .toc{margin:22px 0 6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
-  .toc h2{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);margin-bottom:8px}
+  .toc h2{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);
+          margin-bottom:8px;display:flex;align-items:center}
+  .toc .tbtns{margin-left:auto;display:flex;gap:6px}
+  .toc .tbtn{
+    font-family:var(--f-ui);font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;
+    text-transform:none;letter-spacing:0;transition:all .13s;
+  }
+  .toc .tbtn:hover{border-color:var(--accent);color:var(--accent)}
   .toc ol{list-style:none;display:flex;flex-direction:column;gap:5px}
   .toc a{color:var(--ink);text-decoration:none;font-size:14px;font-weight:600}
   .toc a:hover{color:var(--accent)}
@@ -31,7 +39,20 @@
 
   .claim{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:20px;
          box-shadow:0 1px 3px rgba(30,30,20,.05);overflow:hidden;scroll-margin-top:14px}
-  .claim > .body{padding:20px 22px 22px}
+  /* the whole card collapses; the summary keeps title and verdict visible so the
+     register can be scanned closed, and a card addressed by #anchor opens itself */
+  .claim > summary{
+    cursor:pointer;list-style:none;display:flex;align-items:center;gap:12px;
+    padding:15px 20px;transition:background .13s;
+  }
+  .claim > summary::-webkit-details-marker{display:none}
+  .claim > summary::before{content:"\25B8";color:var(--accent);font-size:15px;line-height:1;
+                           transition:transform .15s;flex:none}
+  .claim[open] > summary::before{transform:rotate(90deg)}
+  .claim > summary:hover{background:#fbfaf7}
+  .claim > summary h2{margin-right:auto}
+  .claim[open] > summary{border-bottom:1px solid var(--line)}
+  .claim > .body{padding:8px 22px 22px}
   .claim h2{font-size:19px;font-weight:700;letter-spacing:-.01em}
   .claim .num{color:var(--ink-soft);font-weight:700;margin-right:8px}
   .quote{border-left:4px solid var(--accent);background:#f4f8f9;border-radius:0 10px 10px 0;
@@ -53,6 +74,17 @@
   svg.fig{width:100%;min-width:660px;height:auto;display:block}
   svg.fig .hit{cursor:pointer}
   svg.fig .hit:hover{fill:rgba(29,35,42,.05)}
+  svg.fig .fband{cursor:pointer}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+  .chips .chip{
+    display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:12.5px;font-weight:600;
+    padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+    cursor:pointer;transition:all .13s;
+  }
+  .chips .chip i{width:9px;height:9px;border-radius:2px;background:var(--c,#9aa0a8);flex:none}
+  .chips .chip:hover{border-color:var(--c,var(--accent));color:var(--ink)}
+  .chips .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  p.fighead{font-size:13.5px;color:var(--ink);margin:7px 0 4px}
   .figbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 8px}
   .figbar .cap{font-size:12.5px;color:var(--ink-soft);margin-right:auto}
   .figbar button{
@@ -135,7 +167,11 @@ const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 const fmt = (v, d) => v == null ? "—" :
   v.toLocaleString("en-US", {minimumFractionDigits: d, maximumFractionDigits: d});
 
-/* ── figure: stacked area over years, same conventions as the Sankey page ── */
+/* ── figure: the carriers over time, stacked or one at a time.
+   Same control as the trend chart under each Sankey, and for the same reason:
+   the stack shows the shape of the whole system but flattens anything small,
+   so a carrier that ends near zero — which is exactly what this claim turns on —
+   is only legible drawn alone against its own rescaled axis. ── */
 const FG = {W: 1080, H: 330, ML: 62, MR: 12, MT: 26, MB: 46};
 
 function niceTicks(maxV){
@@ -146,13 +182,15 @@ function niceTicks(maxV){
   return {step, top: Math.ceil(maxV/step)*step};
 }
 
-function figure(ch, id){
+function figure(ch, id, sel, claimId){
   const {W:CW, H:CH, ML, MR, MT, MB} = FG;
   const pw = CW-ML-MR, ph = CH-MT-MB;
   const ys = ch.years, y0 = ys[0], y1 = ys[ys.length-1], span = (y1-y0) || 1;
   const X = i => ML + pw*(ys[i]-y0)/span;
   const totals = ys.map((_, i) => ch.series.reduce((a, s) => a + s.values[i], 0));
-  const t = niceTicks(Math.max.apply(null, totals));
+  const one = (sel == null) ? null : ch.series[sel];
+  // the axis is rescaled to whatever is on screen; that is the point of the single view
+  const t = niceTicks(Math.max.apply(null, one ? one.values : totals));
   const Y = v => MT + ph*(1 - v/t.top);
 
   const p = [`<svg class="fig" id="${id}" viewBox="0 0 ${CW} ${CH}" width="${CW}" height="${CH}" xmlns="http://www.w3.org/2000/svg" font-family='"Helvetica Neue", Helvetica, Arial, sans-serif'>`];
@@ -160,18 +198,26 @@ function figure(ch, id){
   for (let g = 0; g <= t.top + 1e-9; g += t.step){
     const y = Y(g);
     p.push(`<line x1="${ML}" y1="${y.toFixed(1)}" x2="${CW-MR}" y2="${y.toFixed(1)}" stroke="#e8e5dc" stroke-width="1"/>`);
-    p.push(`<text x="${ML-8}" y="${(y+3.5).toFixed(1)}" font-size="10.5" fill="#9aa0a8" text-anchor="end">${g.toLocaleString("en-US")}</text>`);
+    p.push(`<text x="${ML-8}" y="${(y+3.5).toFixed(1)}" font-size="10.5" fill="#9aa0a8" text-anchor="end">${g.toLocaleString("en-US", {maximumFractionDigits: t.step < 1 ? 2 : t.step < 10 ? 1 : 0})}</text>`);
   }
   p.push(`<text x="${ML-8}" y="${MT-9}" font-size="10" font-weight="700" fill="#9aa0a8" text-anchor="end">${esc(ch.unit)}</text>`);
 
-  const acc = ys.map(() => 0);
-  ch.series.forEach(s => {
-    const top = ys.map((_, i) => acc[i] + s.values[i]);
-    const up = top.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" L");
-    const lo = acc.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).reverse().join(" L");
-    p.push(`<path d="M${up} L${lo} Z" fill="${s.color}" opacity="0.9"><title>${esc(s.label)}</title></path>`);
-    ys.forEach((_, i) => acc[i] = top[i]);
-  });
+  if (one){
+    const pts = ys.map((_, i) => `${X(i).toFixed(1)},${Y(one.values[i]).toFixed(1)}`);
+    p.push(`<path d="M${pts.join(" L")} L${X(ys.length-1).toFixed(1)},${Y(0).toFixed(1)} L${X(0).toFixed(1)},${Y(0).toFixed(1)} Z" fill="${one.color}" opacity="0.18"/>`);
+    p.push(`<path d="M${pts.join(" L")}" fill="none" stroke="${one.color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`);
+    ys.forEach((_, i) => p.push(`<circle cx="${X(i).toFixed(1)}" cy="${Y(one.values[i]).toFixed(1)}" r="2.2" fill="${one.color}"/>`));
+  } else {
+    const acc = ys.map(() => 0);
+    ch.series.forEach((s, si) => {
+      const top = ys.map((_, i) => acc[i] + s.values[i]);
+      const up = top.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" L");
+      const lo = acc.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).reverse().join(" L");
+      p.push(`<path d="M${up} L${lo} Z" fill="${s.color}" opacity="0.9" class="fband" data-claim="${esc(claimId||"")}" data-i="${si}">`
+           + `<title>${esc(s.label)} — click to see it on its own</title></path>`);
+      ys.forEach((_, i) => acc[i] = top[i]);
+    });
+  }
 
   ys.forEach((y, i) => {
     const edge = i === 0 || i === ys.length-1;
@@ -181,7 +227,7 @@ function figure(ch, id){
 
   // legend along the bottom, in stacking order
   let lx = ML;
-  ch.series.forEach(s => {
+  (one ? [one] : ch.series).forEach(s => {
     p.push(`<rect x="${lx}" y="${CH-16}" width="9" height="9" rx="2" fill="${s.color}"/>`);
     p.push(`<text x="${lx+14}" y="${CH-8}" font-size="11" fill="#5a636e">${esc(s.label)}</text>`);
     lx += 22 + s.label.length*6.1;
@@ -190,9 +236,12 @@ function figure(ch, id){
   ys.forEach((y, i) => {
     const a = i === 0 ? ML : (X(i-1)+X(i))/2;
     const b = i === ys.length-1 ? CW-MR : (X(i)+X(i+1))/2;
-    const lines = ch.series.map(s => `${s.label} ${fmt(s.values[i], 2)}`).reverse().join("<br>");
+    const head = one ? `${y} — ${one.label} ${fmt(one.values[i], 2)} ${ch.unit}`
+                     : `${y} — total ${fmt(totals[i], 2)} ${ch.unit}`;
+    const lines = one ? `${(totals[i] ? one.values[i]/totals[i]*100 : 0).toFixed(1)}% of the total that year`
+                      : ch.series.map(s => `${s.label} ${fmt(s.values[i], 2)}`).reverse().join("<br>");
     p.push(`<rect x="${a.toFixed(1)}" y="${MT}" width="${Math.max(1,b-a).toFixed(1)}" height="${ph}" fill="transparent" class="hit"`
-         + ` data-tip="${esc(y + " — total " + fmt(totals[i],2) + " " + ch.unit)}|${esc(lines)}"></rect>`);
+         + ` data-tip="${esc(head)}|${esc(lines)}"></rect>`);
   });
   p.push(`</svg>`);
   return p.join("");
@@ -273,8 +322,10 @@ function tableHTML(t, series){
 function panelCard(c){
   const figId = `fig-${c.id}`;
   const blocks = c.panel.blocks;
-  return `<section class="claim" id="${esc(c.id)}"><div class="body">
-    <h2><span class="num">${c.number}.</span>${esc(c.title)}</h2>
+  return `<details class="claim" id="${esc(c.id)}">
+    <summary><h2><span class="num">${c.number}.</span>${esc(c.title)}</h2>
+      <span class="v panel">Comparison</span></summary>
+    <div class="body">
     <p style="font-size:14px;margin:10px 0 4px">${esc(c.lead)}</p>
 
     <h3 class="sec">Comparison</h3>
@@ -317,27 +368,30 @@ function panelCard(c){
       <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>`).join("")}
 
     <p class="permalink">Cite this card: <code>evidence.html#${esc(c.id)}</code></p>
-  </div></section>`;
+  </div></details>`;
 }
 
 function card(c){
   if (c.kind === "panel") return panelCard(c);
   const figId = `fig-${c.id}`;
-  return `<section class="claim" id="${esc(c.id)}"><div class="body">
-    <h2><span class="num">${c.number}.</span>${esc(c.title)}</h2>
-
-    <div class="quote"><span class="lbl">Claim as drafted</span>${esc(c.claim)}</div>
+  return `<details class="claim" id="${esc(c.id)}">
+    <summary><h2><span class="num">${c.number}.</span>${esc(c.title)}</h2>
+      <span class="v ${c.verdict}">${VERDICT[c.verdict]}</span></summary>
+    <div class="body">
+    <div class="quote"><span class="lbl">Simple fact</span>${esc(c.claim)}</div>
 
     <div class="verdict"><span class="v ${c.verdict}">${VERDICT[c.verdict]}</span>
       <p>${c.verdictLine}</p></div>
 
-    ${c.rewrite ? `<div class="quote fix"><span class="lbl">Suggested wording</span>${esc(c.rewrite)}</div>` : ""}
+    ${c.rewrite ? `<div class="quote fix"><span class="lbl">Detailed fact supported by numbers and references</span>${esc(c.rewrite)}</div>` : ""}
 
     <h3 class="sec">Evidence</h3>
     <div class="figbar"><span class="cap">${esc(c.chart.title)}${c.chart.note ? " · " + esc(c.chart.note) : ""}</span>
       <button data-fig="${figId}" data-name="${esc(c.id)}" data-fmt="png">PNG</button>
       <button data-fig="${figId}" data-name="${esc(c.id)}" data-fmt="svg">SVG</button></div>
-    <div class="chartwrap">${figure(c.chart, figId)}</div>
+    <div class="chips" id="chips-${esc(c.id)}"></div>
+    <p class="fighead" id="fighead-${esc(c.id)}"></p>
+    <div class="chartwrap" id="wrap-${esc(c.id)}"></div>
 
     ${c.tables.map(t => tableHTML(t, c.chart.series)).join("")}
 
@@ -355,25 +409,125 @@ function card(c){
       <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>`).join("")}
 
     <p class="permalink">Cite this card: <code>evidence.html#${esc(c.id)}</code></p>
-  </div></section>`;
+  </div></details>`;
 }
 
+/* ── pill switch over the figure ─────────────────────────────────
+   FIGSEL holds the series index each card is showing, or null for the stack.
+   Chips, and the stacked bands themselves, both drive it. */
+const FIGSEL = {};
+
+const pctChange = (a, b) => {
+  if (!a && !b) return "\u2014";
+  if (!a) return "from zero";
+  if (!b) return "to zero";
+  if (b/a >= 10) return "\u00d7" + (b/a).toFixed(0);
+  const d = (b-a)/a*100;
+  return (d >= 0 ? "+" : "\u2212") + (Math.abs(d) >= 100 ? Math.abs(d).toFixed(0) : Math.abs(d).toFixed(1)) + "%";
+};
+
+function figChips(c){
+  const sel = FIGSEL[c.id];
+  const chip = (i, label, color) =>
+      `<button class="chip${sel === i ? " on" : ""}" data-claim="${esc(c.id)}" data-i="${i == null ? "" : i}"`
+    + `${color ? ` style="--c:${color}"` : ""}>${color ? "<i></i>" : ""}${esc(label)}</button>`;
+  return chip(null, "All carriers", null)
+       + c.chart.series.map((s, i) => chip(i, s.label, s.color)).join("");
+}
+
+function figHead(c){
+  const ch = c.chart, sel = FIGSEL[c.id], ys = ch.years, last = ys.length - 1;
+  const totals = ys.map((_, i) => ch.series.reduce((a, s) => a + s.values[i], 0));
+  if (sel == null)
+    return `Total ${ys[0]} <b>${fmt(totals[0], 1)} ${esc(ch.unit)}</b> \u2192 ${ys[last]} `
+         + `<b>${fmt(totals[last], 1)} ${esc(ch.unit)}</b> (<b>${pctChange(totals[0], totals[last])}</b>). `
+         + `<b>Pick a carrier to see it on its own scale</b> \u2014 a carrier that ends near zero is `
+         + `invisible in the stack, and that is what this claim turns on.`;
+  const s = ch.series[sel], v = s.values, pk = v.indexOf(Math.max.apply(null, v));
+  return `<b style="color:${s.color}">${esc(s.label)}</b> in ${ys[0]} <b>${fmt(v[0], 2)} ${esc(ch.unit)}</b> `
+       + `\u2192 ${ys[last]} <b>${fmt(v[last], 2)} ${esc(ch.unit)}</b> (<b>${pctChange(v[0], v[last])}</b>) `
+       + `\u00b7 peak ${fmt(v[pk], 2)} in ${ys[pk]} `
+       + `\u00b7 ${(v[last]/totals[last]*100).toFixed(1)}% of the total today`;
+}
+
+function paintFigure(c){
+  const figId = `fig-${c.id}`, sel = FIGSEL[c.id];
+  document.getElementById(`chips-${c.id}`).innerHTML = figChips(c);
+  document.getElementById(`fighead-${c.id}`).innerHTML = figHead(c);
+  document.getElementById(`wrap-${c.id}`).innerHTML = figure(c.chart, figId, sel, c.id);
+  // the export is named after what is actually drawn, so a single-carrier figure
+  // can go straight into the paper under its own name
+  const name = sel == null ? c.id
+             : c.id + "_" + c.chart.series[sel].label.replace(/[^A-Za-z]+/g, "_").replace(/^_|_$/g, "");
+  document.querySelectorAll(`.figbar button[data-fig="${figId}"]`).forEach(b => { b.dataset.name = name; });
+}
+
+function pickSeries(id, i){
+  const c = CLAIMS.find(x => x.id === id);
+  if (!c || !c.chart) return;
+  FIGSEL[id] = (FIGSEL[id] === i) ? null : i;   // the same pill again returns to the stack
+  paintFigure(c);
+}
+
+document.addEventListener("click", e => {
+  const chip = e.target.closest && e.target.closest(".chips .chip");
+  if (chip){ pickSeries(chip.dataset.claim, chip.dataset.i === "" ? null : +chip.dataset.i); return; }
+  const band = e.target.closest && e.target.closest("svg.fig .fband");
+  if (band) pickSeries(band.dataset.claim, +band.dataset.i);
+});
+
 document.getElementById("claims").innerHTML = CLAIMS.map(card).join("");
-document.getElementById("toc").innerHTML = "<h2>Contents</h2><ol>"
+CLAIMS.forEach(c => { if (c.chart){ FIGSEL[c.id] = null; paintFigure(c); } });
+document.getElementById("toc").innerHTML =
+    `<h2>Contents<span class="tbtns"><button class="tbtn" id="expand-all">Expand all</button>`
+  + `<button class="tbtn" id="collapse-all">Collapse all</button></span></h2><ol>`
   + CLAIMS.map(c => `<li><span class="v ${c.verdict || "panel"}">${c.verdict ? VERDICT[c.verdict] : "Comparison"}</span>`
     + `<a href="#${esc(c.id)}">${c.number}. ${esc(c.title)}</a></li>`).join("") + "</ol>";
 
+/* ── collapsing ───────────────────────────────────────────────────
+   Cards start closed, so the register reads as a scannable list of claims and
+   verdicts rather than one long page. Anything that addresses a card by id
+   opens it first: the manuscript cites evidence.html#se-heating-fossil, and
+   that link has to land on an open card, not a closed one. */
+const cards = () => document.querySelectorAll("details.claim");
+const setAll = open => cards().forEach(d => { d.open = open; });
+document.getElementById("expand-all").addEventListener("click", () => setAll(true));
+document.getElementById("collapse-all").addEventListener("click", () => setAll(false));
+
+function openHash(){
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return;
+  const el = document.getElementById(id);
+  if (el && el.tagName === "DETAILS"){ el.open = true; el.scrollIntoView(); }
+}
+window.addEventListener("hashchange", openHash);
+// a contents link to an already-current hash fires no hashchange, so open it directly
+document.querySelectorAll(".toc a").forEach(a => a.addEventListener("click", () => {
+  const el = document.getElementById(a.getAttribute("href").slice(1));
+  if (el) el.open = true;
+}));
+openHash();
+
+/* printing while collapsed would put nothing on paper but the headings */
+let printState = [];
+window.addEventListener("beforeprint", () => {
+  printState = Array.prototype.map.call(cards(), d => d.open);
+  setAll(true);
+});
+window.addEventListener("afterprint", () => {
+  cards().forEach((d, i) => { d.open = printState[i]; });
+});
+
 /* ── tooltips ── */
 const tip = document.getElementById("tip");
-document.querySelectorAll("[data-tip]").forEach(el => {
-  el.addEventListener("mousemove", e => {
-    const p = el.getAttribute("data-tip").split("|");
-    tip.innerHTML = `<b>${p[0]}</b><br>${p[1]}`;
-    tip.style.display = "block";
-    tip.style.left = Math.min(e.clientX+14, window.innerWidth-350) + "px";
-    tip.style.top = (e.clientY+16) + "px";
-  });
-  el.addEventListener("mouseleave", () => { tip.style.display = "none"; });
+document.addEventListener("mousemove", e => {
+  const el = e.target.closest && e.target.closest("[data-tip]");
+  if (!el){ tip.style.display = "none"; return; }
+  const p = el.getAttribute("data-tip").split("|");
+  tip.innerHTML = `<b>${p[0]}</b><br>${p[1]}`;
+  tip.style.display = "block";
+  tip.style.left = Math.min(e.clientX+14, window.innerWidth-350) + "px";
+  tip.style.top = (e.clientY+16) + "px";
 });
 window.addEventListener("scroll", () => { tip.style.display = "none"; }, {passive:true});
 

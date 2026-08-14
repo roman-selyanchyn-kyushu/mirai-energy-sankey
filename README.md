@@ -13,8 +13,30 @@ Created for the **MIRAI Research Group · Kyushu University**.
 | `energy_sankey.html` | **Main deliverable.** All 55 datasets, country tabs + year dropdown, trend chart, click-to-trace, PJ/TWh switch, hi-res PNG and SVG export. Self-contained, no external dependencies. |
 | `energy_sankey_data.xlsx` | All numbers for all 55 datasets (3,170 flows), with the full derivation trail and balance checks. |
 | `scripts/` | The extraction and build pipeline — the authoritative record of how every number was produced. `derive_se.py` reads the Swedish PxWeb API, `derive_jp.py` the METI workbook. |
-| `evidence.html` | **Supporting data.** One card per factual claim in the manuscript: the claim as drafted, a verdict tested against the statistics, a figure, the numbers, the derivation, caveats and a full citation. Each card has a permalink the paper can cite. |
+| `evidence.html` | **Supporting data.** One card per factual claim in the manuscript: the simple fact as drafted, a verdict tested against the statistics, a figure with a per-carrier pill switch, the numbers, the derivation, caveats and a full citation. Each card has a permalink the paper can cite. |
 | `energy_sankey_2023.html` | Frozen 2023-only earlier version, kept so existing links and citations stay valid. |
+
+---
+
+## 0. Publishing — commit and push every change
+
+**Every change is committed and pushed to `main` as soon as it is made.** The live page *is* the review
+copy: it is where the work is checked and where collaborators see it, so a change that sits uncommitted
+on one machine does not exist as far as anyone else is concerned. `main` is the branch GitHub Pages
+serves, so pushing to it publishes.
+
+Rebuild the generated artefacts first, then push all of them together with their source — the page, the
+workbook and the templates must never land in separate commits, or the published page stops matching the
+scripts that produced it:
+
+```bash
+python3 scripts/export.py && python3 scripts/build_html.py && python3 scripts/build_xlsx.py
+python3 scripts/derive_claims.py && python3 scripts/build_evidence.py
+git add -A && git commit -m "..." && git push
+```
+
+Give it a minute after pushing: GitHub Pages rebuilds on its own, and a hard reload may be needed to get
+past a cached copy of `energy_sankey.html` or `evidence.html`.
 
 ---
 
@@ -404,11 +426,24 @@ trend. Nuclear rose +9.6% (724 → 794 PJ) as reactor restarts continued, while 
 answers a different question: not "what does the energy system look like" but "does this specific sentence
 survive contact with the data". The two are linked by a shared nav bar.
 
-Each claim is one card with a fixed anatomy — the claim as drafted, a **verdict** (Supported / Supported
-with revision / Not supported) reached from the data rather than asserted, a figure with PNG and SVG
-export, the endpoint numbers, how they were derived, the caveats, any independent cross-check, and a full
+Each claim is one card with a fixed anatomy — the **simple fact** as drafted, a **verdict** (Supported /
+Supported with revision / Not supported) reached from the data rather than asserted, the **detailed fact
+supported by numbers and references** that should replace it, a figure with PNG and SVG export, the
+endpoint numbers, how they were derived, the caveats, any independent cross-check, and a full
 citation with the exact table. Every card carries a stable anchor, so the manuscript can cite
 `evidence.html#se-heating-fossil` rather than "see the website".
+
+The figure carries the same **pill switch** as the trend chart under each Sankey: *All carriers* stacks
+the whole balance, and picking one carrier — from a pill or by clicking its band — draws it alone against
+its **own rescaled y-axis**, with a headline giving first → last, the change, the peak and its share
+today. That is the only way a carrier that ends near zero is legible: oil for heating runs
+32.8 → 0.45 TWh, invisible in the stack and exactly what the claim turns on. The PNG/SVG export follows
+what is drawn, so a single-carrier figure saves as `se-heating-fossil_Oil`.
+
+Cards are **collapsible and start closed**, so the page opens as a scannable register of claims and
+verdicts; *Expand all* / *Collapse all* sit in the contents box. A card addressed by its anchor opens
+itself and scrolls into view, so a citation link still lands on the open card, and printing expands
+every card first.
 
 Claims are generated, never hand-typed: `scripts/derive_claims.py` reads each figure out of a file in
 `sources/` and emits `claims.json`. Adding a claim means writing one `build_<id>()` function and listing
@@ -423,7 +458,7 @@ fossil fuel from residential heating in Sweden". The fossil collapse is real (oi
 21.7 → 0.45 TWh, −98% from 1990 to 2024) but the attribution is not: biomass burned *in the building* went
 10.0 → 8.3 TWh, **−17%**. The substitution ran through district heating (+42% delivered, its own fuel input
 moving from 13% to 64% biomass) and a 24% fall in total heating demand. Verdict: supported with revision,
-with suggested wording on the card.
+with the detailed replacement wording on the card.
 
 **Card 2 — Sweden and Japan per person, 2024.** A paired dot plot normalised by population (Sweden
 10,569,708, Japan 123,802,000), split into metrics that need no adjustment and two that do. The
