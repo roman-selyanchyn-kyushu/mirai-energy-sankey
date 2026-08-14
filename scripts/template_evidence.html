@@ -184,7 +184,62 @@ function niceTicks(maxV){
   return {step, top: Math.ceil(maxV/step)*step};
 }
 
+/* two countries on one axis. The pills switch which metric is drawn rather than
+   isolating one series, because Sweden against Japan is the whole point and
+   hiding one of them would defeat it. */
+function lineFigure(ch, id, sel){
+  const v = ch.views[sel || 0];
+  const {W:CW, H:CH, ML, MT, MB} = FG;
+  // the series name rides the end of its own line instead of a legend, so this
+  // chart needs room on the right that the stacked figure does not
+  const MR = 78;
+  const pw = CW-ML-MR, ph = CH-MT-MB;
+  const ys = v.years, y0 = ys[0], y1 = ys[ys.length-1], span = (y1-y0) || 1;
+  const X = i => ML + pw*(ys[i]-y0)/span;
+  const all = v.series.reduce((a, s) => a.concat(s.values), []);
+  const t = niceTicks(Math.max.apply(null, all));
+  const Y = q => MT + ph*(1 - q/t.top);
+
+  const p = [`<svg class="fig" id="${id}" viewBox="0 0 ${CW} ${CH}" width="${CW}" height="${CH}" xmlns="http://www.w3.org/2000/svg" font-family='"Helvetica Neue", Helvetica, Arial, sans-serif'>`];
+  p.push(`<rect x="0" y="0" width="${CW}" height="${CH}" fill="#ffffff"/>`);
+  for (let g = 0; g <= t.top + 1e-9; g += t.step){
+    const y = Y(g);
+    p.push(`<line x1="${ML}" y1="${y.toFixed(1)}" x2="${CW-MR}" y2="${y.toFixed(1)}" stroke="#e8e5dc" stroke-width="1"/>`);
+    p.push(`<text x="${ML-8}" y="${(y+3.5).toFixed(1)}" font-size="10.5" fill="#9aa0a8" text-anchor="end">${g.toLocaleString("en-US", {maximumFractionDigits: t.step < 1 ? 2 : t.step < 10 ? 1 : 0})}</text>`);
+  }
+  p.push(`<text x="${ML-8}" y="${MT-9}" font-size="10" font-weight="700" fill="#9aa0a8" text-anchor="end">${esc(v.unit)}</text>`);
+
+  v.series.forEach(s => {
+    const pts = s.values.map((q, i) => `${X(i).toFixed(1)},${Y(q).toFixed(1)}`);
+    p.push(`<path d="M${pts.join(" L")}" fill="none" stroke="${s.color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`);
+    s.values.forEach((q, i) => p.push(`<circle cx="${X(i).toFixed(1)}" cy="${Y(q).toFixed(1)}" r="2.2" fill="${s.color}"/>`));
+    // the label rides the end of its own line, so no legend is needed
+    const n = s.values.length-1;
+    p.push(`<text x="${(X(n)+7).toFixed(1)}" y="${(Y(s.values[n])+4).toFixed(1)}" font-size="11.5" font-weight="700" fill="${s.color}" paint-order="stroke" stroke="#fff" stroke-width="3.5" stroke-linejoin="round">${esc(s.label)}</text>`);
+  });
+
+  ys.forEach((y, i) => {
+    const edge = i === 0 || i === ys.length-1;
+    if (!edge && (y % 5 !== 0 || Math.abs(X(i)-X(0)) < 26 || Math.abs(X(ys.length-1)-X(i)) < 26)) return;
+    p.push(`<text x="${X(i).toFixed(1)}" y="${CH-MB+16}" font-size="10.5" fill="#9aa0a8" text-anchor="middle">${y}</text>`);
+  });
+
+  wrapText(v.note, 132).forEach((l, k) =>
+    p.push(`<text x="${ML}" y="${CH-14+k*12}" font-size="10.5" fill="#7b828a">${esc(l)}</text>`));
+
+  ys.forEach((y, i) => {
+    const a = i === 0 ? ML : (X(i-1)+X(i))/2;
+    const b = i === ys.length-1 ? CW-MR : (X(i)+X(i+1))/2;
+    const lines = v.series.map(s => `${s.label} ${fmt(s.values[i], v.dp)}`).join("<br>");
+    p.push(`<rect x="${a.toFixed(1)}" y="${MT}" width="${Math.max(1,b-a).toFixed(1)}" height="${ph}" fill="transparent" class="hit"`
+         + ` data-tip="${esc(y + " \u2014 " + v.unit)}|${esc(lines)}"></rect>`);
+  });
+  p.push(`</svg>`);
+  return p.join("");
+}
+
 function figure(ch, id, sel, claimId){
+  if (ch.kind === "lines") return lineFigure(ch, id, sel);
   const {W:CW, H:CH, ML, MR, MT, MB} = FG;
   const pw = CW-ML-MR, ph = CH-MT-MB;
   const ys = ch.years, y0 = ys[0], y1 = ys[ys.length-1], span = (y1-y0) || 1;
@@ -570,7 +625,8 @@ function card(c){
     <p class="fighead" id="fighead-${esc(c.id)}"></p>
     <div class="chartwrap" id="wrap-${esc(c.id)}"></div>
 
-    ${c.tables.map(t => tableHTML(t, c.chart.series)).join("")}
+    ${(c.tables || []).map(t => tableHTML(t, c.chart.series)).join("")}
+    ${c.gtables ? `<div class="wtables">${c.gtables.map(gtable).join("")}</div>` : ""}
 
     <h3 class="sec">How this was derived</h3>
     <ul class="pts">${c.derivation.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
@@ -608,12 +664,23 @@ function figChips(c){
   const chip = (i, label, color) =>
       `<button class="chip${sel === i ? " on" : ""}" data-claim="${esc(c.id)}" data-i="${i == null ? "" : i}"`
     + `${color ? ` style="--c:${color}"` : ""}>${color ? "<i></i>" : ""}${esc(label)}</button>`;
+  if (c.chart.kind === "lines")
+    return c.chart.views.map((v, i) => chip(i, v.label, null)).join("");
   return chip(null, "All carriers", null)
        + c.chart.series.map((s, i) => chip(i, s.label, s.color)).join("");
 }
 
 function figHead(c){
-  const ch = c.chart, sel = FIGSEL[c.id], ys = ch.years, last = ys.length - 1;
+  const ch = c.chart, sel = FIGSEL[c.id];
+  if (ch.kind === "lines"){
+    const v = ch.views[sel || 0], n = v.years.length - 1;
+    return v.series.map(s =>
+        `<b style="color:${s.color}">${esc(s.label)}</b> ${v.years[0]} <b>${fmt(s.values[0], v.dp)}</b> `
+      + `\u2192 ${v.years[n]} <b>${fmt(s.values[n], v.dp)}</b> `
+      + `(<b>${pctChange(s.values[0], s.values[n])}</b>)`).join(" \u00b7 ")
+      + ` \u00b7 ${esc(v.unit)}`;
+  }
+  const ys = ch.years, last = ys.length - 1;
   const totals = ys.map((_, i) => ch.series.reduce((a, s) => a + s.values[i], 0));
   if (sel == null)
     return `Total ${ys[0]} <b>${fmt(totals[0], 1)} ${esc(ch.unit)}</b> \u2192 ${ys[last]} `
@@ -634,15 +701,19 @@ function paintFigure(c){
   document.getElementById(`wrap-${c.id}`).innerHTML = figure(c.chart, figId, sel, c.id);
   // the export is named after what is actually drawn, so a single-carrier figure
   // can go straight into the paper under its own name
-  const name = sel == null ? c.id
-             : c.id + "_" + c.chart.series[sel].label.replace(/[^A-Za-z]+/g, "_").replace(/^_|_$/g, "");
+  const picked = sel == null ? null
+               : (c.chart.kind === "lines" ? c.chart.views[sel].label : c.chart.series[sel].label);
+  const name = picked == null ? c.id
+             : c.id + "_" + picked.replace(/[^A-Za-z]+/g, "_").replace(/^_|_$/g, "");
   document.querySelectorAll(`.figbar button[data-fig="${figId}"]`).forEach(b => { b.dataset.name = name; });
 }
 
 function pickSeries(id, i){
   const c = CLAIMS.find(x => x.id === id);
   if (!c || !c.chart) return;
-  FIGSEL[id] = (FIGSEL[id] === i) ? null : i;   // the same pill again returns to the stack
+  // a stacked chart returns to the stack when the same pill is clicked again; a
+  // lines chart always has one view selected, so there is nothing to return to
+  FIGSEL[id] = (FIGSEL[id] === i && c.chart.kind !== "lines") ? null : i;
   paintFigure(c);
 }
 
@@ -654,7 +725,7 @@ document.addEventListener("click", e => {
 });
 
 document.getElementById("claims").innerHTML = CLAIMS.map(card).join("");
-CLAIMS.forEach(c => { if (c.chart){ FIGSEL[c.id] = null; paintFigure(c); } });
+CLAIMS.forEach(c => { if (c.chart){ FIGSEL[c.id] = c.chart.kind === "lines" ? 0 : null; paintFigure(c); } });
 document.getElementById("toc").innerHTML =
     `<h2>Contents<span class="tbtns"><button class="tbtn" id="expand-all">Expand all</button>`
   + `<button class="tbtn" id="collapse-all">Collapse all</button></span></h2><ol>`

@@ -210,6 +210,10 @@ def main():
             m = sum(len(b["metrics"]) for b in c["panel"]["blocks"])
             print(f"  {c['number']}. {c['id']:24} panel        "
                   f"{len(c['panel']['blocks'])} blocks, {m} metrics, {len(c['sources'])} sources")
+        elif c["chart"].get("kind") == "lines":
+            v = c["chart"]["views"]
+            print(f"  {c['number']}. {c['id']:24} verdict={c['verdict']:11} "
+                  f"{len(v)} views, {len(v[0]['years'])} years, {len(c['sources'])} sources")
         else:
             n = len(c["chart"]["years"])
             print(f"  {c['number']}. {c['id']:24} verdict={c['verdict']:11} "
@@ -224,6 +228,7 @@ def main():
 # The panel therefore separates metrics that need no adjustment from two that
 # are restated onto one convention, with every adjustment shown as its own step.
 
+GJ_KWH = 1000 / 3.6                                   # kWh in a GJ
 NCV_GCV = {"coal": 0.95, "oil": 0.95, "gas": 0.90}   # IEA/Eurostat net-to-gross ratios
 NUCLEAR_EFF = 0.33                                    # IEA convention, applied to both countries
 
@@ -239,6 +244,7 @@ def _ds():
 def build_se_jp_percapita():
     import derive_se, derive_jp
     D, POP = _ds(), _pop()
+    CO2 = _co2()
     YEAR = 2024
     pse = POP["se"][str(YEAR)]["value"]
     pjp = POP["jp"][str(YEAR)]["value"]
@@ -310,6 +316,25 @@ def build_se_jp_percapita():
           fos(jp_h)/sum(jp_h.values())*100, "%"),
     ]
 
+    # emissions belong with the measured metrics: no primary-energy convention touches them
+    c_se, c_jp = CO2["se"], CO2["jp"]
+    cons_yr = max(y for y in c_se if c_se[y]["consumption_co2_per_capita"] is not None)
+    block_c = [
+        M("CO\u2082, territorial", c_se[str(YEAR)]["co2_per_capita"],
+          c_jp[str(YEAR)]["co2_per_capita"], "t/person"),
+        M("CO\u2082, consumption-based", c_se[cons_yr]["consumption_co2_per_capita"],
+          c_jp[cons_yr]["consumption_co2_per_capita"], f"t/person ({cons_yr})"),
+        # computed on this card's own harmonised primary energy rather than taken
+        # from the compiler, whose denominator uses the substitution method — the
+        # very convention the block above exists to remove
+        M("CO\u2082 per unit of primary energy",
+          c_se[str(YEAR)]["co2_per_capita"]*1e6 / (sum(se_h.values())*1000/pse * GJ_KWH),
+          c_jp[str(YEAR)]["co2_per_capita"]*1e6 / (sum(jp_h.values())*1000/pjp * GJ_KWH),
+          "g/kWh"),
+        M("Share of global CO\u2082", c_se[str(YEAR)]["share_global_co2"],
+          c_jp[str(YEAR)]["share_global_co2"], "%"),
+    ]
+
     sector = [{"label": {"res": "Residential", "com": "Commercial & services",
                          "ind": "Industrial", "tpt": "Transport"}[s],
                "se": round(seI.get(s, 0)/sum(seI.get(x, 0) for x in SEC)*100, 1),
@@ -353,6 +378,17 @@ def build_se_jp_percapita():
                      "calorific value."},
             {"title": "Sector split of final energy use", "metrics": sector,
              "note": "Share of final energy consumption excluding non-energy use."},
+            {"title": "Fossil CO\u2082 \u2014 also directly comparable", "metrics": block_c,
+             "note": (f"Emissions themselves need no harmonisation: they are measured at the fuel, not "
+                      f"booked by a primary-energy convention. Consumption-based emissions add what is "
+                      f"embodied in imports and remove what is embodied in exports, and are published a "
+                      f"year behind \u2014 the gap between those two rows is the more interesting "
+                      f"number. The intensity row is the exception, because energy is its denominator: "
+                      f"it is computed against the harmonised primary energy above rather than taken "
+                      f"from the compiler, whose own figures of "
+                      f"{c_se[str(YEAR)]['co2_per_unit_energy']:.0f} and "
+                      f"{c_jp[str(YEAR)]['co2_per_unit_energy']:.0f} g/kWh sit on the substitution "
+                      f"method. Fossil CO\u2082 only; the trajectory since 1990 has its own card.")},
         ]},
         "steps": steps,
         "population": {"se": POP["se"][str(YEAR)], "jp": POP["jp"][str(YEAR)]},
@@ -966,6 +1002,184 @@ def build_se_jp_biomass():
 
 
 CLAIMS.append(build_se_jp_biomass)
+
+
+# ── emissions since 1990 ───────────────────────────────────────────────────
+# The decarbonisation trajectory, which is the paper's own subject. Territorial
+# and consumption-based are both drawn, because Sweden's territorial figure
+# understates its footprint by far more than Japan's does and a commentary that
+# quotes only the territorial number invites the obvious objection.
+
+SE_C, JP_C = "#0f6f8e", "#c2562f"
+
+
+def _co2():
+    return json.load(open(os.path.join(SOURCES, "co2.json")))
+
+
+def build_se_jp_emissions():
+    D = _co2()
+    years = sorted(int(y) for y in D["se"] if D["se"][y]["co2"] is not None)
+    get = lambda c, f: [D[c][str(y)][f] for y in years]
+
+    def view(vid, label, unit, se, jp, note, dp=2):
+        # a year is only drawn where both countries have it, so a line never
+        # implies data that is not there
+        keep = [i for i, y in enumerate(years) if se[i] is not None and jp[i] is not None]
+        return {"id": vid, "label": label, "unit": unit, "dp": dp,
+                "years": [years[i] for i in keep],
+                "series": [{"label": "Sweden", "color": SE_C, "values": [round(se[i], 3) for i in keep]},
+                           {"label": "Japan", "color": JP_C, "values": [round(jp[i], 3) for i in keep]}],
+                "note": note}
+
+    terr_se, terr_jp = get("se", "co2_per_capita"), get("jp", "co2_per_capita")
+    cons_se, cons_jp = get("se", "consumption_co2_per_capita"), get("jp", "consumption_co2_per_capita")
+    tot_se, tot_jp = get("se", "co2"), get("jp", "co2")
+    idx = lambda v: [x / v[0] * 100 if x is not None else None for x in v]
+
+    views = [
+        view("pc", "Per person, territorial", "t CO\u2082/person", terr_se, terr_jp,
+             "Emissions released inside the country. This is the number national targets are written "
+             "against, and the one a commentary normally quotes."),
+        view("cons", "Per person, consumption-based", "t CO\u2082/person", cons_se, cons_jp,
+             "Territorial emissions plus those embodied in imports, less those embodied in exports \u2014 "
+             "the footprint of what each population consumes rather than of what it produces on its own "
+             "soil. Published one year behind the territorial series."),
+        view("tot", "Total, indexed to 1990", "1990 = 100", idx(terr_se and tot_se), idx(tot_jp),
+             "Japan's system is about 25 times Sweden's, so absolute totals cannot share an axis. "
+             "Indexing shows the shape of each trajectory; the absolute figures are in the table below.",
+             dp=1),
+    ]
+
+    first, last = years[0], years[-1]
+    L = len(views[0]["years"]) - 1
+    se_pc, jp_pc = views[0]["series"][0]["values"], views[0]["series"][1]["values"]
+    se_cs, jp_cs = views[1]["series"][0]["values"], views[1]["series"][1]["values"]
+    cons_last = views[1]["years"][-1]
+    pct = lambda a, b: (b - a) / a * 100
+
+    rows = []
+    for y in (first, 2000, 2010, 2020, last):
+        i = years.index(y)
+        rows.append([str(y),
+                     f"{tot_se[i]:,.1f}", f"{terr_se[i]:.2f}",
+                     f"{tot_jp[i]:,.1f}", f"{terr_jp[i]:.2f}",
+                     f"{terr_jp[i]/terr_se[i]:.2f}\u00d7"])
+
+    return {
+        "id": "se-jp-emissions",
+        "kind": "claim",
+        "title": f"Emissions since 1990",
+        "claim": ("Sweden and Japan have both reduced their emissions since 1990."),
+        "verdict": "revised",
+        "verdictLine": (
+            f"Both did, but not comparably. Sweden's territorial CO\u2082 per person fell "
+            f"<b>{pct(se_pc[0], se_pc[L]):.0f}%</b> ({se_pc[0]:.2f} \u2192 {se_pc[L]:.2f} t), Japan's "
+            f"<b>{pct(jp_pc[0], jp_pc[L]):.0f}%</b> ({jp_pc[0]:.2f} \u2192 {jp_pc[L]:.2f} t). The "
+            f"comparison also depends on which emissions are counted: on a "
+            f"<b>consumption basis Sweden started above Japan</b> in {first} \u2014 "
+            f"{se_cs[0]:.2f} against {jp_cs[0]:.2f} t per person \u2014 and its footprint is still "
+            f"<b>{se_cs[-1]/se_pc[years.index(cons_last)]:.2f}\u00d7 its territorial figure</b> against "
+            f"Japan's {jp_cs[-1]/jp_pc[years.index(cons_last)]:.2f}\u00d7."),
+        "rewrite": (
+            f"Between {first} and {last} Swedish territorial CO\u2082 fell from {tot_se[0]:,.1f} to "
+            f"{tot_se[L]:,.1f} Mt ({pct(tot_se[0], tot_se[L]):.0f}%) and Japanese from {tot_jp[0]:,.0f} to "
+            f"{tot_jp[L]:,.0f} Mt ({pct(tot_jp[0], tot_jp[L]):.0f}%); per person the falls are "
+            f"{pct(se_pc[0], se_pc[L]):.0f}% and {pct(jp_pc[0], jp_pc[L]):.0f}%, ending at "
+            f"{se_pc[L]:.2f} and {jp_pc[L]:.2f} t. The gap narrows on a consumption basis: in {first} "
+            f"Sweden's consumption-based emissions were {se_cs[0]:.2f} t per person against Japan's "
+            f"{jp_cs[0]:.2f}, higher despite territorial emissions a third lower, and by {cons_last} the "
+            f"two stood at {se_cs[-1]:.2f} and {jp_cs[-1]:.2f} t. Sweden's decarbonisation is therefore "
+            f"real but partly a shift in where emissions occur rather than whether they occur."),
+        "chart": {
+            "kind": "lines",
+            "title": f"CO\u2082 emissions, Sweden and Japan, {first}\u2013{last}",
+            "note": "fossil CO\u2082 only; land use, methane and N\u2082O are excluded",
+            "views": views,
+        },
+        "gtables": [
+            {"title": f"Fossil CO\u2082, {first} to {last}",
+             "head": ["Year", "Sweden, Mt", "Sweden, t/person", "Japan, Mt", "Japan, t/person",
+                      "JP \u00f7 SE per person"],
+             "num": [False, True, True, True, True, True],
+             "rows": rows,
+             "note": "Territorial emissions. Per-person figures use the population series published "
+                     "alongside the emissions data, so the ratio is internally consistent."},
+            {"title": "Territorial against consumption-based, per person",
+             "head": ["", f"Sweden {first}", f"Sweden {cons_last}", f"Japan {first}",
+                      f"Japan {cons_last}"],
+             "num": [False, True, True, True, True],
+             "rows": [["Territorial, t/person", f"{se_pc[0]:.2f}",
+                       f"{se_pc[years.index(cons_last)]:.2f}", f"{jp_pc[0]:.2f}",
+                       f"{jp_pc[years.index(cons_last)]:.2f}"],
+                      ["Consumption-based, t/person", f"{se_cs[0]:.2f}", f"{se_cs[-1]:.2f}",
+                       f"{jp_cs[0]:.2f}", f"{jp_cs[-1]:.2f}"],
+                      ["Consumption \u00f7 territorial",
+                       f"{se_cs[0]/se_pc[0]:.2f}\u00d7",
+                       f"{se_cs[-1]/se_pc[years.index(cons_last)]:.2f}\u00d7",
+                       f"{jp_cs[0]/jp_pc[0]:.2f}\u00d7",
+                       f"{jp_cs[-1]/jp_pc[years.index(cons_last)]:.2f}\u00d7"]],
+             "note": "A ratio above 1 means the country consumes more emissions than it produces, "
+                     "i.e. it is a net importer of embodied carbon."},
+        ],
+        "derivation": [
+            "Emissions come from the Global Carbon Budget, pulled by scripts/fetch_co2.py and stored as "
+            "sources/co2.json. Only Sweden, Japan and the fields used here are kept.",
+            "Per-person figures are the Global Carbon Budget's own, computed against the population "
+            "series distributed with it, so the territorial and consumption-based rates share a "
+            "denominator. That denominator is not the SCB and Statistics Bureau series used on the "
+            "per-person card, which differ by well under a percent.",
+            "The indexed view divides each country's total by its own 1990 value, because Japan's system "
+            "is roughly 25 times Sweden's and the two cannot share a linear axis without hiding Sweden.",
+            "A year is drawn only where both countries report it, so the consumption-based lines stop "
+            f"at {cons_last} rather than running flat to {last}.",
+        ],
+        "caveats": [
+            "Fossil CO\u2082 only. Methane, nitrous oxide and the F-gases are excluded, as is land use. "
+            "Sweden's forest sink is large enough that its net greenhouse-gas balance including land use "
+            "is a substantially different number, and its agricultural methane is proportionally larger "
+            "than Japan's. Quote this series as fossil CO\u2082, not as greenhouse gases.",
+            "Consumption-based estimates carry far more uncertainty than territorial ones: they depend "
+            "on a global input-output model of trade rather than on fuel sold within a border. Treat the "
+            "direction and the rough magnitude as robust and the individual annual values as indicative.",
+            "The Global Carbon Budget is a compiler, not a national statistical office. It is the "
+            "standard comparable source and is peer-reviewed, but it is not the same authority as "
+            "Energimyndigheten or METI are for the energy balances \u2014 the national inventories "
+            "(Naturv\u00e5rdsverket, GIO/NIES) report on the UNFCCC basis and differ in scope.",
+            "Emissions are not energy. This card shares no derivation with the Sankey diagrams and "
+            "should not be reconciled against them line by line; the energy balances carry no emission "
+            "factors.",
+        ],
+        "crosscheck": (
+            f"The territorial and per-person series are mutually consistent: dividing Sweden's "
+            f"{tot_se[L]:,.1f} Mt in {last} by the distributed population reproduces the published "
+            f"{se_pc[L]:.2f} t per person, and likewise for Japan. Against the energy balances the "
+            f"direction agrees without being derivable from them \u2014 Swedish primary supply fell "
+            f"11.4% between 2005 and 2024 while territorial CO\u2082 per person fell "
+            f"{pct(se_pc[years.index(2005)], se_pc[L]):.0f}% over the same period, the difference being "
+            f"the shift in what is burned rather than how much energy is used."),
+        "sources": [
+            {"author": "Global Carbon Project", "year": "2025",
+             "title": "Global Carbon Budget \u2014 territorial and consumption-based CO\u2082",
+             "detail": "Fossil CO\u2082 by country, 1990\u20132024, with consumption-based estimates to "
+                       "the latest available year. Distributed as a tidy dataset by Our World in Data "
+                       "and pulled by scripts/fetch_co2.py.",
+             "url": "https://github.com/owid/co2-data"},
+            {"author": "Naturv\u00e5rdsverket (Swedish EPA)", "year": "2026",
+             "title": "Sweden's National Inventory Report to the UNFCCC",
+             "detail": "The national authority for Swedish emissions, reporting all greenhouse gases "
+                       "including land use. Cited as the national counterpart rather than used here.",
+             "url": "https://www.naturvardsverket.se/en/services-and-permits/reporting-and-registers/national-inventory-report/"},
+            {"author": "Greenhouse Gas Inventory Office of Japan (GIO), NIES", "year": "2026",
+             "title": "National Greenhouse Gas Inventory Report of Japan",
+             "detail": "The national authority for Japanese emissions, on the same UNFCCC basis. Cited "
+                       "as the national counterpart rather than used here.",
+             "url": "https://www.nies.go.jp/gio/en/"},
+        ],
+    }
+
+
+CLAIMS.append(build_se_jp_emissions)
 
 if __name__ == "__main__":
     main()

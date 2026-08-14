@@ -526,6 +526,32 @@ recomputes from the Forestry Agency's own production and customs series — 152,
 answer from a different statistical system. And the Forestry Agency's growing-stock figure of
 5,560 million m³ puts Japan's 22.3 million m³ annual harvest at 0.40% of standing stock per year.
 
+**Card 4 — emissions since 1990.** The decarbonisation trajectory, which is the commentary's own
+subject. Drafted as "both have reduced their emissions since 1990"; true, but not comparably. Swedish
+territorial CO₂ per person fell **−46%** (6.71 → 3.59 t), Japanese **−17%** (9.36 → 7.77 t). The card's
+point is that the comparison depends on which emissions are counted: on a **consumption basis Sweden
+started above Japan** in 1990 — 13.11 against 11.04 t per person, despite territorial emissions a third
+lower — and Sweden's footprint is still 1.68× its territorial figure against Japan's 1.16×. Sweden's
+decarbonisation is real but partly a shift in *where* emissions occur. Verdict: supported with revision.
+
+The figure is a new `lines` chart kind: two countries on one axis, pills switching the **metric** rather
+than isolating a series, because Sweden against Japan is the whole point. Three views — territorial per
+person, consumption-based per person, and totals indexed to 1990 (Japan's system is ~25× Sweden's, so
+absolute totals cannot share a linear axis). Series names ride the end of their own line instead of a
+legend.
+
+Emissions come from the **Global Carbon Budget**, pulled by `scripts/fetch_co2.py` into
+`sources/co2.json` — Sweden and Japan only, 1990–2024, the fields the page uses. Fossil CO₂ only: no
+methane, no N₂O, no land use. That last exclusion matters, since Sweden's forest sink is large enough to
+change its net balance substantially, so the series must be quoted as fossil CO₂ and not as greenhouse
+gases. The national inventories (Naturvårdsverket, GIO/NIES) are cited as the national counterparts.
+
+Card 2 also gains a **fossil CO₂ block**, on the same per-person footing as the rest. Three of its four
+rows need no harmonisation — emissions are measured at the fuel, not booked by a convention. The
+exception is intensity, which has energy in its denominator: it is computed against *this card's own
+harmonised* primary energy (67 vs 223 g/kWh) rather than taken from the compiler, whose 62 and 201 g/kWh
+sit on the substitution method the card exists to remove.
+
 Population comes from `scripts/fetch_pop.py` — SCB's PxWeb API for Sweden and the Statistics Bureau's
 published 人口推計 table for Japan, both put on a mid-period basis so the denominator matches the energy
 year.
@@ -545,6 +571,7 @@ scripts/
   build_html.py            injects datasets into template.html -> energy_sankey.html
   build_xlsx.py            builds the Excel workbook
   fetch_pop.py             SCB API + Statistics Bureau table -> sources/population.json
+  fetch_co2.py             Global Carbon Budget (via OWID) -> sources/co2.json, SE/JP 1990-
   derive_claims.py         reads sources/ -> claims.json (one entry per manuscript claim)
   build_evidence.py        injects claims into template_evidence.html -> evidence.html
   template.html            Sankey page source (layout, styling, renderer)
