@@ -66,6 +66,8 @@
   .v.unsupported{background:#fbeaea;color:#973030}
   .v.panel{background:#eaf1f5;color:#215c73}
   .blocknote{font-size:13px;color:var(--ink-soft);margin:4px 0;max-width:940px}
+  .wtables{overflow-x:auto}
+  .wtables table{max-width:100%;min-width:520px}
   .verdict{display:flex;gap:12px;align-items:flex-start;margin:14px 0 2px}
   .verdict p{font-size:14px;margin:0}
   h3.sec{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);
@@ -247,6 +249,105 @@ function figure(ch, id, sel, claimId){
   return p.join("");
 }
 
+/* ── composition bars: one bar per country or year, split into segments.
+   Sweden publishes wood fuel in GWh and Japan in tonnes, so the bars are drawn
+   as shares by default — the split is the comparable quantity, not the length.
+   Block notes are drawn inside the SVG so they travel with the exported figure. */
+const SB = {W: 1040, ML: 214, MR: 84, RH: 30, GAP: 9, PAD: 12};
+
+function wrapText(text, maxChars){
+  const lines = [];
+  let cur = "";
+  text.split(" ").forEach(w => {
+    if ((cur + " " + w).trim().length > maxChars && cur){ lines.push(cur); cur = w; }
+    else cur = (cur ? cur + " " : "") + w;
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function stackbars(blocks, id){
+  const {W:CW, ML, MR, RH, GAP, PAD} = SB;
+  const pw = CW - ML - MR;
+  const legendOf = b => {
+    const seen = [];
+    b.bars.forEach(bar => bar.segments.forEach(s => {
+      if (!seen.some(x => x.label === s.label)) seen.push({label: s.label, color: s.color});
+    }));
+    return seen;
+  };
+  const legLines = b => {
+    let n = 1, x = 0;
+    legendOf(b).forEach(s => {
+      const w = 22 + s.label.length*6.05;
+      if (x + w > CW - 12 && x){ n++; x = w; } else x += w;
+    });
+    return n;
+  };
+  const noteLines = b => b.note ? wrapText(b.note, 150).length : 0;
+
+  let H = PAD;
+  blocks.forEach(b => {
+    H += 24 + b.bars.length*(RH+GAP) + 4 + legLines(b)*16 + noteLines(b)*13 + 16;
+  });
+
+  const p = [`<svg class="fig" id="${id}" viewBox="0 0 ${CW} ${H}" width="${CW}" height="${H}" xmlns="http://www.w3.org/2000/svg" font-family='"Helvetica Neue", Helvetica, Arial, sans-serif'>`];
+  p.push(`<rect x="0" y="0" width="${CW}" height="${H}" fill="#ffffff"/>`);
+
+  let y = PAD;
+  blocks.forEach(b => {
+    p.push(`<text x="6" y="${y+11}" font-size="10.5" font-weight="700" letter-spacing="1" fill="#9aa0a8">${esc(b.title.toUpperCase())}</text>`);
+    if (b.unit) p.push(`<text x="${CW-6}" y="${y+11}" font-size="10.5" fill="#9aa0a8" text-anchor="end">${esc(b.unit)}</text>`);
+    p.push(`<line x1="6" y1="${y+18}" x2="${CW-6}" y2="${y+18}" stroke="#e8e5dc" stroke-width="1"/>`);
+    y += 24;
+
+    // absolute blocks share one scale across the block; share blocks each fill the width
+    const tot = bar => bar.segments.reduce((a, s) => a + s.value, 0);
+    const top = b.scale === "absolute" ? Math.max.apply(null, b.bars.map(tot)) : null;
+
+    b.bars.forEach(bar => {
+      const t = tot(bar), full = top ? pw*(t/top) : pw;
+      p.push(`<text x="${ML-12}" y="${y+RH/2+1}" font-size="12.5" font-weight="600" fill="#1d232a" text-anchor="end">${esc(bar.label)}</text>`);
+      if (bar.sub) p.push(`<text x="${ML-12}" y="${y+RH/2+14}" font-size="10.5" fill="#9aa0a8" text-anchor="end">${esc(bar.sub)}</text>`);
+      let x = ML;
+      bar.segments.forEach(s => {
+        const w = t ? full*(s.value/t) : 0;
+        if (w <= 0) return;
+        const pc = t ? s.value/t*100 : 0;
+        p.push(`<rect x="${x.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${RH}" fill="${s.color}"/>`);
+        // the note overrides the computed share where the source gives only a bound
+        const lab = s.note || (pc >= 4 ? pc.toFixed(0) + "%" : "");
+        if (lab && w >= lab.length*7.6 + 10)
+          p.push(`<text x="${(x+w/2).toFixed(1)}" y="${y+RH/2+4}" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">${esc(lab)}</text>`);
+        x += w;
+      });
+      if (top) p.push(`<text x="${(ML+full+8).toFixed(1)}" y="${y+RH/2+4}" font-size="11.5" font-weight="700" fill="#5a636e">${fmt(t, 1)}</text>`);
+      y += RH + GAP;
+    });
+
+    y += 4;
+    let lx = 6;
+    legendOf(b).forEach(s => {
+      const w = 22 + s.label.length*6.05;
+      if (lx + w > CW - 12 && lx > 6){ lx = 6; y += 16; }
+      p.push(`<rect x="${lx}" y="${y+2}" width="9" height="9" rx="2" fill="${s.color}"/>`);
+      p.push(`<text x="${lx+14}" y="${y+10}" font-size="11" fill="#5a636e">${esc(s.label)}</text>`);
+      lx += w;
+    });
+    y += 16;
+
+    if (b.note){
+      wrapText(b.note, 150).forEach(l => {
+        p.push(`<text x="6" y="${y+9}" font-size="10.5" fill="#7b828a">${esc(l)}</text>`);
+        y += 13;
+      });
+    }
+    y += 16;
+  });
+  p.push(`</svg>`);
+  return p.join("");
+}
+
 /* ── paired dot plot: one row per metric, two dots joined, ratio at the right.
    Each row is scaled to its own maximum because the metrics carry different
    units; the printed values, not the dot positions, are what should be quoted. */
@@ -319,6 +420,69 @@ function tableHTML(t, series){
   return h + `</table>`;
 }
 
+/* a plain pre-formatted table: this card's numbers carry their own units and
+   bounds, so they arrive as strings rather than being re-formatted here */
+function gtable(t){
+  let h = `<table><caption>${esc(t.title)}</caption><tr>`
+        + t.head.map((c, i) => `<th${t.num[i] ? ' class="num"' : ""}>${esc(c)}</th>`).join("")
+        + `</tr>`;
+  t.rows.forEach(r => {
+    const tot = String(r[0]).toLowerCase().indexOf("total") === 0;
+    h += `<tr${tot ? ' class="tot"' : ""}>`
+       + r.map((c, i) => `<td${t.num[i] ? ' class="num"' : ""}>${esc(c)}</td>`).join("") + `</tr>`;
+  });
+  return h + `</table>` + (t.note ? `<p class="blocknote">${esc(t.note)}</p>` : "");
+}
+
+/* the biomass card: a verdict like card 1, but two figures — composition bars
+   for what the fuel is and where it comes from, then the comparable metrics */
+function biomassCard(c){
+  const figA = `fig-${c.id}`, figB = `fig2-${c.id}`;
+  const bar = (id, name, cap) =>
+      `<div class="figbar"><span class="cap">${cap}</span>`
+    + `<button data-fig="${id}" data-name="${esc(name)}" data-fmt="png">PNG</button>`
+    + `<button data-fig="${id}" data-name="${esc(name)}" data-fmt="svg">SVG</button></div>`;
+  return `<details class="claim" id="${esc(c.id)}">
+    <summary><h2><span class="num">${c.number}.</span>${esc(c.title)}</h2>
+      <span class="v ${c.verdict}">${VERDICT[c.verdict]}</span></summary>
+    <div class="body">
+
+    <div class="quote"><span class="lbl">Simple fact</span>${esc(c.claim)}</div>
+
+    <div class="verdict"><span class="v ${c.verdict}">${VERDICT[c.verdict]}</span>
+      <p>${c.verdictLine}</p></div>
+
+    <div class="quote fix"><span class="lbl">Detailed fact supported by numbers and references</span>${esc(c.rewrite)}</div>
+
+    <h3 class="sec">Where the fuel comes from, and what it is</h3>
+    ${bar(figA, c.id + "_supply", "Shares, not bar lengths, are the comparable quantity \u2014 the two countries publish in different units.")}
+    <div class="chartwrap">${stackbars(c.bars, figA)}</div>
+
+    <h3 class="sec">Forest, harvest and cost</h3>
+    ${bar(figB, c.id + "_forest", "Each row is scaled to its own maximum \u2014 the printed values, not the dot positions, are the comparable quantities.")}
+    <div class="chartwrap">${dotplot(c.panel.blocks, figB)}</div>
+    ${c.panel.blocks.map(b => b.note ? `<p class="blocknote"><b>${esc(b.title)}.</b> ${esc(b.note)}</p>` : "").join("")}
+
+    <h3 class="sec">The numbers</h3>
+    <div class="wtables">${c.tables.map(gtable).join("")}</div>
+
+    <h3 class="sec">How this was derived</h3>
+    <ul class="pts">${c.derivation.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
+
+    <h3 class="sec">Caveats</h3>
+    <ul class="pts">${c.caveats.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
+
+    <h3 class="sec">Internal consistency check</h3><div class="xcheck">${esc(c.crosscheck)}</div>
+
+    <h3 class="sec">Sources</h3>
+    ${c.sources.map(s => `<div class="cite"><b>${esc(s.author)} (${esc(s.year)}). ${esc(s.title)}.</b>
+      <div class="d">${esc(s.detail)}</div>
+      <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>`).join("")}
+
+    <p class="permalink">Cite this card: <code>evidence.html#${esc(c.id)}</code></p>
+  </div></details>`;
+}
+
 function panelCard(c){
   const figId = `fig-${c.id}`;
   const blocks = c.panel.blocks;
@@ -372,6 +536,7 @@ function panelCard(c){
 }
 
 function card(c){
+  if (c.kind === "biomass") return biomassCard(c);
   if (c.kind === "panel") return panelCard(c);
   const figId = `fig-${c.id}`;
   return `<details class="claim" id="${esc(c.id)}">
