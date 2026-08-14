@@ -472,6 +472,17 @@ function biomassCard(c){
     <h3 class="sec">Caveats</h3>
     <ul class="pts">${c.caveats.map(d => `<li>${esc(d)}</li>`).join("")}</ul>
 
+    <h3 class="sec">Verification against the primary sources</h3>
+    <p style="font-size:13.5px;margin-bottom:8px">Each publication named in the research note was fetched
+    and the figure read back out of it. <b>${c.verification.checked} figures were checked and all of them
+    matched</b>; ${c.verification.missed} groups could not be reached.</p>
+    <div class="wtables"><table><caption>What was read back out of the primary source</caption>
+      <tr><th>Figure</th><th>What the source itself says</th></tr>
+      ${c.verification.rows.map(r => `<tr><td class="num">${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}
+    </table></div>
+    <p class="blocknote"><b>Not reached.</b></p>
+    <ul class="pts">${c.verification.gaps.map(g => `<li>${esc(g)}</li>`).join("")}</ul>
+
     <h3 class="sec">Internal consistency check</h3><div class="xcheck">${esc(c.crosscheck)}</div>
 
     <h3 class="sec">Sources</h3>

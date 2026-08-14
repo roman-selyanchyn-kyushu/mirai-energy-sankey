@@ -489,13 +489,31 @@ published only as a bound, so it is drawn at 5% and labelled `<5%` rather than a
 second is the same paired dot plot as card 2, covering forest area, forest per person (2.64 vs 0.20 ha,
 ×13), growth against harvest, and delivered fuel cost.
 
-Unlike the other cards this one rests on a **compiled research note** rather than an extraction this
-pipeline performs: `sources/claims/japan_forest_biomass_verified_statistics.md`. Numbers are still never
-typed in — `derive_claims.py` matches each figure to a distinctive phrase in its own bullet, so a renamed
-or deleted line stops the build. Seven arithmetic identities in the note are asserted at build time
-(pellet and chip domestic + imported = total, PKS by origin = total, self-sufficiency = supply ÷ demand,
-forest area by type = total, and the Swedish categories against their published total). The card states
-in its first caveat that the figures are sourced but not independently verified by this project.
+Provenance runs through a **compiled research note** rather than an extraction this pipeline performs:
+`sources/claims/japan_forest_biomass_verified_statistics.md`. Numbers are still never typed in —
+`derive_claims.py` matches each figure to a distinctive phrase in its own bullet, so a renamed or deleted
+line stops the build. Seven arithmetic identities in the note are asserted at build time (pellet and chip
+domestic + imported = total, PKS by origin = total, self-sufficiency = supply ÷ demand, forest area by
+type = total, and the Swedish categories against their published total).
+
+**The note was then checked against the primary publications.** Each source it names was fetched and the
+figure read back out of it; the results are recorded in
+`sources/claims/biomass_primary_verification.md`, parsed by the same reader and shown on the card.
+**18 figures were checked and every one matched** — Japan's forest area against the Forestry Agency's own
+table (総数 2,502 万ha, split 1,009 / 1,355 / 138), the pellet and PKS import series and their origin
+countries, the 436,000 km road network and 25.2 m/ha density, forestry households, wood demand and
+self-sufficiency, and on the Swedish side the 55,500 GWh wood-fuel total with its three categories, the
+27.9 / 23.5 / 40.7 Mha forest areas and the 87.7 million m³sk gross felling.
+
+Two independent cross-checks came out of that reading. The domestic share of Japanese pellet supply
+recomputes from the Forestry Agency's own production and customs series — 152,000 t produced against
+6,381,000 t imported, a 2.3% domestic share — against the 2.3% the combustion survey reports, the same
+answer from a different statistical system. And the Forestry Agency's growing-stock figure of
+5,560 million m³ puts Japan's 22.3 million m³ annual harvest at 0.40% of standing stock per year.
+
+Three groups could not be reached and remain sourced but unchecked: the Swedish price table and the
+e-Stat survey tables are JavaScript applications, and the slope, fuel-cost and energy-balance PDFs
+yielded no readable text. The card says so in its caveats and lists them.
 
 Population comes from `scripts/fetch_pop.py` — SCB's PxWeb API for Sweden and the Statistics Bureau's
 published 人口推計 table for Japan, both put on a mid-period basis so the denominator matches the energy

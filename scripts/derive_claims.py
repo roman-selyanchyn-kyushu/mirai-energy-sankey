@@ -411,16 +411,18 @@ def build_se_jp_percapita():
 # changed or missing line breaks the build instead of publishing a wrong number.
 
 BIOMASS_MD = os.path.join(SOURCES, "claims", "japan_forest_biomass_verified_statistics.md")
+# what came back when each primary publication named in the note was fetched and read
+BIOMASS_CHECK = os.path.join(SOURCES, "claims", "biomass_primary_verification.md")
 
 # feedstock palette, kept close to the Sankey colours
 BC = {"prim": "#4a9b52", "byprod": "#7cb87f", "rec": "#94953f", "domchip": "#2f6b3a",
       "imp_pellet": "#c2562f", "imp_chip": "#d98a45", "pks": "#a2643a", "dom": "#4a9b52"}
 
 
-def _bullets():
-    """Every '- **value** — text' bullet in the research note, in file order."""
+def _bullets(path=None):
+    """Every '- **value** — text' bullet in a note, in file order."""
     out = []
-    for line in open(BIOMASS_MD, encoding="utf-8"):
+    for line in open(path or BIOMASS_MD, encoding="utf-8"):
         m = re.match(r"^- \*\*(.+?)\*\*\s*[—-]\s*(.*)$", line.strip())
         if m:
             out.append({"lead": m.group(1), "text": m.group(2), "line": line.strip()})
@@ -430,9 +432,10 @@ def _bullets():
 class _Note:
     """Lookup by a distinctive phrase; raises rather than guessing."""
 
-    def __init__(self):
-        self.rows = _bullets()
-        if len(self.rows) < 80:
+    def __init__(self, path=None, minimum=80):
+        self.rows = _bullets(path)
+        self.minimum = minimum
+        if len(self.rows) < self.minimum:
             raise SystemExit(f"biomass note: only {len(self.rows)} bullets parsed, file format changed?")
         self.used = set()
 
@@ -471,8 +474,26 @@ CLAIMS.append(build_se_jp_percapita)
 
 
 
+def _verification():
+    """The verification note, split by its ## headings."""
+    out, sec = {}, None
+    for line in open(BIOMASS_CHECK, encoding="utf-8"):
+        line = line.rstrip()
+        if line.startswith("## "):
+            sec = line[3:].strip()
+            out[sec] = []
+        elif sec and line.startswith("- **"):
+            m = re.match(r"^- \*\*(.+?)\*\*\s*[\u2014-]?\s*(.*)$", line)
+            if m:
+                body = re.sub(r"\s*\u2014\s*[^\u2014]*\[direct (PDF|page|release)\].*$", "", m.group(2))
+                out[sec].append({"lead": m.group(1), "text": body.strip().rstrip(".")})
+    return out
+
+
 def build_se_jp_biomass():
     N, POP = _Note(), _pop()
+    V = _Note(BIOMASS_CHECK, minimum=15)
+    VS = _verification()
     pse, pjp = POP["se"]["2024"]["value"], POP["jp"]["2024"]["value"]
 
     # ── forest estate ──
@@ -546,6 +567,15 @@ def build_se_jp_biomass():
            ("Waste wood", N.num("waste wood, **FY2023**")),
            ("Transport biofuels", N.num("biofuels, **FY2023**"))]
     bal_tot = N.num("biomass in Japan\u2019s primary energy supply")
+
+    # ── found only when the primary sources were read ──
+    pel_use_2023 = V.inline("wood pellets used in 2024, confirmed verbatim",
+                            r"rise on the ([\d,]+) tonnes used in 2023")
+    pel_use_2017 = V.num("wood pellets used in 2017")
+    pel_dom_prod = V.num("domestic pellet production in 2024")
+    se_rec_imp = V.num("imported raw-material share of the recycled wood fuel")
+    se_peak = V.num("the 2022 peak in Swedish unprocessed wood fuel")
+    jp_stock = V.num("forest growing stock in the same table")
 
     # ── delivered fuel cost ──
     cost = {"jp_chip": N.num("wood-chip cost above, **CALCULATED**"),
@@ -662,10 +692,14 @@ def build_se_jp_biomass():
              ]},
             {"title": "Japan's imported biomass fuel, 2015 \u2192 2024", "scale": "absolute",
              "unit": "Mt, customs basis",
-             "note": ("Customs entries rather than survey-reported combustion, so these differ slightly "
-                      "from the consumption figures above. Pellets rose "
+             "note": ("Customs entries rather than survey-reported combustion, so these differ from the "
+                      "consumption figures above. Pellets rose "
                       f"\u00d7{ramp[-1][1]/ramp[0][1]:.0f} and palm kernel shell "
-                      f"\u00d7{ramp[-1][2]/ramp[0][2]:.0f} over the decade."),
+                      f"\u00d7{ramp[-1][2]/ramp[0][2]:.0f} over the decade. The combustion survey shows "
+                      f"the same shape: {pel_use_2017/1000:,.0f} thousand tonnes of pellets burned in "
+                      f"2017 against {pel_tot*1000:,.0f} thousand in 2024, a rise of "
+                      f"\u00d7{pel_tot*1e6/pel_use_2017:.0f}, and a {(pel_tot*1e6/pel_use_2023-1)*100:.0f}% "
+                      f"jump in 2024 alone."),
              "bars": [{"label": str(y), "sub": f"{a+b:.1f} Mt", "segments": [
                  {"label": "Wood pellets", "value": a, "color": BC["imp_pellet"]},
                  {"label": "Palm kernel shell", "value": b, "color": BC["pks"]}]}
@@ -696,6 +730,15 @@ def build_se_jp_biomass():
                       "is not identically defined in the two sources.")},
         ]},
 
+        "verification": {
+            "checked": len(VS["Verified \u2014 Japan"]) + len(VS["Verified \u2014 Sweden"]),
+            "missed": len(VS["Not reached"]),
+            "rows": [[r["lead"], r["text"]] for r in
+                     VS["Verified \u2014 Japan"] + VS["Verified \u2014 Sweden"]],
+            "gaps": [r["lead"] + (". " + r["text"] if r["text"] else "")
+                     for r in VS["Not reached"]],
+        },
+
         "tables": [
             {"title": "Japan: solid biomass fuel burned, 2024",
              "head": ["Fuel", "Domestic", "Imported", "Total", "Imported share"],
@@ -724,7 +767,11 @@ def build_se_jp_biomass():
                       ["Domestic primary forest fuel", f"{se_prim:,.0f}", f"{se_prim/se_wf*100:.1f}%"],
                       ["Recycled wood fuel", f"{se_rec:,.0f}", f"{se_rec/se_wf*100:.1f}%"],
                       ["Total", f"{se_wf:,.0f}", "100.0%"]],
-             "note": "Imported raw material is reported only as a bound: less than 5% of the total."},
+             "note": ("Imported raw material is reported only as a bound: just under 5% of total "
+                      "production. Within that, the Energy Agency reports the recycled category "
+                      f"separately as {se_rec_imp:.0f}% imported, so the imports are concentrated there "
+                      f"rather than spread evenly. Swedish wood-fuel use is also falling: {se_peak:,.0f} "
+                      f"GWh at the 2022 peak against {se_wf:,.0f} GWh in 2024.")},
             {"title": "Forest structure and the barriers to mobilising it",
              "head": ["", "Sweden", "Japan"],
              "num": [False, True, True],
@@ -766,10 +813,12 @@ def build_se_jp_biomass():
             "rounded 'two-thirds' and '68.6%' in the sources.",
         ],
         "caveats": [
-            "These figures are transcribed from a compiled research note, not re-derived from the primary "
-            "publications by this pipeline. The note names a primary source for every line and those are "
-            "cited below, but unlike the other cards no independent extraction stands behind them. Treat "
-            "the numbers as sourced, not as verified by this project.",
+            f"Provenance runs through a compiled research note rather than an extraction this pipeline "
+            f"performs. {len(VS['Verified \u2014 Japan']) + len(VS['Verified \u2014 Sweden'])} of its "
+            f"figures were afterwards read back out of the primary publications and all of them matched "
+            f"(see the verification section). {len(VS['Not reached'])} groups could not be reached: the "
+            f"Swedish price table and the e-Stat survey tables are JavaScript applications, and three "
+            f"Japanese PDFs yielded no readable text. Those figures remain sourced but unchecked.",
             "The two countries' fuel figures are in different units and cannot be added or ranked against "
             "each other. Sweden publishes wood fuel in GWh of energy; Japan publishes physical tonnes, and "
             "mixes dry-tonne chips with as-received pellets and PKS. Only the shares are comparable.",
@@ -795,7 +844,15 @@ def build_se_jp_biomass():
             f"demand figures ({jp_supply} / {jp_demand} m\u00b3). The three Swedish wood-fuel categories "
             f"sum to {se_byprod+se_prim+se_rec:,.0f} GWh against a published total of {se_wf:,.0f} GWh, a "
             f"{se_wf-se_byprod-se_prim-se_rec:,.0f} GWh residual shown as unattributed rather than "
-            "silently absorbed. All seven identities are asserted at build time."),
+            "silently absorbed. All seven identities are asserted at build time. "
+            f"Two independent routes were opened by reading the primary sources. The domestic share of "
+            f"Japanese pellet supply can be recomputed from the Forestry Agency's own production and "
+            f"customs series \u2014 {pel_dom_prod:,.0f} tonnes produced against {pel_cust*1000:,.0f} "
+            f"tonnes imported, a domestic share of {pel_dom_prod/(pel_dom_prod+pel_cust*1000)*100:.1f}% "
+            f"\u2014 against the {pel_dom/pel_tot*100:.1f}% the combustion survey reports: the same "
+            f"answer from a different statistical system. And the Forestry Agency's forest-resource table "
+            f"gives a growing stock of {jp_stock:,.0f} million m\u00b3, against which the "
+            f"{jp_round:.1f} million m\u00b3 harvested in 2024 is {jp_round/jp_stock*100:.2f}% a year."),
         "sources": [
             {"author": "\u6797\u91ce\u5e81 (Forestry Agency, Japan)", "year": "2023",
              "title": "\u68ee\u6797\u8cc7\u6e90\u306e\u73fe\u6cc1 (Current State of Forest Resources)",
@@ -827,6 +884,15 @@ def build_se_jp_biomass():
              "detail": "Domestic industrial roundwood, total supply and demand, the 42.5% self-sufficiency "
                        "ratio, and pellet imports by origin country.",
              "url": "https://www.rinya.maff.go.jp/j/press/kikaku/251121.html"},
+            {"author": "\u6797\u91ce\u5e81 (Forestry Agency, Japan)", "year": "2025",
+             "title": "\u4ee4\u548c6\u5e74\u306b\u304a\u3051\u308b\u6728\u8cea\u7c92\u72b6"
+                      "\u71c3\u6599\uff08\u6728\u8cea\u30da\u30ec\u30c3\u30c8\uff09\u306e"
+                      "\u751f\u7523\u91cf\u7b49\u306b\u3064\u3044\u3066 (Wood pellet production, "
+                      "2024, with the import series for pellets and PKS)",
+             "detail": "Domestic pellet production, and the 2012\u20132024 import series for wood "
+                       "pellets and palm kernel shell with their origin countries. Read directly for "
+                       "this card: it is the source that verifies both import series.",
+             "url": "https://www.rinya.maff.go.jp/j/riyou/biomass/attach/pdf/w_pellet-12.pdf"},
             {"author": "Swedish Energy Agency (Energimyndigheten)", "year": "2025",
              "title": "Of\u00f6r\u00e4dlade tr\u00e4dbr\u00e4nslen 2024 (Unprocessed wood fuels, 2024)",
              "detail": "Total unprocessed wood-fuel use, the industrial by-product, primary forest fuel "
