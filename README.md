@@ -452,15 +452,13 @@ it in `CLAIMS`.
 ```bash
 python3 scripts/derive_claims.py && python3 scripts/build_evidence.py
 ```
+The four cards are ordered general to specific — scale, then what the pathways delivered, then the
+resource behind the divergence, then one sector in detail — and that order is set explicitly at the foot
+of `derive_claims.py` rather than following the order the cards were written in. **Card numbers are
+display only.** Every card is cited by its anchor, so reordering the page never breaks a reference in the
+manuscript.
 
-**Claim 1 — fossil fuel in Swedish residential heating.** Drafted as "biomass has almost entirely removed
-fossil fuel from residential heating in Sweden". The fossil collapse is real (oil for dwellings
-21.7 → 0.45 TWh, −98% from 1990 to 2024) but the attribution is not: biomass burned *in the building* went
-10.0 → 8.3 TWh, **−17%**. The substitution ran through district heating (+42% delivered, its own fuel input
-moving from 13% to 64% biomass) and a 24% fall in total heating demand. Verdict: supported with revision,
-with the detailed replacement wording on the card.
-
-**Card 2 — Sweden and Japan per person, 2024.** A paired dot plot normalised by population (Sweden
+**Card 1 — Sweden and Japan per person, 2024.** A paired dot plot normalised by population (Sweden
 10,569,708, Japan 123,802,000), split into metrics that need no adjustment and two that do. The
 directly-comparable block is measured energy, untouched by the primary-energy conventions that make the
 two Sankeys incomparable: electricity used 11.2 vs 7.1 MWh/person, electricity generated 16.3 vs 8.0,
@@ -471,6 +469,32 @@ nuclear enters at 2.8× the electricity it makes, Japan's renewables at 2.4×. B
 onto the physical energy content method, and the adjustment is shown as five visible steps totalling
 −1.76 EJ so a reader can check it rather than trust it. Harmonised: 192 vs 125 GJ/person, fossil share
 25.5% vs 83.8%.
+
+**Card 2 — emissions since 1990.** The decarbonisation trajectory, which is the commentary's own
+subject. Drafted as "both have reduced their emissions since 1990"; true, but not comparably. Swedish
+territorial CO₂ per person fell **−46%** (6.71 → 3.59 t), Japanese **−17%** (9.36 → 7.77 t). The card's
+point is that the comparison depends on which emissions are counted: on a **consumption basis Sweden
+started above Japan** in 1990 — 13.11 against 11.04 t per person, despite territorial emissions a third
+lower — and Sweden's footprint is still 1.68× its territorial figure against Japan's 1.16×. Sweden's
+decarbonisation is real but partly a shift in *where* emissions occur. Verdict: supported with revision.
+
+The figure is a new `lines` chart kind: two countries on one axis, pills switching the **metric** rather
+than isolating a series, because Sweden against Japan is the whole point. Three views — territorial per
+person, consumption-based per person, and totals indexed to 1990 (Japan's system is ~25× Sweden's, so
+absolute totals cannot share a linear axis). Series names ride the end of their own line instead of a
+legend.
+
+Emissions come from the **Global Carbon Budget**, pulled by `scripts/fetch_co2.py` into
+`sources/co2.json` — Sweden and Japan only, 1990–2024, the fields the page uses. Fossil CO₂ only: no
+methane, no N₂O, no land use. That last exclusion matters, since Sweden's forest sink is large enough to
+change its net balance substantially, so the series must be quoted as fossil CO₂ and not as greenhouse
+gases. The national inventories (Naturvårdsverket, GIO/NIES) are cited as the national counterparts.
+
+Card 2 also gains a **fossil CO₂ block**, on the same per-person footing as the rest. Three of its four
+rows need no harmonisation — emissions are measured at the fuel, not booked by a convention. The
+exception is intensity, which has energy in its denominator: it is computed against *this card's own
+harmonised* primary energy (67 vs 223 g/kWh) rather than taken from the compiler, whose 62 and 201 g/kWh
+sit on the substitution method the card exists to remove.
 
 **Card 3 — forest biomass in Sweden and Japan.** Drafted as "both are heavily forested countries that
 use forest biomass for energy". The endowment claim holds — Sweden 27.9 Mha of forest, Japan 25.02 Mha,
@@ -486,7 +510,7 @@ The card carries two figures. The first is **composition bars** — fuel origin,
 Japan's import ramp from 0.8 Mt in 2015 to 12.5 Mt in 2024 — drawn as *shares*, because Sweden publishes
 wood fuel in GWh and Japan in tonnes and the bar lengths are not comparable. Sweden's import share is
 published only as a bound, so it is drawn at 5% and labelled `<5%` rather than as a point estimate. The
-second is the same paired dot plot as card 2, covering forest area, forest per person (2.64 vs 0.20 ha,
+second is the same paired dot plot as the per-person card, covering forest area, forest per person (2.64 vs 0.20 ha,
 ×13), growth against harvest, and delivered fuel cost.
 
 Provenance runs through a **compiled research note** rather than an extraction this pipeline performs:
@@ -526,31 +550,12 @@ recomputes from the Forestry Agency's own production and customs series — 152,
 answer from a different statistical system. And the Forestry Agency's growing-stock figure of
 5,560 million m³ puts Japan's 22.3 million m³ annual harvest at 0.40% of standing stock per year.
 
-**Card 4 — emissions since 1990.** The decarbonisation trajectory, which is the commentary's own
-subject. Drafted as "both have reduced their emissions since 1990"; true, but not comparably. Swedish
-territorial CO₂ per person fell **−46%** (6.71 → 3.59 t), Japanese **−17%** (9.36 → 7.77 t). The card's
-point is that the comparison depends on which emissions are counted: on a **consumption basis Sweden
-started above Japan** in 1990 — 13.11 against 11.04 t per person, despite territorial emissions a third
-lower — and Sweden's footprint is still 1.68× its territorial figure against Japan's 1.16×. Sweden's
-decarbonisation is real but partly a shift in *where* emissions occur. Verdict: supported with revision.
-
-The figure is a new `lines` chart kind: two countries on one axis, pills switching the **metric** rather
-than isolating a series, because Sweden against Japan is the whole point. Three views — territorial per
-person, consumption-based per person, and totals indexed to 1990 (Japan's system is ~25× Sweden's, so
-absolute totals cannot share a linear axis). Series names ride the end of their own line instead of a
-legend.
-
-Emissions come from the **Global Carbon Budget**, pulled by `scripts/fetch_co2.py` into
-`sources/co2.json` — Sweden and Japan only, 1990–2024, the fields the page uses. Fossil CO₂ only: no
-methane, no N₂O, no land use. That last exclusion matters, since Sweden's forest sink is large enough to
-change its net balance substantially, so the series must be quoted as fossil CO₂ and not as greenhouse
-gases. The national inventories (Naturvårdsverket, GIO/NIES) are cited as the national counterparts.
-
-Card 2 also gains a **fossil CO₂ block**, on the same per-person footing as the rest. Three of its four
-rows need no harmonisation — emissions are measured at the fuel, not booked by a convention. The
-exception is intensity, which has energy in its denominator: it is computed against *this card's own
-harmonised* primary energy (67 vs 223 g/kWh) rather than taken from the compiler, whose 62 and 201 g/kWh
-sit on the substitution method the card exists to remove.
+**Card 4 — fossil fuel in Swedish residential heating.** Drafted as "biomass has almost entirely removed
+fossil fuel from residential heating in Sweden". The fossil collapse is real (oil for dwellings
+21.7 → 0.45 TWh, −98% from 1990 to 2024) but the attribution is not: biomass burned *in the building* went
+10.0 → 8.3 TWh, **−17%**. The substitution ran through district heating (+42% delivered, its own fuel input
+moving from 13% to 64% biomass) and a 24% fall in total heating demand. Verdict: supported with revision,
+with the detailed replacement wording on the card.
 
 Population comes from `scripts/fetch_pop.py` — SCB's PxWeb API for Sweden and the Statistics Bureau's
 published 人口推計 table for Japan, both put on a mid-period basis so the denominator matches the energy

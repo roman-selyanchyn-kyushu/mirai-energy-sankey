@@ -186,7 +186,7 @@ def build_se_heating_fossil():
     }
 
 
-CLAIMS = [build_se_heating_fossil]
+CLAIMS = []   # page order is set explicitly at the foot of this file
 
 
 def main():
@@ -506,7 +506,6 @@ class _Note:
             raise SystemExit(f"biomass note: pattern {pattern!r} not found for {phrase!r}")
         return float(m.group(1).replace(",", ""))
 
-CLAIMS.append(build_se_jp_percapita)
 
 
 
@@ -1001,7 +1000,6 @@ def build_se_jp_biomass():
     }
 
 
-CLAIMS.append(build_se_jp_biomass)
 
 
 # ── emissions since 1990 ───────────────────────────────────────────────────
@@ -1179,7 +1177,23 @@ def build_se_jp_emissions():
     }
 
 
-CLAIMS.append(build_se_jp_emissions)
+
+
+# ── page order ─────────────────────────────────────────────────────────────
+# Deliberate, and not the order the cards were written in. A reader arrives from
+# the manuscript, so the two systems have to be framed before any single result
+# means anything: scale first, then what the pathways delivered, then the
+# resource behind the divergence, then one sector in detail.
+#
+# Card numbers are display only. Every card is cited by its anchor
+# (evidence.html#se-jp-biomass), so reordering never breaks a reference.
+CLAIMS = [
+    build_se_jp_percapita,     # who the two countries are, and what is comparable
+    build_se_jp_emissions,     # what the pathways actually delivered
+    build_se_jp_biomass,       # the resource behind the divergence
+    build_se_heating_fossil,   # one sector, in detail
+]
+
 
 if __name__ == "__main__":
     main()

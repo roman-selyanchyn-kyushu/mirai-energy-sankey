@@ -136,7 +136,8 @@
   tests it against the published statistics. The verdict comes from the data rather than from the draft,
   so a claim that does not survive is marked and rewritten rather than quietly dropped. Every number is
   read from a source file by <code>scripts/derive_claims.py</code>; nothing is typed in by hand. Each card
-  has its own permalink, so the manuscript can cite the exact evidence.</p>
+  has its own permalink, so the manuscript can cite the exact evidence \u2014 <b>card numbers follow
+  reading order and can change as cards are added, so cite the anchor, which does not.</b></p>
 </header>
 
 <div class="toc" id="toc"></div>
@@ -746,7 +747,14 @@ function openHash(){
   const id = decodeURIComponent(location.hash.slice(1));
   if (!id) return;
   const el = document.getElementById(id);
-  if (el && el.tagName === "DETAILS"){ el.open = true; el.scrollIntoView(); }
+  if (!el || el.tagName !== "DETAILS") return;
+  el.open = true;
+  // Compute the offset rather than calling scrollIntoView, which picks its own
+  // scroll container and lands far off when the target is deep in the page, and
+  // wait a frame first: opening a card resizes everything below it.
+  requestAnimationFrame(() => {
+    window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 14);
+  });
 }
 window.addEventListener("hashchange", openHash);
 // a contents link to an already-current hash fires no hashchange, so open it directly
