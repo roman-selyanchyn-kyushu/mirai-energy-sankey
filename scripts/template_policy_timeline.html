@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Policy Timeline — Sweden &amp; Japan Energy Manuscript</title>
+<style>
+  :root{
+    --ink:#1d232a; --ink-soft:#5a636e; --bg:#f7f6f2; --card:#ffffff;
+    --line:#e4e1d8; --accent:#0f6f8e;
+    --f-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);line-height:1.55;padding:28px 20px 60px}
+  .wrap{max-width:1180px;margin:0 auto}
+  .sitenav{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:0}
+  .sitenav a{
+    font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:8px 8px 0 0;text-decoration:none;
+    color:var(--ink-soft);border:1px solid transparent;border-bottom:none;position:relative;top:1px;
+  }
+  .sitenav a:hover{color:var(--accent)}
+  .sitenav a.on{background:var(--card);border-color:var(--line);color:var(--ink)}
+  header.page h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+  header.page p.sub{color:var(--ink-soft);font-size:14px;margin-top:6px;max-width:940px}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:20px;
+         box-shadow:0 1px 3px rgba(30,30,20,.05);padding:16px 18px}
+  h3.sec{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);
+         margin:22px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
+  .panel > h3.sec:first-child{margin-top:0;padding-top:0;border-top:none}
+  .blocknote{font-size:13px;color:var(--ink-soft);margin:4px 0;max-width:940px}
+  .chartwrap{overflow-x:auto;margin:2px 0 4px}
+  svg.fig{width:100%;min-width:1120px;height:auto;display:block}
+  svg.fig .hit{cursor:pointer}
+  .figbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 8px}
+  .figbar .cap{font-size:12.5px;color:var(--ink-soft);margin-right:auto}
+  .cards{margin-top:4px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:12px;
+        box-shadow:0 1px 3px rgba(30,30,20,.05);overflow:hidden;scroll-margin-top:14px}
+  /* the same collapse behaviour as the evidence cards: a register that can be
+     scanned closed, and a card addressed by #anchor opens itself */
+  .card > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;
+                  padding:11px 16px;transition:background .13s}
+  .card > summary::-webkit-details-marker{display:none}
+  .card > summary::before{content:"\25B8";color:var(--accent);font-size:14px;line-height:1;
+                          transition:transform .15s;flex:none}
+  .card[open] > summary::before{transform:rotate(90deg)}
+  .card > summary:hover{background:#fbfaf7}
+  .card[open] > summary{border-bottom:1px solid var(--line)}
+  .card .eid{font-size:11.5px;font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums;flex:none}
+  .card h2{font-size:15px;font-weight:700;letter-spacing:-.01em;margin-right:auto}
+  .card h2 .orig{display:block;font-size:12.5px;font-weight:400;color:var(--ink-soft);margin-top:1px}
+  .card .when{font-size:12px;color:var(--ink-soft);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .card > .body{padding:12px 18px 18px}
+  .dir{font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap;
+       color:#fff;flex:none}
+  .kv{border-collapse:collapse;font-size:13px;width:100%;max-width:820px;margin:2px 0 12px}
+  .kv th,.kv td{border-bottom:1px solid var(--line);padding:5px 10px;text-align:left;vertical-align:top}
+  .kv th{font-size:12px;font-weight:600;color:var(--ink-soft);width:230px;white-space:nowrap}
+  .kv td a{color:var(--accent)}
+  .prose{font-size:13.5px;margin:2px 0 12px;max-width:940px}
+  .cite{background:#fbfaf7;border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:6px 0;
+        font-size:13.5px}
+  .cite b{display:block;margin-bottom:2px}
+  .cite .d{color:var(--ink-soft);font-size:12.5px;margin:3px 0}
+  .cite a{color:var(--accent);word-break:break-all;font-size:12.5px}
+  .permalink{font-size:12px;color:var(--ink-soft);margin-top:12px}
+  .permalink code{background:#f3f1ea;padding:2px 7px;border-radius:4px;user-select:all}
+  .tbtns{margin-left:auto;display:flex;gap:6px}
+  .tbtn{font-family:var(--f-ui);font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:999px;
+        border:1px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;
+        text-transform:none;letter-spacing:0;transition:all .13s}
+  .tbtn:hover{border-color:var(--accent);color:var(--accent)}
+  h3.sec{display:flex;align-items:center}
+  .filters{display:flex;flex-direction:column;gap:7px;margin:2px 0 12px}
+  .frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .frow .flab{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);
+              font-weight:700;width:88px;flex:none}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:12.5px;
+        font-weight:600;padding:4px 11px;border-radius:999px;border:1px solid var(--line);
+        background:#fff;color:var(--ink-soft);cursor:pointer;transition:all .13s}
+  .chip i{width:9px;height:9px;border-radius:2px;background:var(--c,#9aa0a8);flex:none}
+  .chip:hover{border-color:var(--accent);color:var(--ink)}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  svg.fig .hit{cursor:pointer;outline:none}
+  /* the focus ring has to be drawn, not outlined: an SVG outline is clipped by the
+     viewBox on the outermost markers and vanishes exactly where it is needed */
+  svg.fig .hit:focus-visible{fill:rgba(15,111,142,.14);stroke:var(--accent);stroke-width:2}
+  /* hovering an event fades everything that is not it or one of its partners */
+  svg.fig.focusing .mk,svg.fig.focusing .bar,svg.fig.focusing .arc,svg.fig.focusing .tick{opacity:.13}
+  svg.fig.focusing .mk.hi,svg.fig.focusing .arc.hi,svg.fig.focusing .tick.hi{opacity:1}
+  svg.fig.focusing .bar.hi{opacity:.34}
+  .wtables{overflow-x:auto}
+  .wtables table{border-collapse:collapse;font-size:12.5px;width:100%;min-width:1480px}
+  .wtables caption{text-align:left;font-size:13px;color:var(--ink-soft);padding-bottom:8px}
+  .wtables th,.wtables td{border-bottom:1px solid var(--line);padding:5px 9px;text-align:left;
+                          vertical-align:top}
+  .wtables thead th{font-size:11.5px;font-weight:600;color:var(--ink-soft);position:sticky;top:0;
+                    background:var(--card)}
+  .wtables td.id{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .wtables td.id a{color:var(--accent);text-decoration:none;font-weight:600}
+  .wtables td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .figbar button{font-family:var(--f-ui);font-size:12px;font-weight:600;padding:5px 11px;
+                 border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+                 cursor:pointer;transition:all .13s}
+  .figbar button:hover{border-color:var(--accent);color:var(--accent)}
+  #derived table{min-width:0;table-layout:fixed}
+  #derived th:first-child,#derived td.m{width:27%}
+  #derived th.lane,#derived td.v{width:15.5%;padding-right:16px}
+  #derived th:last-child,#derived td.how{width:42%}
+  #derived td.v{font-weight:700}
+  #derived td.how{color:var(--ink-soft);font-size:12px}
+  #derived td.v span{font-weight:400;color:var(--ink-soft)}
+  /* columns are sized by what they hold: dates and flags never wrap, the two
+     title columns and the government name get room so a row stays one or two
+     lines instead of six */
+  .wtables .c-country,.wtables .c-date,.wtables .c-end_date,.wtables .c-still_in_force,
+  .wtables .c-reverses,.wtables .c-supersedes{white-space:nowrap}
+  .wtables .c-title_en,.wtables .c-title_original{min-width:190px}
+  .wtables .c-government_at_adoption{min-width:210px}
+  .wtables .c-direction,.wtables .c-legal_status,.wtables .c-instrument_type,
+  .wtables .c-sector{min-width:104px}
+  footer{margin-top:26px;color:var(--ink-soft);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  footer a{color:var(--accent)}
+  footer p{margin:0 0 8px}
+  footer p.credits{font-size:13.5px;color:var(--ink);line-height:1.7}
+  footer p.credits a{font-weight:600}
+  /* ── print ────────────────────────────────────────────────────────────────
+     A static version for paper: the figure alone on the first sheet, at the full
+     width of a landscape page, followed by the derived figures and the record of
+     what was sought and not found. The controls, the ninety-four cards and the
+     full table are screen things — printing them would run to fifty sheets and
+     bury the figure the page exists to produce. */
+  @page{size:A4 landscape;margin:10mm}
+  @media print{
+    body{background:#fff;padding:0;color:#000}
+    .sitenav,.filters,.tbtns,.figbar button,.tip,#cardspanel,#tablepanel,
+    header.page p.sub{display:none !important}
+    header.page{margin-bottom:4px}
+    header.page h1{font-size:15px}
+    .panel{box-shadow:none;border:none;border-radius:0;padding:0;margin-top:8px;
+           break-inside:avoid;page-break-inside:avoid}
+    .chartwrap{overflow:visible}
+    /* The figure is fitted to the height of the sheet, not its width: at 1240 x
+       1122 it is nearly square, so width-fitting a landscape page would run it
+       onto a second sheet. Height-fitting gives the largest single-page copy
+       the paper allows. */
+    svg.fig{min-width:0;width:auto;height:174mm;max-width:100%;display:block;margin:0 auto}
+    .figbar .cap{font-size:9px}
+    .onscreen{display:none}
+    #derivedpanel{break-before:page;page-break-before:always}
+    #derived table{min-width:0;font-size:9.5px}
+    .blocknote,.sought{font-size:9.5px}
+    h3.sec{font-size:10px;margin:10px 0 5px;padding-top:6px}
+    footer{font-size:9px;margin-top:10px}
+    a{color:#000;text-decoration:none}
+  }
+  .sought{font-size:13px;color:var(--ink-soft);max-width:940px}
+  /* the open questions carry bare source URLs, which pre-wrap will not break —
+     without this the block pushes the whole page sideways on a phone */
+  .sought pre{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--f-ui);font-size:13px;color:var(--ink);
+              background:#fbfaf7;border:1px solid var(--line);border-radius:10px;padding:14px 17px;
+              margin-top:8px;line-height:1.6}
+  .tip{position:fixed;pointer-events:none;z-index:50;display:none;max-width:340px;
+       background:rgba(22,26,30,.94);color:#fff;font-size:12.5px;line-height:1.45;
+       padding:8px 11px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="sitenav">
+  <a href="energy_sankey.html">Energy flow diagrams</a>
+  <a href="evidence.html">Supporting data</a>
+  <a href="policy_timeline.html" class="on">Policy timeline</a>
+</nav>
+
+<header class="page">
+  <h1>Policy Timeline</h1>
+  <p class="sub">Every Swedish and Japanese energy and climate policy decision in the dataset, both
+  countries on one time axis and one pixel scale so the two are directly comparable. Sweden
+  (<b>SE</b>) is the upper lane, Japan (<b>JP</b>) the lower. A marker is a decision; the bar behind it
+  is how long that instrument stayed in force; the band under each lane is who was in government at the
+  time. Marker shape carries legal status and marker colour carries direction of travel, so neither is
+  read from colour alone. Nothing on this page is typed by hand: it is rendered from
+  <code>sources/policy/policy_history_dataset.md</code> by <code>scripts/build_policy_timeline.py</code>.</p>
+</header>
+
+<div class="panel">
+  <div class="filters" id="filters"></div>
+  <div class="figbar"><span class="cap" id="cap"></span>
+    <button id="export-svg">SVG for print</button></div>
+  <div class="chartwrap" id="plotwrap"></div>
+  <p class="blocknote" id="plotnote"></p>
+</div>
+
+<div class="panel">
+  <h3 class="sec">Sought but not verified</h3>
+  <p class="blocknote" id="soughtnote"></p>
+  <div class="sought" id="sought"></div>
+</div>
+
+<div class="panel" id="derivedpanel">
+  <h3 class="sec">Derived from the data</h3>
+  <p class="blocknote">Every figure below is computed from the dataset when the page loads — none is
+  typed in, and none is quoted from the manuscript. Each row states its own computation, so a reader can
+  disagree with the definition rather than with the number. These count the whole dataset, not the
+  current filter state.</p>
+  <div class="wtables" id="derived"></div>
+</div>
+
+<div class="panel" id="cardspanel">
+  <h3 class="sec">Every decision, one card each<span class="tbtns">
+    <button class="tbtn" id="expand-all">Expand all</button>
+    <button class="tbtn" id="collapse-all">Collapse all</button></span></h3>
+  <p class="blocknote" id="cardnote"></p>
+  <div class="cards" id="cards"></div>
+</div>
+
+<div class="panel" id="tablepanel">
+  <h3 class="sec">The same events as a table</h3>
+  <p class="blocknote">Every plotted decision, in the same order and under the same filters as the
+  figure, for screen readers and for anyone who would rather read the data than look at it. The id in
+  the first column links to that decision's card.</p>
+  <div class="wtables" id="tablewrap"></div>
+</div>
+
+<footer>
+  <p class="credits">
+    Built for the <a href="https://www.mirai.nu/" target="_blank" rel="noopener">Sweden–Japan MIRAI Project</a>
+    · <a href="https://www.mirai.nu/pages/materials" target="_blank" rel="noopener">GCT for Materials for Energy Conversion and Storage</a>
+    · Designed by <a href="https://q-pit.kyushu-u.ac.jp/roman_selyanchyn/" target="_blank" rel="noopener">Roman Selyanchyn</a> (Kyushu University)
+    · Data extraction, preparation and coding with Claude Code
+  </p>
+  <p>
+    Companion to the <a href="energy_sankey.html">energy flow diagrams</a> and the
+    <a href="evidence.html">supporting data</a>. Method and source files are documented in the
+    <a href="https://github.com/roman-selyanchyn-kyushu/mirai-energy-sankey" target="_blank" rel="noopener">project README</a>.
+  </p>
+</footer>
+
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+"use strict";
+
+/* The dataset, parsed out of sources/policy/policy_history_dataset.md by
+   scripts/build_policy_timeline.py and embedded verbatim. No policy name, date,
+   rate or status is written anywhere in this file — everything below reads it
+   out of these three constants. */
+const EVENTS = __EVENTS__;
+const GOVERNMENTS = __GOVERNMENTS__;
+const OPEN_QUESTIONS = __OPEN_QUESTIONS__;
+
+/* ── encoding ──────────────────────────────────────────────────────────────
+   Two independent channels. legal_status is drawn as shape, direction as
+   colour, from the Okabe–Ito colourblind-safe palette; neither distinction is
+   ever carried by colour alone. Both maps are keyed on the vocabulary the
+   dataset declares, and an unlisted value falls back to something visible
+   rather than vanishing. */
+const PAL = {
+  strengthening:  "#0072B2",   // Okabe–Ito blue
+  weakening:      "#D55E00",   // Okabe–Ito vermillion
+  restructuring:  "#CC79A7",   // Okabe–Ito reddish purple
+  neutral:        "#999999",   // neutral grey
+};
+const SHAPE = {
+  legally_binding_statute:        "square",
+  binding_secondary_legislation:  "disc",
+  administratively_binding:       "ring",
+  non_binding_plan:               "diamond",
+  political_declaration:          "triangle",
+};
+/* Sweden above Japan, and sublanes in the order the manuscript discusses them:
+   the cross-cutting frameworks first, then the instruments underneath them.
+   Any country or sector the dataset gains that is not listed is appended rather
+   than dropped. */
+const LANE_ORDER = ["SE", "JP"];
+const SECTOR_ORDER = ["cross_cutting", "carbon_pricing", "electricity", "nuclear",
+                      "transport", "industry", "heat", "hydrogen", "forestry_landuse"];
+
+const L = {
+  W: 1240, ML: 176, MR: 18,          // left gutter holds the sublane labels
+  axisH: 34, footH: 86,
+  rowH: 11, barH: 5, r: 4,           // one packed row per event, kept tight
+  sublaneGap: 8, bandH: 15, bandGap: 5, laneGap: 26, laneHeadH: 20, arcH: 34,
+};
+
+/* ── dates ─────────────────────────────────────────────────────────────────
+   Dates arrive at three precisions — a bare year, a year and month, or a full
+   day — and the precision is data, not sloppiness, so a partial date is kept as
+   the interval it denotes rather than silently pinned to 1 January. */
+const iso = d => d.length === 10 ? d : d.length === 7 ? d + "-01" : d + "-01-01";
+const t = d => Date.parse(iso(d) + "T00:00:00Z");
+const YEAR = 365.2425 * 864e5;
+
+function extent(d, precision){
+  const a = t(d);
+  if (precision === "year"  && d.length === 4) return [a, Date.UTC(+d + 1, 0, 1)];
+  if (precision === "month" && d.length === 7){
+    const [y, m] = d.split("-").map(Number);
+    return [a, Date.UTC(y + (m === 12 ? 1 : 0), m % 12, 1)];
+  }
+  return [a, a];
+}
+const mid = e => { const [a, b] = extent(e.date, e.date_precision); return (a + b) / 2; };
+
+/* labels are derived from the vocabulary, never transcribed */
+const label = s => String(s).replace(/_/g, " ").replace(/^./, c => c.toUpperCase());
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+
+/* ── layout ────────────────────────────────────────────────────────────────
+   The axis spans whole years from the earliest event to the end of the current
+   one, so both lanes share one scale and the right edge means "now" without any
+   date being written down. */
+const now = new Date();
+const T0 = Date.UTC(new Date(Math.min.apply(null, EVENTS.map(e => t(e.date)))).getUTCFullYear(), 0, 1);
+const T1 = Math.max(
+  Date.UTC(now.getUTCFullYear() + 1, 0, 1),
+  ...EVENTS.map(e => e.end_date ? extent(e.end_date, e.end_date.length === 4 ? "year" : "day")[1] : 0));
+const PW = L.W - L.ML - L.MR;
+const X = ms => L.ML + PW * (ms - T0) / (T1 - T0);
+
+/* An instrument occupies its sublane for as long as it is in force, so two that
+   overlap in time cannot share a row. Rows are filled greedily, earliest first;
+   Japan's cross-cutting sublane needs two dozen of them, and that thickness is
+   the durability comparison rather than an accident of layout. */
+function barSpan(e){
+  const a = extent(e.date, e.date_precision)[0];
+  // an end_date is the more specific fact even when still_in_force is also set:
+  // the two temporary Swedish fuel-tax measures are in force now and already
+  // legislated to expire, and the bar should stop where the statute says.
+  if (e.end_date) return [a, extent(e.end_date, e.end_date.length === 4 ? "year" : "day")[1]];
+  if (e.still_in_force) return [a, T1];
+  return [a, extent(e.date, e.date_precision)[1]];
+}
+
+function pack(events){
+  const rows = [];
+  events.slice().sort((p, q) => t(p.date) - t(q.date) || p.id.localeCompare(q.id)).forEach(e => {
+    const [a, b] = barSpan(e);
+    // leave a marker's width of clearance so two markers never touch
+    const need = a - (L.r + 2) * (T1 - T0) / PW;
+    let i = rows.findIndex(rw => rw.end < need);
+    if (i < 0){ i = rows.length; rows.push({end: -Infinity, events: []}); }
+    rows[i].end = Math.max(b, mid(e) + (L.r + 2) * (T1 - T0) / PW);
+    rows[i].events.push(e);
+    e._row = i;
+  });
+  return rows;
+}
+
+function layout(events){
+  let y = L.axisH;
+  const lanes = [];
+  // the lane list comes from the whole dataset, not from the filtered set: a
+  // country the filters empty out keeps its lane and its government band, so
+  // "no Japanese decision is a weakening" is visible as an empty lane rather
+  // than as a missing one
+  const countries = LANE_ORDER.concat(
+    [...new Set(EVENTS.map(e => e.country))].filter(c => !LANE_ORDER.includes(c)));
+  countries.forEach(c => {
+    const mine = events.filter(e => e.country === c);
+    const present = [...new Set(mine.map(e => e.sector))];
+    const sectors = SECTOR_ORDER.filter(s => present.includes(s))
+      .concat(present.filter(s => !SECTOR_ORDER.includes(s)));
+    const lane = {country: c, head: y + L.laneHeadH, top: y + L.laneHeadH + L.arcH,
+                  sublanes: [], events: mine};
+    let sy = lane.top;
+    sectors.forEach(s => {
+      const rows = pack(mine.filter(e => e.sector === s));
+      lane.sublanes.push({sector: s, top: sy, rows, h: rows.length * L.rowH});
+      sy += rows.length * L.rowH + L.sublaneGap;
+    });
+    lane.bottom = sectors.length ? sy - L.sublaneGap : sy + L.rowH;
+    lane.bandTop = lane.bottom + L.bandGap;
+    lanes.push(lane);
+    y = lane.bandTop + L.bandH + L.laneGap;
+  });
+  return {lanes, H: y - L.laneGap + L.footH};
+}
+
+/* ── marker shapes ─────────────────────────────────────────────────────── */
+function marker(e, x, y){
+  const c = PAL[e.direction] || "#000000";
+  const r = L.r, sh = SHAPE[e.legal_status] || "disc";
+  // a verified marker is drawn solid with a white halo so it reads on top of the
+  // bars; an uncertain one keeps its shape and colour but is outlined in a dash,
+  // so the doubt is visible without becoming a fourth colour or a sixth shape
+  const un = e.confidence === "uncertain";
+  const skin = un ? ` fill-opacity="0.35" stroke="${c}" stroke-width="1.2" stroke-dasharray="2 1.6"`
+                  : ` stroke="#ffffff" stroke-width="0.9"`;
+  if (sh === "square")   return `<rect x="${(x-r).toFixed(1)}" y="${(y-r).toFixed(1)}" width="${2*r}" height="${2*r}" fill="${c}"${skin}/>`;
+  if (sh === "disc")     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${c}"${skin}/>`;
+  if (sh === "ring")     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r-0.6}" fill="#ffffff" stroke="${c}" stroke-width="1.8"${un ? ` stroke-dasharray="2 1.6"` : ``}/>`;
+  if (sh === "diamond")  return `<path d="M${x.toFixed(1)} ${(y-r).toFixed(1)}L${(x+r*0.82).toFixed(1)} ${y.toFixed(1)}L${x.toFixed(1)} ${(y+r).toFixed(1)}L${(x-r*0.82).toFixed(1)} ${y.toFixed(1)}Z" fill="${c}"${skin}/>`;
+  return `<path d="M${x.toFixed(1)} ${(y-r*1.1).toFixed(1)}L${(x+r).toFixed(1)} ${(y+r*0.8).toFixed(1)}L${(x-r).toFixed(1)} ${(y+r*0.8).toFixed(1)}Z" fill="${c}"${skin}/>`;
+}
+
+/* ── whisker for an imprecise date ─────────────────────────────────────────
+   A year-precision event is known to have happened inside its year and no more
+   finely than that. Drawing it as a point would claim a day the source does not
+   give, so it is drawn as a whisker spanning the interval with the marker at the
+   middle — the reader sees the uncertainty rather than being told about it. */
+function whisker(e, y){
+  const [a, b] = extent(e.date, e.date_precision);
+  if (b <= a) return "";
+  const c = PAL[e.direction] || "#000000", x1 = X(a), x2 = X(b), cap = 3;
+  return `<path d="M${x1.toFixed(1)} ${(y-cap).toFixed(1)}V${(y+cap).toFixed(1)}M${x1.toFixed(1)} ${y.toFixed(1)}H${x2.toFixed(1)}M${x2.toFixed(1)} ${(y-cap).toFixed(1)}V${(y+cap).toFixed(1)}"`
+       + ` stroke="${c}" stroke-width="1.1" fill="none" opacity="0.85"/>`;
+}
+
+/* ── reversal arcs and succession ticks ────────────────────────────────────
+   Two relationships, drawn as two deliberately different marks. A reversal is a
+   break: vermillion, curved, with an arrowhead pointing back at what was undone.
+   A succession is continuity: grey, dotted, flat, no arrowhead — the Japanese
+   plan-revision chain should read as one instrument being re-issued, not as a
+   series of changes of mind.
+
+   The arc bows upward, over the markers rather than through them, rising into
+   the reserved band above the lane when the two events sit far apart vertically.
+   A strict band-only route would need long vertical legs cutting through
+   twenty-four rows of Japanese cross-cutting instruments to reach it. */
+function arc(from, to, aid, bid){
+  const dx = Math.abs(to.x - from.x);
+  const lift = Math.max(16, Math.min(dx * 0.22, 62));
+  const apex = Math.max(from.laneArcTop, Math.min(from.y, to.y) - lift);
+  const c1x = from.x + (to.x - from.x) * 0.22, c2x = from.x + (to.x - from.x) * 0.78;
+  // stop short of the target marker so the arrowhead lands on its edge
+  const ang = Math.atan2(to.y - apex, to.x - c2x);
+  const gap = L.r + 3.2;
+  const ex = to.x - Math.cos(ang) * gap, ey = to.y - Math.sin(ang) * gap;
+  const h = 4.6, w = 3.0, ux = Math.cos(ang), uy = Math.sin(ang);
+  const bx = ex - ux * h, by = ey - uy * h;            // base of the arrowhead
+  const head = `M${ex.toFixed(1)} ${ey.toFixed(1)}`
+    + `L${(bx - uy*w).toFixed(1)} ${(by + ux*w).toFixed(1)}`
+    + `L${(bx + uy*w).toFixed(1)} ${(by - ux*w).toFixed(1)}Z`;
+  const tag = aid ? ` class="arc" data-a="${esc(aid)}" data-b="${esc(bid)}"` : ` class="arc"`;
+  return `<path${tag} d="M${from.x.toFixed(1)} ${(from.y - L.r - 1).toFixed(1)} C${c1x.toFixed(1)} ${apex.toFixed(1)} ${c2x.toFixed(1)} ${apex.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}"`
+       + ` fill="none" stroke="${PAL.weakening}" stroke-width="1.3" opacity="0.85"/>`
+       + `<path${tag} d="${head}" fill="${PAL.weakening}" opacity="0.85"/>`;
+}
+
+function tick(from, to, aid, bid){
+  return `<path class="tick"${aid ? ` data-a="${esc(aid)}" data-b="${esc(bid)}"` : ``}`
+       + ` d="M${from.x.toFixed(1)} ${from.y.toFixed(1)}L${to.x.toFixed(1)} ${to.y.toFixed(1)}"`
+       + ` fill="none" stroke="#9aa0a8" stroke-width="1" stroke-dasharray="1.5 2.5" opacity="0.9"/>`;
+}
+
+/* ── the plot ──────────────────────────────────────────────────────────────
+   Groups are named by lane and by channel so the exported SVG opens in
+   Illustrator as an editable figure rather than one flat soup of paths. */
+const POS = {};   // event id -> where its marker landed, for arcs and ticks
+
+function plot(events){
+  const {lanes, H} = layout(events);
+  for (const k in POS) delete POS[k];
+  lanes.forEach(lane => lane.sublanes.forEach(sl => sl.rows.forEach((row, ri) => row.events.forEach(e => {
+    POS[e.id] = {x: X(mid(e)), y: sl.top + ri * L.rowH + L.rowH / 2,
+                 laneArcTop: lane.head + 4, country: lane.country};
+  }))));
+  const p = [`<svg class="fig" id="timeline" viewBox="0 0 ${L.W} ${H.toFixed(0)}" width="${L.W}" height="${H.toFixed(0)}"`
+           + ` xmlns="http://www.w3.org/2000/svg" font-family='"Helvetica Neue", Helvetica, Arial, sans-serif'>`];
+  p.push(`<rect x="0" y="0" width="${L.W}" height="${H.toFixed(0)}" fill="#ffffff"/>`);
+
+  const y0 = L.axisH - 8, y1 = H - L.footH + 4;
+
+  /* decade gridlines, drawn once behind both lanes because the scale is shared */
+  p.push(`<g id="axis">`);
+  const first = Math.ceil(new Date(T0).getUTCFullYear() / 10) * 10;
+  for (let yr = first; Date.UTC(yr, 0, 1) <= T1; yr += 10){
+    const x = X(Date.UTC(yr, 0, 1));
+    p.push(`<line x1="${x.toFixed(1)}" y1="${y0}" x2="${x.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#e8e5dc" stroke-width="1"/>`);
+    p.push(`<text x="${x.toFixed(1)}" y="${L.axisH-14}" font-size="10.5" fill="#9aa0a8" text-anchor="middle">${yr}</text>`);
+    p.push(`<text x="${x.toFixed(1)}" y="${(y1+16).toFixed(1)}" font-size="10.5" fill="#9aa0a8" text-anchor="middle">${yr}</text>`);
+  }
+  // the right edge is the present, and says so rather than carrying a typed date
+  p.push(`<line x1="${X(t(nowISO())).toFixed(1)}" y1="${y0}" x2="${X(t(nowISO())).toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#9aa0a8" stroke-width="1" stroke-dasharray="2 3"/>`);
+  p.push(`<text x="${(X(t(nowISO()))-4).toFixed(1)}" y="${L.axisH-14}" font-size="10" font-style="italic" fill="#9aa0a8" text-anchor="end">today</text>`);
+  p.push(`</g>`);
+
+  lanes.forEach(lane => {
+    p.push(`<g id="lane-${esc(lane.country)}">`);
+    p.push(`<text x="${L.ML}" y="${(lane.head-7).toFixed(1)}" font-size="13" font-weight="700" fill="#1d232a">${esc(lane.country)}</text>`);
+    p.push(`<text x="${(L.ML+26).toFixed(1)}" y="${(lane.head-7).toFixed(1)}" font-size="11" fill="#9aa0a8">${lane.events.length} decisions</text>`);
+    p.push(`<line x1="${L.ML}" y1="${(lane.head-3).toFixed(1)}" x2="${L.W-L.MR}" y2="${(lane.head-3).toFixed(1)}" stroke="#e4e1d8" stroke-width="1"/>`);
+
+    if (!lane.events.length)
+      p.push(`<text x="${L.ML}" y="${(lane.top+L.rowH).toFixed(1)}" font-size="11.5" font-style="italic" fill="#9aa0a8">no decision in this lane matches the filters</text>`);
+
+    /* sublane labels and their separators */
+    p.push(`<g id="lane-${esc(lane.country)}-sublane-labels">`);
+    lane.sublanes.forEach((sl, i) => {
+      const cy = sl.top + sl.h / 2;
+      p.push(`<text x="${L.ML-10}" y="${(cy+3.5).toFixed(1)}" font-size="11" fill="#5a636e" text-anchor="end">${esc(label(sl.sector))}`
+           + ` <tspan fill="#b3b8bd">${sl.rows.reduce((a, r) => a + r.events.length, 0)}</tspan></text>`);
+      if (i) p.push(`<line x1="${L.ML}" y1="${(sl.top-L.sublaneGap/2).toFixed(1)}" x2="${L.W-L.MR}" y2="${(sl.top-L.sublaneGap/2).toFixed(1)}" stroke="#f1efe8" stroke-width="1"/>`);
+    });
+    p.push(`</g>`);
+
+    /* duration bars first, so markers sit on top of them */
+    p.push(`<g id="lane-${esc(lane.country)}-duration-bars">`);
+    lane.sublanes.forEach(sl => sl.rows.forEach((row, ri) => row.events.forEach(e => {
+      const [a, b] = barSpan(e), y = sl.top + ri * L.rowH + L.rowH / 2;
+      const x = X(a), w = Math.max(1.5, X(b) - X(a));
+      p.push(`<rect class="bar" data-id="${esc(e.id)}" x="${x.toFixed(1)}" y="${(y-L.barH/2).toFixed(1)}"`
+           + ` width="${w.toFixed(1)}" height="${L.barH}"`
+           + ` rx="1.5" fill="${PAL[e.direction] || "#000000"}" opacity="0.2"/>`);
+    })));
+    p.push(`</g>`);
+
+    /* succession ticks sit under the markers: they are context, not a mark */
+    p.push(`<g id="lane-${esc(lane.country)}-successions">`);
+    lane.events.filter(e => e.supersedes && POS[e.supersedes]).forEach(e =>
+      p.push(tick(POS[e.id], POS[e.supersedes], e.id, e.supersedes)));
+    p.push(`</g>`);
+
+    p.push(`<g id="lane-${esc(lane.country)}-markers">`);
+    lane.sublanes.forEach(sl => sl.rows.forEach((row, ri) => row.events.forEach(e => {
+      const y = sl.top + ri * L.rowH + L.rowH / 2;
+      p.push(`<g class="mk" data-id="${esc(e.id)}">${whisker(e, y)}${marker(e, X(mid(e)), y)}</g>`);
+    })));
+    p.push(`</g>`);
+
+    p.push(`<g id="lane-${esc(lane.country)}-reversals">`);
+    lane.events.filter(e => e.reverses && POS[e.reverses]).forEach(e =>
+      p.push(arc(POS[e.id], POS[e.reverses], e.id, e.reverses)));
+    p.push(`</g>`);
+
+    /* the government band, directly under its own lane. Tint flips whenever the
+       party or coalition changes, so a bar crossing a tint boundary is a bar
+       that outlived a change of government. */
+    p.push(`<g id="lane-${esc(lane.country)}-governments">`);
+    const segs = GOVERNMENTS.filter(g => g.country === lane.country)
+                            .sort((a, b) => t(a.start_date) - t(b.start_date));
+    let tint = 0, prev = null;
+    segs.forEach(g => {
+      if (prev !== null && g.party_or_coalition !== prev) tint ^= 1;
+      prev = g.party_or_coalition;
+      const a = Math.max(t(g.start_date), T0), b = Math.min(g.end_date ? t(g.end_date) : T1, T1);
+      if (b <= a) return;
+      const x = X(a), w = X(b) - X(a);
+      p.push(`<rect x="${x.toFixed(1)}" y="${lane.bandTop.toFixed(1)}" width="${w.toFixed(1)}" height="${L.bandH}"`
+           + ` fill="${tint ? "#d7d3c8" : "#eceae2"}" stroke="#ffffff" stroke-width="0.6"`
+           + ` data-tip="${esc(g.pm_name)}|${esc(g.party_or_coalition)}<br>${esc(g.start_date)} — ${esc(g.end_date || "still in office")}"/>`);
+      // the surname is written in wherever it fits, so the band still reads on
+      // paper and in the exported figure, where there is no hover
+      const sur = g.pm_name.split(" ").pop();
+      if (w > sur.length * 5.6 + 8)
+        p.push(`<text x="${(x+w/2).toFixed(1)}" y="${(lane.bandTop+L.bandH/2+3.5).toFixed(1)}" font-size="9.5" fill="#5a636e" text-anchor="middle" pointer-events="none">${esc(sur)}</text>`);
+    });
+    p.push(`<text x="${L.ML-10}" y="${(lane.bandTop+L.bandH/2+3.5).toFixed(1)}" font-size="10" fill="#9aa0a8" text-anchor="end">government</text>`);
+    p.push(`</g>`);
+
+    p.push(`</g>`);
+  });
+
+  p.push(legend(events, H));
+  p.push(`</svg>`);
+  return p.join("");
+}
+
+const nowISO = () => new Date().toISOString().slice(0, 10);
+
+/* The key is drawn inside the figure, from the values actually present, so it
+   travels with the exported SVG. */
+function legend(events, H){
+  const y = H - L.footH + 40;
+  const p = [`<g id="key">`];
+  let x = L.ML;
+  p.push(`<text x="${L.ML-10}" y="${(y+3.5).toFixed(1)}" font-size="10" fill="#9aa0a8" text-anchor="end">key</text>`);
+  const statuses = Object.keys(SHAPE).filter(s => events.some(e => e.legal_status === s));
+  statuses.forEach(s => {
+    p.push(marker({direction: "neutral", legal_status: s}, x + L.r, y));
+    p.push(`<text x="${(x+2*L.r+5).toFixed(1)}" y="${(y+3.5).toFixed(1)}" font-size="10" fill="#5a636e">${esc(label(s))}</text>`);
+    x += 2 * L.r + 9 + label(s).length * 5.4 + 14;
+  });
+  x = L.ML;
+  const dirs = Object.keys(PAL).filter(d => events.some(e => e.direction === d));
+  dirs.forEach(d => {
+    p.push(`<rect x="${x.toFixed(1)}" y="${(y+14).toFixed(1)}" width="16" height="7" rx="1.5" fill="${PAL[d]}" opacity="0.2"/>`);
+    p.push(`<circle cx="${(x+8).toFixed(1)}" cy="${(y+17.5).toFixed(1)}" r="${L.r}" fill="${PAL[d]}" stroke="#ffffff" stroke-width="0.9"/>`);
+    p.push(`<text x="${(x+22).toFixed(1)}" y="${(y+21).toFixed(1)}" font-size="10" fill="#5a636e">${esc(label(d))}</text>`);
+    x += 22 + label(d).length * 5.4 + 16;
+  });
+  x = L.ML;
+  const item = (mark, text) => {
+    p.push(mark);
+    p.push(`<text x="${(x+30).toFixed(1)}" y="${(y+38).toFixed(1)}" font-size="10" fill="#5a636e">${esc(text)}</text>`);
+    x += 30 + text.length * 5.4 + 16;
+  };
+  const ky = y + 34.5;
+  if (events.some(e => e.reverses))
+    item(arc({x: x + 2, y: ky + 4, laneArcTop: ky - 6}, {x: x + 24, y: ky + 4, laneArcTop: ky - 6}),
+         "reverses an earlier decision");
+  if (events.some(e => e.supersedes))
+    item(tick({x: x + 2, y: ky + 3}, {x: x + 24, y: ky + 3}), "supersedes it (same instrument, re-issued)");
+  if (events.some(e => e.date_precision !== "day"))
+    item(`<path d="M${x+2} ${ky-3}V${ky+3}M${x+2} ${ky}H${x+24}M${x+24} ${ky-3}V${ky+3}"`
+       + ` stroke="${PAL.neutral}" stroke-width="1.1" fill="none"/>`,
+         "date known only to the year or month");
+  if (events.some(e => e.confidence === "uncertain"))
+    item(marker({direction: "neutral", legal_status: "binding_secondary_legislation", confidence: "uncertain"}, x + 12, ky),
+         "uncertain");
+  p.push(`<text x="${L.W-L.MR}" y="${(y+21).toFixed(1)}" font-size="9.5" fill="#b3b8bd" text-anchor="end">shape = legal status · colour = direction · bar = time in force</text>`);
+  p.push(`</g>`);
+  return p.join("");
+}
+
+/* ── detail cards ───────────────────────────────────────────────────────────
+   One card per plotted event, carrying every field the dataset populates for it.
+   A field that is null is left out rather than printed as an em dash: null means
+   the question does not apply to that instrument, and inventing a row for it
+   would suggest the answer is missing.
+
+   The anchor is the event id and nothing else, so a citation survives the plot
+   being re-sorted, re-filtered or re-ordered. */
+const FIELDS = [
+  "date", "date_precision", "date_basis", "instrument_type", "legal_status", "binds_whom",
+  "has_interim_targets", "has_independent_review_body", "sector", "direction",
+  "still_in_force", "end_date", "years_in_force", "government_at_adoption",
+  "governments_since_adoption", "reverses", "supersedes", "confidence", "title_en_source",
+];
+const ENUMS = ["country", "date_precision", "date_basis", "instrument_type", "legal_status",
+               "binds_whom", "direction", "sector", "confidence", "title_en_source"];
+const byId = Object.fromEntries(EVENTS.map(e => [e.id, e]));
+
+function value(e, k){
+  const v = e[k];
+  if (v === null || v === undefined || v === "") return null;
+  if (typeof v === "boolean") return v ? "yes" : "no";
+  if (k === "reverses" || k === "supersedes")
+    return `<a href="#${esc(v)}">${esc(v)}</a> — ${esc(byId[v] ? (byId[v].title_en || byId[v].title_original) : "not in this dataset")}`;
+  if (ENUMS.includes(k)) return esc(label(v));
+  return esc(v);
+}
+
+function card(e){
+  const rows = FIELDS.map(k => [k, value(e, k)]).filter(([, v]) => v !== null);
+  const dated = e.date_precision === "day" ? e.date : e.date;   // shown at its own precision
+  return `<details class="card" id="${esc(e.id)}">
+    <summary><span class="eid">${esc(e.id)}</span>
+      <h2>${esc(e.title_en || e.title_original)}${
+        e.title_original && e.title_original !== e.title_en
+          ? `<span class="orig">${esc(e.title_original)}</span>` : ""}</h2>
+      <span class="when">${esc(dated)}</span>
+      <span class="dir" style="background:${PAL[e.direction] || "#000"}">${esc(label(e.direction))}</span>
+    </summary>
+    <div class="body">
+      <table class="kv"><tbody>
+        ${rows.map(([k, v]) => `<tr><th>${esc(label(k))}</th><td>${v}</td></tr>`).join("")}
+      </tbody></table>
+
+      <h3 class="sec">Why it is classed ${esc(label(e.direction).toLowerCase())}</h3>
+      <p class="prose">${esc(e.direction_basis)}</p>
+
+      <h3 class="sec">What changed</h3>
+      <p class="prose">${esc(e.quantified_change)}</p>
+
+      ${e.notes ? `<h3 class="sec">Notes</h3><p class="prose">${esc(e.notes)}</p>` : ""}
+
+      <h3 class="sec">Source</h3>
+      <div class="cite"><b>${esc(e.source_title)}</b>
+        <div class="d">${esc(e.source_publisher)} · ${esc(e.source_date)}</div>
+        <a href="${esc(e.source_url)}" target="_blank" rel="noopener">${esc(e.source_url)}</a></div>
+
+      <p class="permalink">Cite this decision: <code>policy_timeline.html#${esc(e.id)}</code></p>
+    </div></details>`;
+}
+
+/* ── the text equivalent ───────────────────────────────────────────────────
+   The same rows the figure draws, in the same order and under the same filters.
+   A timeline is a picture of a table; anyone who cannot use the picture, or
+   would rather not, should not be reading a worse version of the data. */
+const COLS = ["id", "country", "date", "title_en", "title_original", "sector", "instrument_type",
+              "legal_status", "direction", "still_in_force", "end_date", "years_in_force",
+              "government_at_adoption", "governments_since_adoption", "reverses", "supersedes"];
+
+function table(events){
+  const cell = (e, k) => {
+    const v = e[k], cls = `c-${k}`;
+    if (k === "id") return `<td class="id ${cls}"><a href="#${esc(e.id)}">${esc(e.id)}</a></td>`;
+    if (v === null || v === undefined || v === "") return `<td class="${cls}"></td>`;
+    if (typeof v === "boolean") return `<td class="${cls}">${v ? "yes" : "no"}</td>`;
+    if (typeof v === "number") return `<td class="num ${cls}">${v}</td>`;
+    return `<td class="${cls}">${ENUMS.includes(k) ? esc(label(v)) : esc(v)}</td>`;
+  };
+  return `<table><caption>${events.length} plotted decisions, ${
+    LANE_ORDER.map(c => `${c} ${events.filter(e => e.country === c).length}`).join(" · ")}</caption>
+    <thead><tr>${COLS.map(k => `<th scope="col" class="c-${esc(k)}">${esc(label(k))}</th>`).join("")}</tr></thead>
+    <tbody>${sortRows(events).map(e =>
+      `<tr>${COLS.map(k => cell(e, k)).join("")}</tr>`).join("")}</tbody></table>`;
+}
+
+const sortRows = evs => evs.slice().sort(
+  (a, b) => LANE_ORDER.indexOf(a.country) - LANE_ORDER.indexOf(b.country)
+         || t(a.date) - t(b.date) || a.id.localeCompare(b.id));
+
+/* ── filters ───────────────────────────────────────────────────────────────
+   Four independent facets, each offering only the values the data actually
+   contains. Filtering changes which events are drawn and which rows the table
+   carries; it never touches T0 or T1, so the axis does not move under the
+   reader and two filter states stay comparable. The cards below are the citable
+   register and are always complete, so a filter can never break a citation. */
+const FACETS = ["country", "sector", "direction", "legal_status"];
+const VALUES = {};
+FACETS.forEach(f => {
+  const order = f === "country" ? LANE_ORDER : f === "sector" ? SECTOR_ORDER
+              : f === "direction" ? Object.keys(PAL) : Object.keys(SHAPE);
+  const present = [...new Set(EVENTS.map(e => e[f]))];
+  VALUES[f] = order.filter(v => present.includes(v)).concat(present.filter(v => !order.includes(v)));
+});
+const FILTER = {};
+FACETS.forEach(f => { FILTER[f] = new Set(VALUES[f]); });
+
+const passes = e => FACETS.every(f => FILTER[f].has(e[f]));
+
+function filterUI(){
+  return FACETS.map(f => {
+    const swatch = v => f === "direction" ? ` style="--c:${PAL[v]}"` : "";
+    const dot = v => f === "direction" ? "<i></i>" : "";
+    return `<div class="frow"><span class="flab">${esc(label(f))}</span>`
+      + VALUES[f].map(v =>
+          `<button class="chip${FILTER[f].has(v) ? " on" : ""}" data-facet="${esc(f)}" data-value="${esc(v)}"`
+          + `${swatch(v)} aria-pressed="${FILTER[f].has(v)}">${dot(v)}${esc(label(v))}</button>`).join("")
+      + `<button class="chip" data-facet="${esc(f)}" data-value="*">All</button></div>`;
+  }).join("");
+}
+
+/* ── hit targets ───────────────────────────────────────────────────────────
+   A transparent circle, one per marker, so a 4 px diamond is as easy to hit as
+   a square. It is what carries the click, the hover, the tab stop and the
+   accessible name, and it is stripped from the SVG export the same way the
+   evidence page strips its hover rectangles. */
+function hitLayer(events){
+  return `<g id="hits">` + events.filter(e => POS[e.id]).map(e => {
+    const name = `${e.id}. ${e.title_en || e.title_original}. ${e.date}. `
+      + `${label(e.direction)}, ${label(e.legal_status)}, ${label(e.sector)}.`;
+    const tip = `${esc(e.title_en || e.title_original)} (${esc(e.id)})|${esc(e.date)} · `
+      + `${esc(label(e.direction))} · ${esc(label(e.legal_status))}<br>${esc(label(e.sector))} · `
+      + `${e.still_in_force ? "still in force" : "ended " + esc(e.end_date || "—")}`;
+    return `<circle class="hit" tabindex="0" role="button" cx="${POS[e.id].x.toFixed(1)}"`
+      + ` cy="${POS[e.id].y.toFixed(1)}" r="6.5" fill="transparent" data-id="${esc(e.id)}"`
+      + ` aria-label="${esc(name)}" data-tip="${tip}"/>`;
+  }).join("") + `</g>`;
+}
+
+/* ── paint ─────────────────────────────────────────────────────────────────
+   One function rebuilds the figure, its hit layer, the caption and the table
+   from the current filter state. The cards are built once and left alone. */
+function paint(){
+  const shown = PLOTTED.filter(passes);
+  const wrap = document.getElementById("plotwrap");
+  if (!shown.length){
+    wrap.innerHTML = `<p class="blocknote">No decision matches this combination of filters.</p>`;
+  } else {
+    wrap.innerHTML = plot(shown);
+    document.getElementById("timeline").insertAdjacentHTML("beforeend", hitLayer(shown));
+  }
+  document.getElementById("filters").innerHTML = filterUI();
+  document.getElementById("cap").textContent =
+    `${shown.length} of ${PLOTTED.length} decisions · ${new Date(T0).getUTCFullYear()}–`
+    + `${new Date(T1-1).getUTCFullYear()} · `
+    + LANE_ORDER.map(c => `${c} ${shown.filter(e => e.country === c).length}`).join(" · ");
+  document.getElementById("plotnote").innerHTML =
+    `The axis is fixed to the full range of the dataset and does not rescale when the filters change, `
+    + `so two filter states can be compared directly.`
+    + `<span class="onscreen"> Click or tab to a marker for its card.</span>`;
+  document.getElementById("tablewrap").innerHTML = table(shown);
+}
+
+/* ── derived figures ───────────────────────────────────────────────────────
+   Four measures the manuscript leans on, each computed here and each stating
+   its own rule, because "durable" and "weakened" are definitions before they
+   are numbers and a reader is entitled to argue with the definition. */
+const years = (a, b) => (t(b) - t(a)) / YEAR;
+const SUPERSEDED = new Set(EVENTS.filter(e => e.supersedes).map(e => e.supersedes));
+
+function derivedRows(){
+  const per = fn => LANE_ORDER.map(c => fn(PLOTTED.filter(e => e.country === c), c));
+
+  const longLived = per(evs => evs.filter(e => e.still_in_force && e.years_in_force > 20));
+  // Only an explicit reversal counts. Counting every instrument that simply
+  // stopped inside ten years would sweep in the temporary Swedish fuel-tax
+  // measures, which expire on a date fixed when they were adopted, and the 1980
+  // referendum, which ended when it was decided: that would inflate Sweden's
+  // count with planned sunsets and flatter the argument the page is making.
+  // The dataset marks no field for "temporary", so the rule stays narrow.
+  const undone = per(evs => evs.filter(e =>
+    EVENTS.some(x => x.reverses === e.id && years(e.date, x.date) <= 10)));
+  const oldest = per(evs => evs.reduce((a, b) => b.years_in_force > a.years_in_force ? b : a));
+  const arcs = per(evs => evs.filter(e => e.reverses));
+
+  return [
+    ["Instruments continuously in force for more than twenty years",
+     longLived.map(g => `${g.length}`),
+     `still_in_force is true and years_in_force > 20`],
+    ["Instruments weakened or repealed within ten years of adoption",
+     undone.map(g => `${g.length}`),
+     `a later decision's reverses field names it, within ten years of its adoption; planned `
+     + `expiries and ordinary plan succession are excluded, since the dataset does not mark them`],
+    ["Longest-lived instrument, and the governments it has crossed",
+     oldest.map(e => `${e.id} <span>· ${e.years_in_force} years · ${e.governments_since_adoption} governments</span>`),
+     `the largest years_in_force in the lane; governments_since_adoption counts distinct prime `
+     + `ministers taking office after it was adopted`],
+    ["Reversal arcs drawn",
+     arcs.map(g => `${g.length}`),
+     `decisions whose reverses field names an earlier decision`],
+  ];
+}
+
+function derivedTable(){
+  return `<table><thead><tr><th scope="col">Measure</th>`
+    + LANE_ORDER.map(c => `<th scope="col" class="lane">${esc(c)}</th>`).join("")
+    + `<th scope="col">How it is computed</th></tr></thead><tbody>`
+    + derivedRows().map(([name, vals, how]) =>
+        `<tr><td class="m">${esc(name)}</td>${vals.map(v => `<td class="v">${v}</td>`).join("")}`
+        + `<td class="how">${esc(how)}</td></tr>`).join("")
+    + `</tbody></table>`;
+}
+
+/* ── SVG export ────────────────────────────────────────────────────────────
+   The figure is the source of a manuscript figure, so the export has to open in
+   Illustrator as an editable drawing: text stays as text, and the groups keep
+   their names (lane-SE-markers, lane-JP-duration-bars, axis, key) so a lane can
+   be restyled or switched off without hunting through anonymous paths. The hit
+   layer and any hover state go, since neither means anything on paper. */
+function svgStringOf(el){
+  const s = el.cloneNode(true);
+  s.removeAttribute("class");
+  s.classList && s.classList.remove("focusing");
+  const hits = s.querySelector("#hits");
+  if (hits) hits.remove();
+  s.querySelectorAll(".hi").forEach(n => n.classList.remove("hi"));
+  s.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(s);
+}
+
+document.getElementById("export-svg").addEventListener("click", () => {
+  const el = document.getElementById("timeline");
+  if (!el) return;
+  const shown = PLOTTED.filter(passes).length;
+  const url = URL.createObjectURL(new Blob([svgStringOf(el)], {type: "image/svg+xml;charset=utf-8"}));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `policy_timeline_${shown}of${PLOTTED.length}.svg`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+});
+
+/* ── render ── */
+const PLOTTED = EVENTS.filter(e => e.confidence !== "not_found");
+document.getElementById("cards").innerHTML = sortRows(PLOTTED).map(card).join("");
+document.getElementById("cardnote").textContent =
+  `${PLOTTED.length} cards, one per plotted decision, in lane order and then by date. Each carries every `
+  + `field the dataset populates for that decision and a link to the source it was read from. The `
+  + `register is always complete: the filters above change the figure and the table, never this list. `
+  + `Card order and marker position can change as the dataset grows — the anchor, which is the `
+  + `decision's id, does not, so cite the anchor.`;
+paint();
+document.getElementById("derived").innerHTML = derivedTable();
+
+/* ── what was looked for and not found ─────────────────────────────────────
+   An absence has to be as visible as a finding, or the page quietly asserts
+   that everything asked was answered. Two things are shown: any event the
+   dataset marks confidence "not_found", which is plotted nowhere and would
+   otherwise vanish, and the open questions the dataset carries in prose —
+   where a Japanese counterpart to the Swedish climate policy council was
+   looked for and none was located, and where official chronologies publish
+   only a year. Both are read from the dataset file, not written here. */
+const NOT_FOUND = EVENTS.filter(e => e.confidence === "not_found");
+document.getElementById("soughtnote").textContent =
+  `${PLOTTED.length} of ${EVENTS.length} decisions are plotted and ${NOT_FOUND.length} `
+  + `${NOT_FOUND.length === 1 ? "is" : "are"} listed here as sought but not verified — the two sum to `
+  + `${PLOTTED.length + NOT_FOUND.length}, the size of the dataset. `
+  + (NOT_FOUND.length
+      ? `Each is shown with what was looked for and the source that was checked.`
+      : `No decision in the dataset is marked not_found, so nothing is missing from the figure for `
+        + `that reason. The open questions the dataset records — where something was sought and not `
+        + `located, and where a source publishes only a year — are reproduced below verbatim.`);
+document.getElementById("sought").innerHTML =
+  NOT_FOUND.map(e => `<div class="cite"><b>${esc(e.title_en || e.title_original)} (${esc(e.id)})</b>
+    <div class="d">${esc(e.notes)}</div>
+    <a href="${esc(e.source_url)}" target="_blank" rel="noopener">${esc(e.source_url)}</a></div>`).join("")
+  + `<pre>${esc(OPEN_QUESTIONS)}</pre>`;
+
+document.getElementById("filters").addEventListener("click", ev => {
+  const chip = ev.target.closest(".chip");
+  if (!chip) return;
+  const {facet, value} = chip.dataset;
+  if (value === "*") FILTER[facet] = new Set(VALUES[facet]);
+  else if (FILTER[facet].has(value)) FILTER[facet].delete(value);
+  else FILTER[facet].add(value);
+  // emptying a facet would blank the figure with no way back, so the last chip
+  // turned off restores the whole facet instead
+  if (!FILTER[facet].size) FILTER[facet] = new Set(VALUES[facet]);
+  paint();
+});
+
+/* ── click and keyboard ────────────────────────────────────────────────────
+   Every marker is a tab stop carrying its own accessible name, and Enter or
+   Space opens its card — the same thing a click does. */
+document.addEventListener("click", ev => {
+  const hit = ev.target.closest && ev.target.closest("svg.fig .hit");
+  if (hit) goTo(hit.dataset.id);
+});
+document.addEventListener("keydown", ev => {
+  const hit = ev.target.closest && ev.target.closest("svg.fig .hit");
+  if (!hit || (ev.key !== "Enter" && ev.key !== " ")) return;
+  ev.preventDefault();
+  goTo(hit.dataset.id);
+});
+
+/* ── hovering an event brings out what it is connected to ──────────────────
+   The partners of an event are the ones it reverses or supersedes and the ones
+   that reverse or supersede it, so the relation reads in both directions. */
+function partners(id){
+  const e = byId[id], set = new Set([id]);
+  if (e && e.reverses) set.add(e.reverses);
+  if (e && e.supersedes) set.add(e.supersedes);
+  EVENTS.forEach(x => { if (x.reverses === id || x.supersedes === id) set.add(x.id); });
+  return set;
+}
+
+function highlight(id){
+  const svg = document.getElementById("timeline");
+  if (!svg) return;
+  svg.querySelectorAll(".hi").forEach(n => n.classList.remove("hi"));
+  if (!id){ svg.classList.remove("focusing"); return; }
+  const set = partners(id);
+  svg.classList.add("focusing");
+  svg.querySelectorAll(".mk,.bar").forEach(n => { if (set.has(n.dataset.id)) n.classList.add("hi"); });
+  svg.querySelectorAll(".arc,.tick").forEach(n => {
+    if (n.dataset.a === id || n.dataset.b === id) n.classList.add("hi");
+  });
+}
+
+document.addEventListener("mouseover", ev => {
+  const hit = ev.target.closest && ev.target.closest("svg.fig .hit");
+  highlight(hit ? hit.dataset.id : null);
+});
+document.addEventListener("focusin", ev => {
+  const hit = ev.target.closest && ev.target.closest("svg.fig .hit");
+  if (hit) highlight(hit.dataset.id);
+});
+document.addEventListener("focusout", ev => {
+  if (ev.target.closest && ev.target.closest("svg.fig .hit")) highlight(null);
+});
+
+/* ── tooltips, same mechanism as the other two pages ── */
+const tip = document.getElementById("tip");
+document.addEventListener("mousemove", ev => {
+  const el = ev.target.closest && ev.target.closest("[data-tip]");
+  if (!el){ tip.style.display = "none"; return; }
+  const parts = el.getAttribute("data-tip").split("|");
+  tip.innerHTML = `<b>${parts[0]}</b><br>${parts[1]}`;
+  tip.style.display = "block";
+  tip.style.left = Math.min(ev.clientX + 14, window.innerWidth - 350) + "px";
+  tip.style.top = (ev.clientY + 16) + "px";
+});
+window.addEventListener("scroll", () => { tip.style.display = "none"; }, {passive: true});
+
+/* a card addressed by its anchor opens itself and scrolls into view, so a
+   citation link lands on an open card rather than a closed one */
+const cards = () => document.querySelectorAll("details.card");
+const setAll = open => cards().forEach(d => { d.open = open; });
+document.getElementById("expand-all").addEventListener("click", () => setAll(true));
+document.getElementById("collapse-all").addEventListener("click", () => setAll(false));
+
+/* Open a card and put it on screen. The scroll offset is computed rather than
+   left to scrollIntoView, which picks its own scroll container and lands far off
+   when the target is deep in a page of ninety-four cards. The address bar is
+   updated so the card can be copied as a citation, but a sandbox that refuses
+   history writes must not stop the card from opening. */
+function goTo(id){
+  const el = document.getElementById(id);
+  if (!el || el.tagName !== "DETAILS") return;
+  el.open = true;
+  requestAnimationFrame(() => {
+    window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 14);
+  });
+  try { history.replaceState(null, "", "#" + encodeURIComponent(id)); } catch (err){ /* file:// */ }
+}
+
+function openHash(){
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (id) goTo(id);
+}
+window.addEventListener("hashchange", openHash);
+openHash();
+
+/* The evidence page expands its cards before printing; this page does the
+   opposite and leaves them out of the printout altogether. Ninety-four expanded
+   cards would be fifty sheets of paper wrapped around the one figure the print
+   stylesheet exists to produce. */
+document.getElementById("cap").textContent =
+  `${plotted.length} decisions · ${new Date(T0).getUTCFullYear()}–${new Date(T1-1).getUTCFullYear()} · `
+  + LANE_ORDER.map(c => `${c} ${plotted.filter(e => e.country === c).length}`).join(" \u00b7 ");
+</script>
+</body>
+</html>

@@ -14,6 +14,7 @@ Created for the **MIRAI Research Group · Kyushu University**.
 | `energy_sankey_data.xlsx` | All numbers for all 55 datasets (3,170 flows), with the full derivation trail and balance checks. |
 | `scripts/` | The extraction and build pipeline — the authoritative record of how every number was produced. `derive_se.py` reads the Swedish PxWeb API, `derive_jp.py` the METI workbook. |
 | `evidence.html` | **Supporting data.** One card per factual claim in the manuscript: the simple fact as drafted, a verdict tested against the statistics, a figure with a per-carrier pill switch, the numbers, the derivation, caveats and a full citation. Each card has a permalink the paper can cite. |
+| `policy_timeline.html` | **Policy history.** Every Swedish and Japanese energy and climate policy decision 1974–present on one shared time axis: marker shape for legal status, colour for direction of travel, a bar for how long each instrument stayed in force, and a government band under each lane. Reversal arcs, filters, a card per decision with a citable anchor, a text-equivalent table and an Illustrator-ready SVG export. |
 | `energy_sankey_2023.html` | Frozen 2023-only earlier version, kept so existing links and citations stay valid. |
 
 ---
@@ -32,11 +33,12 @@ scripts that produced it:
 ```bash
 python3 scripts/export.py && python3 scripts/build_html.py && python3 scripts/build_xlsx.py
 python3 scripts/derive_claims.py && python3 scripts/build_evidence.py
+python3 scripts/build_policy_timeline.py
 git add -A && git commit -m "..." && git push
 ```
 
 Give it a minute after pushing: GitHub Pages rebuilds on its own, and a hard reload may be needed to get
-past a cached copy of `energy_sankey.html` or `evidence.html`.
+past a cached copy of `energy_sankey.html`, `evidence.html` or `policy_timeline.html`.
 
 ---
 
@@ -561,7 +563,140 @@ Population comes from `scripts/fetch_pop.py` — SCB's PxWeb API for Sweden and 
 published 人口推計 table for Japan, both put on a mid-period basis so the denominator matches the energy
 year.
 
-## 7. Repository layout
+## 7. Policy timeline page
+
+`policy_timeline.html` is a **policy history**, separate from the other two pages because it answers a third
+question: not "what does the energy system look like" and not "does this sentence survive the data", but
+"what did each country actually decide, and did the decision last". All three are linked by the shared nav
+bar.
+
+The manuscript's finding is that **formal legal bindingness and actual policy durability are dissociable**.
+Sweden has a Climate Act, binding interim targets and an independent climate policy council, and has still
+cut fuel taxes and the biofuel reduction obligation. Japan has weaker framework legislation and has still
+sustained industrial energy programmes across decades and many changes of government. The page is built so
+that a reader sees that without being told: Japan's lanes are long unbroken bars crossing many changes of
+government, and Sweden's lane ends in a cluster of weakening decisions inside a single government's term.
+
+### The dataset
+
+`sources/policy/policy_history_dataset.md` — **94 decisions (Sweden 37, Japan 57) and 42 government
+segments**, 1974 to the present, written by `sources/policy/build_dataset.mjs`. It is a research document
+rather than a data file: two fenced `json` blocks followed by an `open_questions` section in prose. The
+build script parses all three and carries the prose through to the page, because that is where the things
+that were looked for and **not** found are recorded.
+
+Each decision carries its date and the precision that date is actually known to, the original-language
+title and an English one, instrument type, legal status, who it binds, sector, direction of travel with the
+reasoning for that classification, what quantitatively changed, whether it is still in force, how long it
+lasted, which government adopted it, how many have passed since, a full citation, and any decision it
+reverses or supersedes.
+
+### How it is drawn
+
+Both countries share **one horizontal time axis and one pixel scale** — never independent scales — running
+from the earliest decision to the end of the current year, computed at load. Sweden is the upper lane,
+Japan the lower, each split into sublanes by sector and each with a **government band** beneath it, tinted
+alternately and re-tinted whenever the party or coalition changes. A bar crossing a tint boundary is an
+instrument that outlived a change of government, which is the whole comparison in one mark.
+
+| Channel | Carries |
+|---|---|
+| Marker **shape** | Legal status — filled square statute, filled circle binding secondary legislation, open circle administratively binding, small diamond non-binding plan, triangle political declaration |
+| Marker **colour** | Direction — blue strengthening, vermillion weakening, purple restructuring, grey neutral, from the Okabe–Ito colourblind-safe palette |
+| **Bar** behind the marker | How long the instrument stayed in force, running to the right edge if it still is |
+| **Vermillion arc**, arrowhead at the target | This decision reversed that one (15 arcs) |
+| **Grey dotted connector** | This decision superseded that one — the Japanese plan-revision chain as continuity, not as change (22 ticks) |
+| **Whisker** instead of a point | The source publishes only a year or a month, so the marker spans the interval rather than claiming a day (13 decisions) |
+| **Dashed marker outline** | `confidence: uncertain` — implemented and tested, currently unused: all 94 decisions are verified |
+
+Shape and colour are independent channels and are never collapsed, so no distinction is carried by colour
+alone. Every decision gets **its own packed row** inside its sublane — 23 rows for Sweden, 45 for Japan —
+because instruments that overlap in time cannot share one, and Japan's cross-cutting sublane alone needs
+twenty-four. That thickness is the durability comparison rather than an accident of layout.
+
+Filters cover country, sector, direction and legal status, offering only values the data contains. They
+apply to both lanes at once and **never rescale the axis**, so two filter states can be compared directly;
+a lane the filters empty keeps its government band and says so, because a missing lane reads as an
+oversight while an empty one reads as a finding. Filtering to *weakening* is the shortest statement of the
+argument the page can make: **Sweden 14, Japan 0**.
+
+Hovering or tabbing to a marker fades everything except that decision and its partners — what it reverses
+or supersedes, and what reverses or supersedes it. Every marker is a tab stop with its own accessible name,
+Enter or Space opens its card, and the focus ring is drawn rather than outlined, because an SVG `outline`
+is clipped by the viewBox exactly on the edge markers where it is most needed.
+
+### Cards, anchors and the table
+
+Below the figure, **one card per decision** carrying every field the dataset populates for it, the
+reasoning behind its direction, what changed, the notes, and the source with publisher and date. A null
+field is left out rather than printed as a dash: null means the question does not apply to that instrument.
+Clicking or tabbing to a marker opens its card.
+
+Each card's anchor is **the decision's id and nothing else** — `policy_timeline.html#SE-0003` — so the
+manuscript can cite it. Cards are sorted by lane and date, so card order and id order do not coincide, and
+neither is stable as the dataset grows. **The anchor is.** The filters change the figure and the table but
+never the card register, so a filter can never break a citation.
+
+The same events are repeated as a **text-equivalent table**, in the same order and under the same filters,
+for screen readers and for anyone who would rather read the data than look at it.
+
+### Derived figures, and what is missing
+
+Four measures are computed on load and none is typed in. Each states its own rule on the page, so a reader
+can disagree with the definition rather than with the number:
+
+| Measure | SE | JP | Rule |
+|---|---|---|---|
+| Continuously in force > 20 years | 3 | 9 | `still_in_force` and `years_in_force > 20` |
+| Weakened or repealed within 10 years | 5 | 2 | a later decision's `reverses` names it, within ten years |
+| Longest-lived instrument | SE-0003, 35 y, 7 governments | JP-0003, 47 y, 23 governments | largest `years_in_force`; governments counted as distinct PMs taking office since |
+| Reversal arcs | 7 | 8 | decisions whose `reverses` names an earlier decision |
+
+The second rule is deliberately narrow. Counting every instrument that merely *ended* within ten years
+gives Sweden 13 — but that sweeps in six temporary fuel-tax measures which expire on a date fixed when they
+were adopted, and the 1980 referendum, which "ended" when it was decided. Those are planned sunsets, not
+weakenings, and counting them would inflate Sweden's number in exactly the direction that flatters the
+argument. The dataset marks no "temporary" field, so the rule stays with explicit reversals.
+
+A **Sought but not verified** block sits below the figure. No decision in the dataset is marked
+`not_found`, and the page says so and prints the arithmetic — 94 plotted + 0 sought = 94, the size of the
+array — rather than leaving the reader to assume everything asked was answered. The dataset's own open
+questions are reproduced verbatim underneath, including the one that matters most: no Japanese counterpart
+to Klimatpolitiska rådet was located, and the closest candidates are executive self-review rather than
+independent assessment.
+
+### Validation, export and print
+
+The build **validates before it renders** and prints the report every time. It confirms that every
+`reverses` and `supersedes` id resolves to a real decision and points backwards in time, that every date
+parses and matches its stated precision, that every country in the events appears in the governments, that
+government segments neither overlap nor leave gaps, and that no controlled vocabulary contains an
+unexpected value. Anomalies are reported, never dropped: two cross-sector reversal arcs, two real gaps
+between governments (Palme to Carlsson, one day; Ohira to Suzuki, thirty-five) and two Swedish measures
+that are `still_in_force` and also carry a future `end_date`. Errors stop the build; these six do not.
+
+The **SVG export** takes the figure at its current filter state, with text as live text and groups named by
+lane and channel — `lane-SE-markers`, `lane-JP-duration-bars`, `axis`, `key` — so a lane can be restyled or
+switched off in Illustrator without hunting through anonymous paths. This page is the source of a
+manuscript figure, so the export is a deliverable rather than an afterthought.
+
+The **print stylesheet** produces a single static sheet: A4 landscape, the figure fitted to the height of
+the page (it is nearly square, so width-fitting would spill onto a second sheet), controls and cards and
+the full table suppressed, derived figures on the sheet behind. At one A4 sheet the smallest labels land
+around 4 pt — that is the arithmetic of 94 decisions on one page, and A3 or the SVG export is the route to
+anything larger.
+
+```bash
+python3 scripts/build_policy_timeline.py
+```
+
+Nothing about a policy is written into the template. Grepping it for distinctive values from the dataset —
+`1990:582`, `Reinfeldt`, `1979-06-22`, `Barsebäck` — returns nothing; they appear only in the generated
+page, inside the injected JSON.
+
+---
+
+## 8. Repository layout
 
 ```
 energy_sankey.html         published page (generated — edit scripts/template.html, not this)
@@ -579,8 +714,10 @@ scripts/
   fetch_co2.py             Global Carbon Budget (via OWID) -> sources/co2.json, SE/JP 1990-
   derive_claims.py         reads sources/ -> claims.json (one entry per manuscript claim)
   build_evidence.py        injects claims into template_evidence.html -> evidence.html
+  build_policy_timeline.py validates sources/policy/ and injects it -> policy_timeline.html
   template.html            Sankey page source (layout, styling, renderer)
   template_evidence.html   supporting-data page source
+  template_policy_timeline.html   policy-timeline page source
 sources/                   raw source files, gitignored (~67 MB)
   se_em_<year>.json        Energimyndigheten json-stat2 dumps, 2005-2024
   stte_<FY>.xlsx           METI balance workbooks, FY1990-FY2024
@@ -591,9 +728,14 @@ sources/                   raw source files, gitignored (~67 MB)
   claims/                  source files behind individual claims
     japan_forest_biomass_verified_statistics.md   compiled research note behind card 3
     biomass_primary_verification.md               card 3 checked back against the primary sources
+  policy/                  the policy-history dataset, copied in verbatim
+    policy_history_dataset.md   94 decisions + 42 government segments + open questions
+    build_dataset.mjs           the generator that wrote it, kept for the provenance trail
 evidence.html              supporting-data page (generated)
+policy_timeline.html       policy-timeline page (generated)
 energy_sankey_2023.html    frozen earlier 2023-only version
 ```
 
-`energy_sankey.html`, `energy_sankey_data.xlsx` and `evidence.html` are **generated artefacts** — to change the charts,
-edit `scripts/template.html` or the derivation scripts and re-run the pipeline.
+`energy_sankey.html`, `energy_sankey_data.xlsx`, `evidence.html` and `policy_timeline.html` are **generated
+artefacts** — to change the charts, edit `scripts/template.html`, `scripts/template_policy_timeline.html` or
+the derivation scripts and re-run the pipeline.

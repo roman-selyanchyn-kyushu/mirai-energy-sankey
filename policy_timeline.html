@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Policy Timeline — Sweden &amp; Japan Energy Manuscript</title>
+<style>
+  :root{
+    --ink:#1d232a; --ink-soft:#5a636e; --bg:#f7f6f2; --card:#ffffff;
+    --line:#e4e1d8; --accent:#0f6f8e;
+    --f-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);line-height:1.55;padding:28px 20px 60px}
+  .wrap{max-width:1180px;margin:0 auto}
+  .sitenav{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:0}
+  .sitenav a{
+    font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:8px 8px 0 0;text-decoration:none;
+    color:var(--ink-soft);border:1px solid transparent;border-bottom:none;position:relative;top:1px;
+  }
+  .sitenav a:hover{color:var(--accent)}
+  .sitenav a.on{background:var(--card);border-color:var(--line);color:var(--ink)}
+  header.page h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+  header.page p.sub{color:var(--ink-soft);font-size:14px;margin-top:6px;max-width:940px}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:20px;
+         box-shadow:0 1px 3px rgba(30,30,20,.05);padding:16px 18px}
+  h3.sec{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);
+         margin:22px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
+  .panel > h3.sec:first-child{margin-top:0;padding-top:0;border-top:none}
+  .blocknote{font-size:13px;color:var(--ink-soft);margin:4px 0;max-width:940px}
+  .chartwrap{overflow-x:auto;margin:2px 0 4px}
+  svg.fig{width:100%;min-width:1120px;height:auto;display:block}
+  svg.fig .hit{cursor:pointer}
+  .figbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 8px}
+  .figbar .cap{font-size:12.5px;color:var(--ink-soft);margin-right:auto}
+  .cards{margin-top:4px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:12px;
+        box-shadow:0 1px 3px rgba(30,30,20,.05);overflow:hidden;scroll-margin-top:14px}
+  /* the same collapse behaviour as the evidence cards: a register that can be
+     scanned closed, and a card addressed by #anchor opens itself */
+  .card > summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;
+                  padding:11px 16px;transition:background .13s}
+  .card > summary::-webkit-details-marker{display:none}
+  .card > summary::before{content:"\25B8";color:var(--accent);font-size:14px;line-height:1;
+                          transition:transform .15s;flex:none}
+  .card[open] > summary::before{transform:rotate(90deg)}
+  .card > summary:hover{background:#fbfaf7}
+  .card[open] > summary{border-bottom:1px solid var(--line)}
+  .card .eid{font-size:11.5px;font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums;flex:none}
+  .card h2{font-size:15px;font-weight:700;letter-spacing:-.01em;margin-right:auto}
+  .card h2 .orig{display:block;font-size:12.5px;font-weight:400;color:var(--ink-soft);margin-top:1px}
+  .card .when{font-size:12px;color:var(--ink-soft);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .card > .body{padding:12px 18px 18px}
+  .dir{font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap;
+       color:#fff;flex:none}
+  .kv{border-collapse:collapse;font-size:13px;width:100%;max-width:820px;margin:2px 0 12px}
+  .kv th,.kv td{border-bottom:1px solid var(--line);padding:5px 10px;text-align:left;vertical-align:top}
+  .kv th{font-size:12px;font-weight:600;color:var(--ink-soft);width:230px;white-space:nowrap}
+  .kv td a{color:var(--accent)}
+  .prose{font-size:13.5px;margin:2px 0 12px;max-width:940px}
+  .cite{background:#fbfaf7;border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:6px 0;
+        font-size:13.5px}
+  .cite b{display:block;margin-bottom:2px}
+  .cite .d{color:var(--ink-soft);font-size:12.5px;margin:3px 0}
+  .cite a{color:var(--accent);word-break:break-all;font-size:12.5px}
+  .permalink{font-size:12px;color:var(--ink-soft);margin-top:12px}
+  .permalink code{background:#f3f1ea;padding:2px 7px;border-radius:4px;user-select:all}
+  .tbtns{margin-left:auto;display:flex;gap:6px}
+  .tbtn{font-family:var(--f-ui);font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:999px;
+        border:1px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;
+        text-transform:none;letter-spacing:0;transition:all .13s}
+  .tbtn:hover{border-color:var(--accent);color:var(--accent)}
+  h3.sec{display:flex;align-items:center}
+  .filters{display:flex;flex-direction:column;gap:7px;margin:2px 0 12px}
+  .frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .frow .flab{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);
+              font-weight:700;width:88px;flex:none}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:12.5px;
+        font-weight:600;padding:4px 11px;border-radius:999px;border:1px solid var(--line);
+        background:#fff;color:var(--ink-soft);cursor:pointer;transition:all .13s}
+  .chip i{width:9px;height:9px;border-radius:2px;background:var(--c,#9aa0a8);flex:none}
+  .chip:hover{border-color:var(--accent);color:var(--ink)}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  svg.fig .hit{cursor:pointer;outline:none}
+  /* the focus ring has to be drawn, not outlined: an SVG outline is clipped by the
+     viewBox on the outermost markers and vanishes exactly where it is needed */
+  svg.fig .hit:focus-visible{fill:rgba(15,111,142,.14);stroke:var(--accent);stroke-width:2}
+  /* hovering an event fades everything that is not it or one of its partners */
+  svg.fig.focusing .mk,svg.fig.focusing .bar,svg.fig.focusing .arc,svg.fig.focusing .tick{opacity:.13}
+  svg.fig.focusing .mk.hi,svg.fig.focusing .arc.hi,svg.fig.focusing .tick.hi{opacity:1}
+  svg.fig.focusing .bar.hi{opacity:.34}
+  .wtables{overflow-x:auto}
+  .wtables table{border-collapse:collapse;font-size:12.5px;width:100%;min-width:1480px}
+  .wtables caption{text-align:left;font-size:13px;color:var(--ink-soft);padding-bottom:8px}
+  .wtables th,.wtables td{border-bottom:1px solid var(--line);padding:5px 9px;text-align:left;
+                          vertical-align:top}
+  .wtables thead th{font-size:11.5px;font-weight:600;color:var(--ink-soft);position:sticky;top:0;
+                    background:var(--card)}
+  .wtables td.id{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .wtables td.id a{color:var(--accent);text-decoration:none;font-weight:600}
+  .wtables td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .figbar button{font-family:var(--f-ui);font-size:12px;font-weight:600;padding:5px 11px;
+                 border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+                 cursor:pointer;transition:all .13s}
+  .figbar button:hover{border-color:var(--accent);color:var(--accent)}
+  #derived table{min-width:0;table-layout:fixed}
+  #derived th:first-child,#derived td.m{width:27%}
+  #derived th.lane,#derived td.v{width:15.5%;padding-right:16px}
+  #derived th:last-child,#derived td.how{width:42%}
+  #derived td.v{font-weight:700}
+  #derived td.how{color:var(--ink-soft);font-size:12px}
+  #derived td.v span{font-weight:400;color:var(--ink-soft)}
+  /* columns are sized by what they hold: dates and flags never wrap, the two
+     title columns and the government name get room so a row stays one or two
+     lines instead of six */
+  .wtables .c-country,.wtables .c-date,.wtables .c-end_date,.wtables .c-still_in_force,
+  .wtables .c-reverses,.wtables .c-supersedes{white-space:nowrap}
+  .wtables .c-title_en,.wtables .c-title_original{min-width:190px}
+  .wtables .c-government_at_adoption{min-width:210px}
+  .wtables .c-direction,.wtables .c-legal_status,.wtables .c-instrument_type,
+  .wtables .c-sector{min-width:104px}
+  footer{margin-top:26px;color:var(--ink-soft);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  footer a{color:var(--accent)}
+  footer p{margin:0 0 8px}
+  footer p.credits{font-size:13.5px;color:var(--ink);line-height:1.7}
+  footer p.credits a{font-weight:600}
+  /* ── print ────────────────────────────────────────────────────────────────
+     A static version for paper: the figure alone on the first sheet, at the full
+     width of a landscape page, followed by the derived figures and the record of
+     what was sought and not found. The controls, the ninety-four cards and the
+     full table are screen things — printing them would run to fifty sheets and
+     bury the figure the page exists to produce. */
+  @page{size:A4 landscape;margin:10mm}
+  @media print{
+    body{background:#fff;padding:0;color:#000}
+    .sitenav,.filters,.tbtns,.figbar button,.tip,#cardspanel,#tablepanel,
+    header.page p.sub{display:none !important}
+    header.page{margin-bottom:4px}
+    header.page h1{font-size:15px}
+    .panel{box-shadow:none;border:none;border-radius:0;padding:0;margin-top:8px;
+           break-inside:avoid;page-break-inside:avoid}
+    .chartwrap{overflow:visible}
+    /* The figure is fitted to the height of the sheet, not its width: at 1240 x
+       1122 it is nearly square, so width-fitting a landscape page would run it
+       onto a second sheet. Height-fitting gives the largest single-page copy
+       the paper allows. */
+    svg.fig{min-width:0;width:auto;height:174mm;max-width:100%;display:block;margin:0 auto}
+    .figbar .cap{font-size:9px}
+    .onscreen{display:none}
+    #derivedpanel{break-before:page;page-break-before:always}
+    #derived table{min-width:0;font-size:9.5px}
+    .blocknote,.sought{font-size:9.5px}
+    h3.sec{font-size:10px;margin:10px 0 5px;padding-top:6px}
+    footer{font-size:9px;margin-top:10px}
+    a{color:#000;text-decoration:none}
+  }
+  .sought{font-size:13px;color:var(--ink-soft);max-width:940px}
+  /* the open questions carry bare source URLs, which pre-wrap will not break —
+     without this the block pushes the whole page sideways on a phone */
+  .sought pre{white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--f-ui);font-size:13px;color:var(--ink);
+              background:#fbfaf7;border:1px solid var(--line);border-radius:10px;padding:14px 17px;
+              margin-top:8px;line-height:1.6}
+  .tip{position:fixed;pointer-events:none;z-index:50;display:none;max-width:340px;
+       background:rgba(22,26,30,.94);color:#fff;font-size:12.5px;line-height:1.45;
+       padding:8px 11px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="sitenav">
+  <a href="energy_sankey.html">Energy flow diagrams</a>
+  <a href="evidence.html">Supporting data</a>
+  <a href="policy_timeline.html" class="on">Policy timeline</a>
+</nav>
+
+<header class="page">
+  <h1>Policy Timeline</h1>
+  <p class="sub">Every Swedish and Japanese energy and climate policy decision in the dataset, both
+  countries on one time axis and one pixel scale so the two are directly comparable. Sweden
+  (<b>SE</b>) is the upper lane, Japan (<b>JP</b>) the lower. A marker is a decision; the bar behind it
+  is how long that instrument stayed in force; the band under each lane is who was in government at the
+  time. Marker shape carries legal status and marker colour carries direction of travel, so neither is
+  read from colour alone. Nothing on this page is typed by hand: it is rendered from
+  <code>sources/policy/policy_history_dataset.md</code> by <code>scripts/build_policy_timeline.py</code>.</p>
+</header>
+
+<div class="panel">
+  <div class="filters" id="filters"></div>
+  <div class="figbar"><span class="cap" id="cap"></span>
+    <button id="export-svg">SVG for print</button></div>
+  <div class="chartwrap" id="plotwrap"></div>
+  <p class="blocknote" id="plotnote"></p>
+</div>
+
+<div class="panel">
+  <h3 class="sec">Sought but not verified</h3>
+  <p class="blocknote" id="soughtnote"></p>
+  <div class="sought" id="sought"></div>
+</div>
+
+<div class="panel" id="derivedpanel">
+  <h3 class="sec">Derived from the data</h3>
+  <p class="blocknote">Every figure below is computed from the dataset when the page loads — none is
+  typed in, and none is quoted from the manuscript. Each row states its own computation, so a reader can
+  disagree with the definition rather than with the number. These count the whole dataset, not the
+  current filter state.</p>
+  <div class="wtables" id="derived"></div>
+</div>
+
+<div class="panel" id="cardspanel">
+  <h3 class="sec">Every decision, one card each<span class="tbtns">
+    <button class="tbtn" id="expand-all">Expand all</button>
+    <button class="tbtn" id="collapse-all">Collapse all</button></span></h3>
+  <p class="blocknote" id="cardnote"></p>
+  <div class="cards" id="cards"></div>
+</div>
+
+<div class="panel" id="tablepanel">
+  <h3 class="sec">The same events as a table</h3>
+  <p class="blocknote">Every plotted decision, in the same order and under the same filters as the
+  figure, for screen readers and for anyone who would rather read the data than look at it. The id in
+  the first column links to that decision's card.</p>
+  <div class="wtables" id="tablewrap"></div>
+</div>
+
+<footer>
+  <p class="credits">
+    Built for the <a href="https://www.mirai.nu/" target="_blank" rel="noopener">Sweden–Japan MIRAI Project</a>
+    · <a href="https://www.mirai.nu/pages/materials" target="_blank" rel="noopener">GCT for Materials for Energy Conversion and Storage</a>
+    · Designed by <a href="https://q-pit.kyushu-u.ac.jp/roman_selyanchyn/" target="_blank" rel="noopener">Roman Selyanchyn</a> (Kyushu University)
+    · Data extraction, preparation and coding with Claude Code
+  </p>
+  <p>
+    Companion to the <a href="energy_sankey.html">energy flow diagrams</a> and the
+    <a href="evidence.html">supporting data</a>. Method and source files are documented in the
+    <a href="https://github.com/roman-selyanchyn-kyushu/mirai-energy-sankey" target="_blank" rel="noopener">project README</a>.
+  </p>
+</footer>
+
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+"use strict";
+
+/* The dataset, parsed out of sources/policy/policy_history_dataset.md by
+   scripts/build_policy_timeline.py and embedded verbatim. No policy name, date,
+   rate or status is written anywhere in this file — everything below reads it
+   out of these three constants. */
+const EVENTS = [{"id":"SE-0001","country":"SE","date":"1980-03-23","date_precision":"day","date_basis":"announced","title_original":"Folkomröstningen om kärnkraft","title_en":"Referendum on nuclear power","instrument_type":"referendum","legal_status":"political_declaration","binds_whom":"none","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"All three options envisaged eventual nuclear phase-out, so the vote reduced the policy basis for retaining zero-carbon nuclear generation.","sector":"nuclear","quantified_change":"Voters chose among three phase-out options; option 2 received 39.1%, option 3 38.7%, and option 1 18.9%","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"1980-06-10","years_in_force":0,"government_at_adoption":"Thorbjörn Fälldin (Centre Party-led non-socialist coalition)","governments_since_adoption":0,"source_title":"Demokratistatistik – inför supervalåret 2014","source_publisher":"Statistics Sweden (SCB)","source_date":"2014-06","source_url":"https://www.scb.se/contentassets/ec23a88d26524d6cafb9f0e81aedfc09/me0104_2014a01_br_me09br1401.pdf","confidence":"verified","notes":"Advisory referendum; SCB table 1.1.18 reports the option shares. The subsequent parliamentary decision is a separate event.","title_en_source":"translated"},{"id":"SE-0002","country":"SE","date":"1980-06-10","date_precision":"day","date_basis":"announced","title_original":"Riksdagens beslut om kärnkraftsavveckling","title_en":"Parliamentary nuclear phase-out decision","instrument_type":"target_adoption","legal_status":"political_declaration","binds_whom":"government","has_interim_targets":false,"has_independent_review_body":false,"direction":"weakening","direction_basis":"The decision capped the fleet at 12 reactors and required the last reactor to close by 2010, reducing planned low-carbon generation.","sector":"nuclear","quantified_change":"Maximum 12 reactors; all nuclear generation to end no later than 2010","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2010-09-01","years_in_force":30,"government_at_adoption":"Thorbjörn Fälldin (Centre Party-led non-socialist coalition)","governments_since_adoption":0,"source_title":"Kärnkraften – förutsättningar för generationsskifte","source_publisher":"Regeringskansliet","source_date":"2010-03-22","source_url":"https://data.riksdagen.se/dokument/GX03172","confidence":"verified","notes":"The 2010 deadline was a parliamentary policy decision rather than a self-executing closure statute.","title_en_source":"translated"},{"id":"SE-0003","country":"SE","date":"1991-01-01","date_precision":"day","date_basis":"in_force","title_original":"Lag (1990:582) om koldioxidskatt","title_en":"Carbon Dioxide Tax Act (1990:582)","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"strengthening","direction_basis":"A new tax of SEK 250/tCO2 put a direct price on fossil carbon emissions.","sector":"carbon_pricing","quantified_change":"Carbon price introduced from SEK 0 to SEK 250/tCO2. General statutory rate (SEK/tCO2): 1991 250; 1992 250; 1993 320; 1994 320; 1995 320; 1996 360; 1997 Jan–Jun 360 and Jul–Dec 370; 1998 370; 1999 370; 2000 370; 2001 530; 2002 630; 2003 760; 2004 910; 2005 910; 2006 920; 2007 930; 2008 1,010; 2009 1,050; 2010 1,050; 2011 1,050; 2012 1,080; 2013 1,080; 2014 1,080; 2015 1,120; 2016 1,120; 2017 1,130; 2018 1,150; 2019 1,180; 2020 1,190; 2021 1,190; 2022 1,220; 2023 1,330; 2024 1,450; 2025 1,510; 2026 1,520. Reduced manufacturing rate outside EU ETS (SEK/tCO2): 1991–1992 no single rate because firm-specific relief applied; 1993–1995 80; 1996 90; 1997 Jan–Jun 180 and Jul–Dec 185; 1998–2000 185; 2001 185.5; 2002 189; 2003 190; 2004–2005 191; 2006 193; 2007 195; 2008 212; 2009–2010 221; 2011 315; 2012–2014 324; 2015–2016 672; 2017 678; 2018 1,150; 2019 1,180; 2020 1,190; 2021 1,190; 2022 1,220; 2023 1,330; 2024 1,450; 2025 1,510; 2026 1,520. ETS-covered industrial fuel use is fully exempt from CO2 tax from 2011; earlier overlapping exemptions varied by fuel and use and cannot be represented as one rate.","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":35,"government_at_adoption":"Ingvar Carlsson (Swedish Social Democratic Party (S))","governments_since_adoption":7,"source_title":"Lag (1990:582) om koldioxidskatt","source_publisher":"Sveriges riksdag","source_date":"1990-06-14","source_url":"https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/lag-1990582-om-koldioxidskatt_sfs-1990-582/","confidence":"verified","notes":"The standalone 1990 Act was repealed on 1 January 1995, but the tax continued without interruption in the Energy Tax Act (1994:1776); still_in_force refers to the policy instrument. The annual general-rate series is nominal and excludes temporary motor-fuel deviations.","title_en_source":"translated"},{"id":"SE-0004","country":"SE","date":"1993-01-01","date_precision":"day","date_basis":"in_force","title_original":"1993 års omläggning av energi- och koldioxidbeskattningen","title_en":"1993 restructuring of energy and carbon taxation","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"restructuring","direction_basis":"The general rate rose from SEK 250 to 320/tCO2 while manufacturing received a 25% rate (SEK 80/t), increasing household stringency but reducing industrial stringency.","sector":"carbon_pricing","quantified_change":"General rate SEK 250→320/tCO2; manufacturing rate changed from non-uniform relief to 25% of general rate, SEK 80/tCO2","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"1997-07-01","years_in_force":4,"government_at_adoption":"Carl Bildt (Moderate Party–Liberal People's Party–Centre Party–Christian Democrats coalition)","governments_since_adoption":0,"source_title":"Koldioxidskatt och ekonomiska styrmedel i klimatarbetet","source_publisher":"Sveriges riksdag","source_date":"1994-01-01","source_url":"https://data.riksdagen.se/dokument/GQB3100","confidence":"verified","notes":"A two-level structure replaced firm-specific relief.","title_en_source":"translated"},{"id":"SE-0005","country":"SE","date":"1997-07-01","date_precision":"day","date_basis":"in_force","title_original":"Höjd koldioxidskatt för industrin","title_en":"Increase in the industrial carbon-tax rate","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"strengthening","direction_basis":"Manufacturing's reduced rate doubled from 25% to 50% of the general rate, from SEK 90 to 185/tCO2 at the transition.","sector":"carbon_pricing","quantified_change":"Reduced manufacturing rate 25%→50% of general rate; SEK 90→185/tCO2","reverses":null,"supersedes":"SE-0004","still_in_force":false,"end_date":"2001-01-01","years_in_force":4,"government_at_adoption":"Göran Persson (Swedish Social Democratic Party (S))","governments_since_adoption":0,"source_title":"CO2 taxation in Sweden: 20 years of experience and looking ahead","source_publisher":"Government Offices of Sweden","source_date":"2011","source_url":"https://www.government.se/contentassets/419eb2cafa93423c891c09cb9914801b/hammar-and-akerfeldt-2011-co2-taxation-in-sweden.-20-years-of-experience-and-looking-ahead.pdf","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"SE-0006","country":"SE","date":"2011-01-01","date_precision":"day","date_basis":"in_force","title_original":"Höjd koldioxidskatt för industri utanför EU ETS","title_en":"Carbon-tax reform for industry inside and outside the EU ETS","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"restructuring","direction_basis":"The non-ETS industrial rate rose from 21% to 30% of the general rate while ETS-covered industrial fuel use fell to zero CO2 tax, shifting price coverage toward non-ETS industry.","sector":"carbon_pricing","quantified_change":"Non-ETS manufacturing 21%→30% of general rate (SEK 221→315/tCO2); ETS-covered industrial fuel use to 0","reverses":null,"supersedes":"SE-0005","still_in_force":false,"end_date":"2015-01-01","years_in_force":4,"government_at_adoption":"Fredrik Reinfeldt (Moderate Party–Liberal People's Party–Centre Party–Christian Democrats coalition)","governments_since_adoption":0,"source_title":"Vissa skattefrågor inför budgetpropositionen för 2011","source_publisher":"Sveriges riksdag","source_date":"2010-04-13","source_url":"https://data.riksdagen.se/dokument/GY03108","confidence":"verified","notes":"Intermediate 2001–2010 percentages and annual SEK/t values are retained in SE-0003's full trajectory.","title_en_source":"translated"},{"id":"SE-0007","country":"SE","date":"2015-01-01","date_precision":"day","date_basis":"in_force","title_original":"Höjd koldioxidskatt för industri utanför EU ETS","title_en":"Increase in the non-ETS industrial carbon-tax rate","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"strengthening","direction_basis":"The non-ETS manufacturing rate doubled from 30% to 60% of the general rate, from SEK 324 to 672/tCO2.","sector":"carbon_pricing","quantified_change":"Non-ETS manufacturing 30%→60% of general rate; SEK 324→672/tCO2","reverses":null,"supersedes":"SE-0006","still_in_force":false,"end_date":"2018-01-01","years_in_force":3,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":0,"source_title":"Sweden's carbon tax","source_publisher":"Government Offices of Sweden","source_date":"not published","source_url":"https://www.government.se/government-policy/taxes-and-tariffs/swedens-carbon-tax/","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"SE-0008","country":"SE","date":"2018-01-01","date_precision":"day","date_basis":"in_force","title_original":"Slopad nedsättning av koldioxidskatt för industri utanför EU ETS","title_en":"Abolition of the non-ETS industrial carbon-tax reduction","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"strengthening","direction_basis":"The non-ETS manufacturing rate rose from 60% to 100% of the general rate, from SEK 678/t in 2017 to SEK 1,150/t in 2018.","sector":"carbon_pricing","quantified_change":"Non-ETS manufacturing 60%→100% of general rate; SEK 678→1,150/tCO2","reverses":null,"supersedes":"SE-0007","still_in_force":true,"end_date":null,"years_in_force":8,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":2,"source_title":"Sweden's carbon tax","source_publisher":"Government Offices of Sweden","source_date":"not published","source_url":"https://www.government.se/government-policy/taxes-and-tariffs/swedens-carbon-tax/","confidence":"verified","notes":"EU ETS-covered industrial fuel use remains exempt from CO2 tax.","title_en_source":"translated"},{"id":"SE-0009","country":"SE","date":"1999-11-30","date_precision":"day","date_basis":"repealed","title_original":"Stängning av Barsebäck 1","title_en":"Closure of Barsebäck Unit 1","instrument_type":"programme_termination","legal_status":"administratively_binding","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"Permanent closure removed one 600 MW low-carbon reactor from the electricity system.","sector":"nuclear","quantified_change":"Operating capacity 600→0 MW for Barsebäck 1","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":27,"government_at_adoption":"Göran Persson (Swedish Social Democratic Party (S))","governments_since_adoption":4,"source_title":"Kärnkraften – ökat ansvar och förutsättningar för generationsskifte","source_publisher":"Government Offices of Sweden","source_date":"2010-03-22","source_url":"https://www.regeringen.se/contentassets/57c6dbd9169e430293e71a71a6183938/karnkraften---okat-ansvar-och-forutsattningar-for--generationsskifte/","confidence":"verified","notes":"Date is the final shutdown date, not the date of the preceding political agreement.","title_en_source":"translated"},{"id":"SE-0010","country":"SE","date":"2005-05-31","date_precision":"day","date_basis":"repealed","title_original":"Stängning av Barsebäck 2","title_en":"Closure of Barsebäck Unit 2","instrument_type":"programme_termination","legal_status":"administratively_binding","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"Permanent closure removed the remaining 600 MW low-carbon reactor at Barsebäck.","sector":"nuclear","quantified_change":"Operating capacity 600→0 MW for Barsebäck 2; site total 600→0 MW","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":21,"government_at_adoption":"Göran Persson (Swedish Social Democratic Party (S))","governments_since_adoption":4,"source_title":"Kärnkraften – ökat ansvar och förutsättningar för generationsskifte","source_publisher":"Government Offices of Sweden","source_date":"2010-03-22","source_url":"https://www.regeringen.se/contentassets/57c6dbd9169e430293e71a71a6183938/karnkraften---okat-ansvar-och-forutsattningar-for--generationsskifte/","confidence":"verified","notes":"Date is the final shutdown date.","title_en_source":"translated"},{"id":"SE-0011","country":"SE","date":"2010-09-01","date_precision":"day","date_basis":"in_force","title_original":"Kärnkraften – förutsättningar för generationsskifte","title_en":"Nuclear power: conditions for generational replacement","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":null,"has_independent_review_body":null,"direction":"strengthening","direction_basis":"The amendment replaced a statutory new-reactor prohibition with permission for replacement reactors at existing sites while retaining a ten-reactor ceiling.","sector":"nuclear","quantified_change":"Permitted new reactors 0→up to 10 replacement reactors, one for each permanently closed reactor, at existing sites","reverses":"SE-0002","supersedes":null,"still_in_force":false,"end_date":"2024-01-01","years_in_force":14,"government_at_adoption":"Fredrik Reinfeldt (Moderate Party–Liberal People's Party–Centre Party–Christian Democrats coalition)","governments_since_adoption":0,"source_title":"Kärnkraften – förutsättningar för generationsskifte","source_publisher":"Sveriges riksdag","source_date":"2010-06-17","source_url":"https://data.riksdagen.se/fil/F057535E-D4BD-4AAD-B47B-FCF0028C90B4","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"SE-0012","country":"SE","date":"2015","date_precision":"year","date_basis":"announced","title_original":"Förordning (2015:517) om stöd till lokala klimatinvesteringar","title_en":"Ordinance (2015:517) on support for local climate investments (Klimatklivet)","instrument_type":"programme_launch","legal_status":"binding_secondary_legislation","binds_whom":"both","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The programme created investment grants prioritized by durable greenhouse-gas reductions per krona; the initial 2015 appropriation was SEK 107 million available to the programme.","sector":"cross_cutting","quantified_change":"Annual programme appropriation available for grants (SEK million): 2015 107; 2016 576; 2017 1,166; 2018 1,484; 2019 1,447; 2020 1,886; 2021 1,846; 2022 2,659; 2023 2,954; 2024 4,925; 2025 1,108; 2026 approximately 4,500","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":11,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":2,"source_title":"Riksrevisionens rapport om statens insatser för jordbrukets klimatomställning, table 2","source_publisher":"Sveriges riksdag","source_date":"2026-03-17","source_url":"https://data.riksdagen.se/dokument/hd03113","confidence":"verified","notes":"Series is the appropriation available for support (anslagspost 1 and 2), not disbursement or multi-year authorization. The 2026 figure is the enacted rounded total published by the Government; 2015–2025 are the official Riksrevision/Naturvårdsverket compilation.","title_en_source":"translated"},{"id":"SE-0013","country":"SE","date":"2019-01-01","date_precision":"day","date_basis":"in_force","title_original":"Budgetbeslut om avveckling av Klimatklivet","title_en":"Budget decision to phase out Klimatklivet","instrument_type":"budget_measure","legal_status":"administratively_binding","binds_whom":"government","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"The 2019 budget cut the planned appropriation from SEK 2.09 billion to SEK 0.75 billion and stopped new grants during most of the year.","sector":"cross_cutting","quantified_change":"Planned 2019 appropriation SEK 2,090→750 million; new award rounds suspended","reverses":"SE-0012","supersedes":null,"still_in_force":false,"end_date":"2020-01-01","years_in_force":1,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":0,"source_title":"Riksrevisionens rapport om Klimatklivet","source_publisher":"Sveriges riksdag","source_date":"2019-06-13","source_url":"https://data.riksdagen.se/dokument/H603121","confidence":"verified","notes":"The programme was not legally repealed; later budgets restored and expanded it.","title_en_source":"translated"},{"id":"SE-0014","country":"SE","date":"2017-06-15","date_precision":"day","date_basis":"announced","title_original":"Ett klimatpolitiskt ramverk för Sverige","title_en":"A climate policy framework for Sweden","instrument_type":"target_adoption","legal_status":"political_declaration","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":true,"direction":"strengthening","direction_basis":"Parliament adopted net zero by 2045 plus quantified 2030 and 2040 non-ETS and transport targets, adding measurable interim milestones.","sector":"cross_cutting","quantified_change":"Net zero by 2045 with at least 85% territorial reduction from 1990; non-ETS -63% by 2030 and -75% by 2040 from 1990; domestic transport excluding aviation -70% by 2030 from 2010","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":9,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":2,"source_title":"Det klimatpolitiska ramverket","source_publisher":"Government Offices of Sweden","source_date":"2017-06-12","source_url":"https://www.regeringen.se/artiklar/2017/06/det-klimatpolitiska-ramverket/","confidence":"verified","notes":"The numerical targets are parliamentary goals outside the operative text of the Climate Act; up to 8 percentage points of the 2030 non-ETS target and 2 points of the 2040 target may use supplementary measures.","title_en_source":"translated"},{"id":"SE-0015","country":"SE","date":"2018-01-01","date_precision":"day","date_basis":"in_force","title_original":"Klimatlag (2017:720)","title_en":"Climate Act (2017:720)","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"government","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Act converted climate governance into recurring statutory duties for an annual climate report and a four-year action plan, although it contains no numerical emissions ceiling.","sector":"cross_cutting","quantified_change":"not quantified","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":8,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":2,"source_title":"Klimatlag (2017:720)","source_publisher":"Sveriges riksdag","source_date":"2017-06-22","source_url":"https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/klimatlag-2017720_sfs-2017-720/","confidence":"verified","notes":"The Act binds the Government's process; the 2045 and interim targets are separate parliamentary goals.","title_en_source":"translated"},{"id":"SE-0016","country":"SE","date":"2018-01-01","date_precision":"day","date_basis":"in_force","title_original":"Förordning (2017:1268) med instruktion för Klimatpolitiska rådet","title_en":"Ordinance (2017:1268) with instructions for the Climate Policy Council","instrument_type":"ordinance","legal_status":"binding_secondary_legislation","binds_whom":"government","has_interim_targets":null,"has_independent_review_body":true,"direction":"strengthening","direction_basis":"The ordinance created an expert council required to independently assess each year whether policy is compatible with the climate goals.","sector":"cross_cutting","quantified_change":"One independent annual assessment required; council has 6–8 members plus chair and vice-chair","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":8,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":2,"source_title":"Förordning (2017:1268) med instruktion för Klimatpolitiska rådet","source_publisher":"Sveriges riksdag","source_date":"2017-12-07","source_url":"https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/forordning-20171268-med-instruktion-for_sfs-2017-1268/","confidence":"verified","notes":"The Government appoints members after a nomination proposal from the Council; the Council reports to the Government and publishes its assessment.","title_en_source":"translated"},{"id":"SE-0017","country":"SE","date":"2018","date_precision":"year","date_basis":"announced","title_original":"Förordning (2017:1319) om statligt stöd till åtgärder som bidrar till industrins klimatomställning","title_en":"Ordinance (2017:1319) on state support for measures contributing to industrial climate transition (Industriklivet)","instrument_type":"programme_launch","legal_status":"binding_secondary_legislation","binds_whom":"both","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The programme introduced dedicated support for industrial process-emission reductions with an initial SEK 300 million appropriation.","sector":"industry","quantified_change":"Annual appropriation (SEK million): 2018 300; 2019 500; 2020 600; 2021 750; 2022 900; 2023 1,350; 2024 about 1,450; 2025 about 3,370 after a SEK 2,200 million spring-budget transfer; 2026 653","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":8,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":2,"source_title":"Industriklivet – planering, genomförande och uppföljning","source_publisher":"Government Offices of Sweden","source_date":"2025-02-20","source_url":"https://www.regeringen.se/contentassets/eb7183bcf3934ca0960ad27e30b88c12/riksrevisionens-rapport-om-industriklivet-skr.-20242584.pdf","confidence":"verified","notes":"2018–2024 are parliamentary appropriations shown in the official report; 2025 combines the then-base appropriation with the enacted SEK 2.2bn transfer; 2026 is the Energy Agency's published programme total. Values are appropriations, not disbursements.","title_en_source":"translated"},{"id":"SE-0018","country":"SE","date":"2018-07-01","date_precision":"day","date_basis":"in_force","title_original":"Lag (2017:1201) om reduktion av växthusgasutsläpp från vissa fossila drivmedel","title_en":"Act (2017:1201) on reduction of greenhouse-gas emissions from certain fossil fuels","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Fuel suppliers acquired binding life-cycle emission-reduction obligations of 2.6% for petrol and 19.3% for diesel.","sector":"transport","quantified_change":"Petrol obligation 0→2.6%; diesel 0→19.3% life-cycle GHG-intensity reduction","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":8,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":2,"source_title":"Lag (2017:1201) om reduktion av växthusgasutsläpp från vissa fossila drivmedel","source_publisher":"Sveriges riksdag","source_date":"2017-11-30","source_url":"https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/lag-20171201-om-reduktion-av-vaxthusgasutslapp_sfs-2017-1201/","confidence":"verified","notes":"Percentages are statutory reductions in life-cycle greenhouse-gas intensity, not volumetric biofuel blending shares.","title_en_source":"translated"},{"id":"SE-0019","country":"SE","date":"2020-01-01","date_precision":"day","date_basis":"in_force","title_original":"Reduktionsnivåer 2020","title_en":"Reduction-obligation levels for 2020","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Required reductions rose from 2.6% to 4.2% for petrol and from 19.3% to 21.0% for diesel.","sector":"transport","quantified_change":"Petrol 2.6→4.2%; diesel 19.3→21.0%","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2021-08-01","years_in_force":1,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":0,"source_title":"Reduktionsplikt","source_publisher":"Swedish Energy Agency","source_date":"not published","source_url":"https://www.energimyndigheten.se/klimat/transporter/reduktionsplikt/","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"SE-0020","country":"SE","date":"2021-08-01","date_precision":"day","date_basis":"in_force","title_original":"Reduktionsnivåer 2021","title_en":"Reduction-obligation levels for 2021","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Required reductions rose from 4.2% to 6.0% for petrol and from 21.0% to 26.0% for diesel.","sector":"transport","quantified_change":"Petrol 4.2→6.0%; diesel 21.0→26.0%","reverses":null,"supersedes":"SE-0019","still_in_force":false,"end_date":"2022-01-01","years_in_force":1,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":0,"source_title":"Reduktionsplikt","source_publisher":"Swedish Energy Agency","source_date":"not published","source_url":"https://www.energimyndigheten.se/klimat/transporter/reduktionsplikt/","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"SE-0021","country":"SE","date":"2022-01-01","date_precision":"day","date_basis":"in_force","title_original":"Reduktionsnivåer 2022","title_en":"Reduction-obligation levels for 2022","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Required reductions rose from 6.0% to 7.8% for petrol and from 26.0% to 30.5% for diesel.","sector":"transport","quantified_change":"Petrol 6.0→7.8%; diesel 26.0→30.5%","reverses":null,"supersedes":"SE-0020","still_in_force":false,"end_date":"2024-01-01","years_in_force":2,"government_at_adoption":"Magdalena Andersson (Swedish Social Democratic Party (S) minority government)","governments_since_adoption":0,"source_title":"Reduktionsplikt","source_publisher":"Swedish Energy Agency","source_date":"not published","source_url":"https://www.energimyndigheten.se/klimat/transporter/reduktionsplikt/","confidence":"verified","notes":"The same levels were retained for 2023 instead of the previously scheduled increase.","title_en_source":"translated"},{"id":"SE-0022","country":"SE","date":"2022-06-22","date_precision":"day","date_basis":"enacted","title_original":"Pausad höjning av reduktionsplikten för 2023","title_en":"Pause in the scheduled 2023 reduction-obligation increase","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"weakening","direction_basis":"The amendment held 2023 at 7.8% petrol and 30.5% diesel instead of raising the levels to 10.1% and 35.0%.","sector":"transport","quantified_change":"Scheduled 2023 petrol 10.1→7.8% and diesel 35.0→30.5%","reverses":"SE-0018","supersedes":null,"still_in_force":false,"end_date":"2024-01-01","years_in_force":2,"government_at_adoption":"Magdalena Andersson (Swedish Social Democratic Party (S) minority government)","governments_since_adoption":0,"source_title":"Pausad höjning av reduktionsplikten för bensin och diesel 2023 (Betänkande 2021/22:MJU31)","source_publisher":"Sveriges riksdag","source_date":"2022-06-22","source_url":"https://www.riksdagen.se/sv/dokument-och-lagar/dokument/betankande/pausad-hojning-av-reduktionsplikten-for-bensin-och_h901mju31/","confidence":"verified","notes":"The Riksdag enacted the amendment on 22 June 2022; it entered into force on 1 January 2023.","title_en_source":"translated"},{"id":"SE-0023","country":"SE","date":"2024-01-01","date_precision":"day","date_basis":"in_force","title_original":"Sänkt reduktionsplikt för bensin och diesel","title_en":"Lowered reduction obligation for petrol and diesel","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"weakening","direction_basis":"Binding 2024 levels fell from 7.8% to 6.0% for petrol and from 30.5% to 6.0% for diesel, and were far below the previously scheduled 12.5% and 40.0%.","sector":"transport","quantified_change":"Actual petrol 7.8→6.0% and diesel 30.5→6.0%; versus previously scheduled 2024 levels, petrol 12.5→6.0% and diesel 40.0→6.0%","reverses":"SE-0021","supersedes":null,"still_in_force":false,"end_date":"2025-07-01","years_in_force":1,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Regeringen går vidare med förslag om sänkt reduktionsplikt","source_publisher":"Government Offices of Sweden","source_date":"2023-10-12","source_url":"https://www.regeringen.se/pressmeddelanden/2023/10/regeringen-gar-vidare-med-forslag-om-sankt-reduktionsplikt/","confidence":"verified","notes":"Implemented through SFS 2023:823; this is a legally enacted Tidö-agreement commitment.","title_en_source":"translated"},{"id":"SE-0024","country":"SE","date":"2025-07-01","date_precision":"day","date_basis":"in_force","title_original":"Reformerad reduktionsplikt","title_en":"Reformed reduction obligation","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The obligation rose from 6% to 10% for both fuels and added eligible electricity from public charging, increasing the nominal target while broadening compliance options.","sector":"transport","quantified_change":"Petrol 6.0→10.0%; diesel 6.0→10.0% for 2025–2030; public-charging electricity newly creditable","reverses":"SE-0023","supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":1,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Sänkt skatt på bensin och diesel och reformerad reduktionsplikt","source_publisher":"Government Offices of Sweden","source_date":"2024-08-27","source_url":"https://www.regeringen.se/pressmeddelanden/2024/08/sankt-skatt-pa-bensin-och-diesel-och-reformerad-reduktionsplikt/","confidence":"verified","notes":"Implemented in the current Act through SFS 2025:576.","title_en_source":"translated"},{"id":"SE-0025","country":"SE","date":"2018-07-01","date_precision":"day","date_basis":"in_force","title_original":"Bonus–malus-systemet","title_en":"Bonus–malus vehicle tax system","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The reform introduced a purchase bonus of up to SEK 60,000 for low-emission cars and elevated vehicle tax for high-emission cars for three years.","sector":"transport","quantified_change":"Climate bonus 0→up to SEK 60,000 per vehicle; elevated malus tax period 0→3 years","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":8,"government_at_adoption":"Stefan Löfven (Swedish Social Democratic Party–Green Party coalition)","governments_since_adoption":2,"source_title":"Viktigare lagar och förordningar inför halvårsskiftet 2018","source_publisher":"Government Offices of Sweden","source_date":"2018","source_url":"https://www.regeringen.se/contentassets/f63d6c7f48434cdd9bf0d10077f93b9c/viktigare-lagar-och-forordningar-infor-halvarsskiftet-2018.pdf","confidence":"verified","notes":"The official summary identifies SFS 2017:1215 and Regulation 2017:1334. still_in_force refers to the malus side; the bonus was terminated separately in SE-0026.","title_en_source":"translated"},{"id":"SE-0026","country":"SE","date":"2022-11-08","date_precision":"day","date_basis":"repealed","title_original":"Klimatbonusen upphör","title_en":"Termination of the climate bonus","instrument_type":"programme_termination","legal_status":"binding_secondary_legislation","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"Eligibility for a purchase bonus of up to SEK 70,000 ended for vehicles ordered after 8 November 2022.","sector":"transport","quantified_change":"Maximum climate bonus up to SEK 70,000→0 for new orders after 2022-11-08","reverses":"SE-0025","supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":4,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Klimatbonusen upphör den 8 november","source_publisher":"Government Offices of Sweden","source_date":"2022-11-07","source_url":"https://www.regeringen.se/pressmeddelanden/2022/11/klimatbonusen-upphor-den-8-november/","confidence":"verified","notes":"The malus vehicle-tax component continues.","title_en_source":"translated"},{"id":"SE-0027","country":"SE","date":"2022-05-01","date_precision":"day","date_basis":"in_force","title_original":"Tillfälligt sänkt skatt på bensin och diesel","title_en":"Temporary reduction of petrol and diesel tax","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"Motor-fuel tax fell by SEK 1.05/l for five months, reducing the price incentive to cut fossil-fuel use.","sector":"transport","quantified_change":"Petrol and diesel energy tax -SEK 1.05/l from 2022-05-01 through 2022-09-30","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2022-10-01","years_in_force":0,"government_at_adoption":"Magdalena Andersson (Swedish Social Democratic Party (S) minority government)","governments_since_adoption":0,"source_title":"Tillfälligt sänkt skatt på bensin och diesel","source_publisher":"Government Offices of Sweden","source_date":"2022-03-14","source_url":"https://www.regeringen.se/rattsliga-dokument/departementsserien-och-promemorior/2022/03/tillfalligt-sankt-skatt-pa-bensin-och-diesel/","confidence":"verified","notes":"Nominal tax reduction, excluding VAT effects.","title_en_source":"translated"},{"id":"SE-0028","country":"SE","date":"2023-01-01","date_precision":"day","date_basis":"in_force","title_original":"Sänkt energiskatt på bensin och diesel 2023","title_en":"Reduced energy tax on petrol and diesel for 2023","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"Energy tax was set SEK 0.80/l below the indexed baseline, reducing fossil-fuel price stringency.","sector":"transport","quantified_change":"Petrol and diesel energy tax -SEK 0.80/l versus indexed 2023 baseline (about SEK 1.00/l including VAT at full pass-through)","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2024-01-01","years_in_force":1,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Genomfört: Bokslut över Tidöavtalet – Tillväxt och hushållsekonomi","source_publisher":"Government Offices of Sweden","source_date":"2026-05-05","source_url":"https://www.regeringen.se/regeringens-politik/regeringens-prioriteringar/genomfort-bokslut-over-tidoavtalet/tillvaxt-och-hushallsekonomi/","confidence":"verified","notes":"Implemented through the 2023 budget legislation.","title_en_source":"translated"},{"id":"SE-0029","country":"SE","date":"2024-01-01","date_precision":"day","date_basis":"in_force","title_original":"Sänkt skatt på bensin och diesel 2024","title_en":"Reduced petrol and diesel tax for 2024","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"Compared with indexed rates, petrol energy tax fell SEK 1.31/l and diesel energy tax SEK 0.341/l, lowering fossil-fuel price incentives.","sector":"transport","quantified_change":"Petrol energy tax -SEK 1.31/l versus indexed baseline and total energy-plus-CO2 tax -SEK 0.60/l versus 2023; diesel energy tax -SEK 0.341/l versus indexed baseline","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2025-01-01","years_in_force":1,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Sänkt skatt på bensin och diesel och förstärkt skattenedsättning för jordbruksdiesel även under 2024","source_publisher":"Government Offices of Sweden","source_date":"2023-09-07","source_url":"https://www.regeringen.se/pressmeddelanden/2023/09/sankt-skatt-pa-bensin-och-diesel-och-forstarkt-skattenedsattning-for-jordbruksdiesel-aven-under-2024/","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"SE-0030","country":"SE","date":"2025-01-01","date_precision":"day","date_basis":"in_force","title_original":"Sänkt skatt på bensin och diesel 2025","title_en":"Reduced petrol and diesel tax for 2025","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"The enacted two-step reduction lowered petrol tax by a cumulative SEK 0.67/l and diesel tax by SEK 0.49/l relative to the rates previously set for 2025.","sector":"transport","quantified_change":"2025-01-01: petrol energy tax -SEK 0.35/l and diesel energy-plus-CO2 tax -SEK 0.17/l; 2025-07-01 additional petrol energy tax -SEK 0.32/l and diesel energy tax -SEK 0.32/l","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":1,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Sänkt skatt på bensin och diesel, Prop. 2024/25:30","source_publisher":"Government Offices of Sweden","source_date":"2024-10-17","source_url":"https://www.regeringen.se/rattsliga-dokument/proposition/2024/10/prop.-20242530","confidence":"verified","notes":"The post-July 2025 statutory rates were carried into 2026 without indexation, subject to separate temporary 2026 cuts.","title_en_source":"translated"},{"id":"SE-0031","country":"SE","date":"2026-05-01","date_precision":"day","date_basis":"in_force","title_original":"Tillfälligt sänkt skatt på drivmedel 2026","title_en":"Temporary motor-fuel tax reduction for 2026","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"Energy tax fell by SEK 0.82/l for petrol and SEK 0.319/l for diesel, taking combined tax to the EU minimum and increasing projected emissions.","sector":"transport","quantified_change":"2026-05-01 to 2026-09-30: petrol energy tax -SEK 0.82/l, combined tax SEK 4.79→3.97/l; diesel energy tax -SEK 0.319/l, combined tax SEK 3.961→3.642/l","reverses":null,"supersedes":null,"still_in_force":true,"end_date":"2026-10-01","years_in_force":0,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Extra ändringsbudget för 2026 – Sänkt skatt på drivmedel samt el- och gasprisstöd","source_publisher":"Sveriges riksdag","source_date":"2026-04-13","source_url":"https://www.riksdagen.se/sv/dokument-och-lagar/dokument/proposition/extra-andringsbudget-for-2026-sankt-skatt-pa_hd03236/html/","confidence":"verified","notes":"Temporary event is still in force on the dataset cut-off date, 2026-08-16.","title_en_source":"translated"},{"id":"SE-0032","country":"SE","date":"2026-07-01","date_precision":"day","date_basis":"in_force","title_original":"Ytterligare tillfälligt sänkt skatt på bensin och diesel","title_en":"Additional temporary reduction of petrol and diesel tax","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":null,"direction":"weakening","direction_basis":"CO2 tax fell by SEK 2.40/l for five months and the Government estimated an isolated 0.3 MtCO2 emissions increase in 2026.","sector":"carbon_pricing","quantified_change":"2026-07-01 to 2026-11-30: petrol and diesel CO2 tax -SEK 2.40/l; petrol CO2 tax SEK 3.27→0.87/l; diesel CO2 tax SEK 2.811→0.411/l; estimated 2026 emissions +0.3 MtCO2","reverses":"SE-0003","supersedes":null,"still_in_force":true,"end_date":"2026-12-01","years_in_force":0,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Extra ändringsbudget för 2026 – Stöd till Ukraina samt stöd till hushåll och andra åtgärder med anledning av kriget i Mellanöstern","source_publisher":"Sveriges riksdag","source_date":"2026-06-11","source_url":"https://data.riksdagen.se/dokument/hd03275","confidence":"verified","notes":"This temporary deviation is not folded into the annual benchmark rate in SE-0003.","title_en_source":"translated"},{"id":"SE-0033","country":"SE","date":"2024-01-01","date_precision":"day","date_basis":"in_force","title_original":"Ny kärnkraft i Sverige","title_en":"New nuclear power in Sweden","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":null,"has_independent_review_body":null,"direction":"strengthening","direction_basis":"The law removed the ten-reactor ceiling and the restriction to existing nuclear sites, expanding the legal scope for zero-carbon generation.","sector":"nuclear","quantified_change":"Maximum 10→no statutory reactor-number cap; eligible sites existing nuclear sites→any permitted site","reverses":null,"supersedes":"SE-0011","still_in_force":true,"end_date":null,"years_in_force":2,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Ny kärnkraft i Sverige","source_publisher":"Sveriges riksdag","source_date":"2023-11-29","source_url":"https://www.riksdagen.se/sv/dokument-och-lagar/dokument/betankande/ny-karnkraft-i-sverige_hb01nu5/html/","confidence":"verified","notes":"This implements a central Tidö energy commitment in statute.","title_en_source":"translated"},{"id":"SE-0034","country":"SE","date":"2025-08-01","date_precision":"day","date_basis":"in_force","title_original":"Lag (2025:587) om statligt stöd för investeringar i ny kärnkraft","title_en":"Act (2025:587) on state support for investment in new nuclear power","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":null,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Act created state loans and two-way contracts for difference for approximately 5 GW of new nuclear capacity.","sector":"nuclear","quantified_change":"Dedicated support 0→state loans plus two-way CfDs for approximately 5,000 MW, about four large reactors; normally at least 300 MW aggregate at one site","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":1,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Finansiering och riskdelning vid investeringar i ny kärnkraft, Prop. 2024/25:150","source_publisher":"Government Offices of Sweden","source_date":"2025-03-27","source_url":"https://www.regeringen.se/rattsliga-dokument/proposition/2025/03/prop.-202425150","confidence":"verified","notes":"Support terms are set project by project within the statutory model.","title_en_source":"translated"},{"id":"SE-0035","country":"SE","date":"2026-07-15","date_precision":"day","date_basis":"in_force","title_original":"Ny kärnkraft i Sverige – fler möjliga platser vid kusten","title_en":"New nuclear power in Sweden: more possible coastal sites","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":null,"has_independent_review_body":null,"direction":"strengthening","direction_basis":"The amendment removed Environmental Code coastal-area prohibitions that had barred case-by-case review of nuclear facilities in additional coastal locations.","sector":"nuclear","quantified_change":"not quantified","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":0,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Fler möjliga platser för ny kärnkraft vid Sveriges kust","source_publisher":"Government Offices of Sweden","source_date":"2026-06-17","source_url":"https://www.regeringen.se/pressmeddelanden/2026/06/fler-mojliga-platser-for-ny-karnkraft-vid-sveriges-kust/","confidence":"verified","notes":"The change allows environmental review; it does not itself authorize a reactor.","title_en_source":"translated"},{"id":"SE-0036","country":"SE","date":"2023-05-11","date_precision":"day","date_basis":"in_force","title_original":"Europaparlamentets och rådets förordning (EU) 2023/857","title_en":"Regulation (EU) 2023/857 amending the Effort Sharing Regulation","instrument_type":"eu_obligation","legal_status":"legally_binding_statute","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Sweden's binding 2030 ESR target increased from a 40% to a 50% reduction from 2005, with annual emissions allocations.","sector":"cross_cutting","quantified_change":"Swedish 2030 ESR target -40%→-50% versus 2005; official 2026 projection shows a cumulative 2021–2030 shortfall of 13.1 MtCO2e after surpluses in 2021–2023 and deficits from 2024","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":3,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Regulation (EU) 2023/857","source_publisher":"EUR-Lex","source_date":"2023-04-19","source_url":"https://eur-lex.europa.eu/eli/reg/2023/857/oj/eng","confidence":"verified","notes":"The 13.1 MtCO2e gap is the latest Naturvårdsverket projection published June 2026, not part of the Regulation itself: https://www.naturvardsverket.se/om-oss/aktuellt/nyheter-och-pressmeddelanden/2026/juni/sveriges-klimatutslapp-minskade-2025-men-avstanden-till-klimatmalen-okar/"},{"id":"SE-0037","country":"SE","date":"2023-05-11","date_precision":"day","date_basis":"in_force","title_original":"Europaparlamentets och rådets förordning (EU) 2023/839","title_en":"Regulation (EU) 2023/839 amending the LULUCF Regulation","instrument_type":"eu_obligation","legal_status":"legally_binding_statute","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The revised Regulation assigned Sweden an additional 3.955 MtCO2e net-removal contribution for 2030 and a binding 2026–2029 trajectory.","sector":"forestry_landuse","quantified_change":"Sweden 2030 net-removal contribution: 2016–2018 average -43.366 MtCO2e plus -3.955 Mt, implying -47.321 MtCO2e; official 2025 projection for 2030 about -35 to -29 MtCO2e, a 12–18 Mt annual shortfall against the annex value","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":3,"government_at_adoption":"Ulf Kristersson (Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats)","governments_since_adoption":0,"source_title":"Regulation (EU) 2023/839","source_publisher":"EUR-Lex","source_date":"2023-04-19","source_url":"https://eur-lex.europa.eu/eli/reg/2023/839/oj/eng","confidence":"verified","notes":"The projected sink range is from Naturvårdsverket's 2025 climate-reporting basis; comparing it directly with the Annex IIa contribution is an arithmetic indication, while formal compliance also applies accounting rules and the 2026–2029 budget."},{"id":"JP-0001","country":"JP","date":"1974","date_precision":"year","date_basis":"announced","title_original":"サンシャイン計画","title_en":"Sunshine Project","instrument_type":"programme_launch","legal_status":"administratively_binding","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The programme created a national R&D effort for solar, geothermal, coal and hydrogen technologies to reduce oil dependence.","sector":"cross_cutting","quantified_change":"Programme funding before launch 0; exact annual budget series not published on the NEDO history page","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"1993","years_in_force":19,"government_at_adoption":"Kakuei Tanaka (Liberal Democratic Party (LDP))","governments_since_adoption":0,"source_title":"History of NEDO","source_publisher":"NEDO","source_date":"not published","source_url":"https://www.nedo.go.jp/english/introducing/history.html","confidence":"verified","notes":"The official history publishes the launch year, not a day. The programme was integrated into the New Sunshine Project in 1993."},{"id":"JP-0002","country":"JP","date":"1978","date_precision":"year","date_basis":"announced","title_original":"ムーンライト計画","title_en":"Moonlight Project","instrument_type":"programme_launch","legal_status":"administratively_binding","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The programme established a national energy-conservation technology portfolio with approximately JPY 140 billion total funding through 1992.","sector":"cross_cutting","quantified_change":"Energy-conservation R&D programme 0→approximately JPY 140 billion cumulative budget, 1978–1992","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"1992","years_in_force":14,"government_at_adoption":"Takeo Fukuda (Liberal Democratic Party (LDP))","governments_since_adoption":0,"source_title":"平成29年度エネルギーに関する年次報告（エネルギー白書2018）","source_publisher":"Agency for Natural Resources and Energy","source_date":"2018-06-08","source_url":"https://www.enecho.meti.go.jp/about/whitepaper/2018html/1-1-4.html","confidence":"verified","notes":"The official source publishes only year precision for launch and end."},{"id":"JP-0003","country":"JP","date":"1979-06-22","date_precision":"day","date_basis":"enacted","title_original":"エネルギーの使用の合理化等に関する法律（昭和五十四年法律第四十九号）","title_en":"Act on the Rational Use of Energy (Act No. 49 of 1979)","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Act introduced binding energy-management obligations for designated factories and standards for machinery and equipment.","sector":"cross_cutting","quantified_change":"Designated-factory energy-management regime 0→1 national regime; no economy-wide emissions target","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":47,"government_at_adoption":"Masayoshi Ohira (Liberal Democratic Party (LDP))","governments_since_adoption":23,"source_title":"エネルギーの使用の合理化等に関する法律","source_publisher":"e-Gov 法令検索","source_date":"1979-06-22","source_url":"https://laws.e-gov.go.jp/document?lawid=354AC0000000049","confidence":"verified","notes":"The statute was renamed the Act on Rationalizing Energy Use and Shifting to Non-fossil Energy in 2023; this record tracks the continuing statute."},{"id":"JP-0004","country":"JP","date":"1980-10-01","date_precision":"day","date_basis":"in_force","title_original":"新エネルギー総合開発機構","title_en":"New Energy Development Organization (NEDO)","instrument_type":"agency_creation","legal_status":"legally_binding_statute","binds_whom":"government","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"A permanent national organization consolidated implementation of new-energy technology development.","sector":"cross_cutting","quantified_change":"Dedicated national new-energy development organization 0→1","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":46,"government_at_adoption":"Zenko Suzuki (Liberal Democratic Party (LDP))","governments_since_adoption":22,"source_title":"History of NEDO","source_publisher":"NEDO","source_date":"not published","source_url":"https://www.nedo.go.jp/english/introducing/history.html","confidence":"verified","notes":"Its mandate and legal form subsequently expanded; the organization continues as NEDO."},{"id":"JP-0005","country":"JP","date":"1983","date_precision":"year","date_basis":"in_force","title_original":"省エネ法改正（1983年）","title_en":"1983 amendment to the Energy Conservation Act","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The amendment added the certified energy-manager examination and an annual 1% energy-intensity improvement effort for designated factories.","sector":"industry","quantified_change":"Annual energy-intensity improvement effort 0→1%; statutory energy-manager examination 0→1 system","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":43,"government_at_adoption":"Yasuhiro Nakasone (Liberal Democratic Party (LDP))","governments_since_adoption":21,"source_title":"省エネ法の概要と改正経緯","source_publisher":"Agency for Natural Resources and Energy","source_date":"2022-06-08","source_url":"https://www.meti.go.jp/shingikai/enecho/shoene_shinene/sho_energy/pdf/015_s01_00.pdf","confidence":"verified","notes":"The official amendment chronology gives year precision.","title_en_source":"translated"},{"id":"JP-0006","country":"JP","date":"1993","date_precision":"year","date_basis":"announced","title_original":"ニューサンシャイン計画","title_en":"New Sunshine Project","instrument_type":"programme_launch","legal_status":"administratively_binding","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"restructuring","direction_basis":"The project integrated the Sunshine, Moonlight and global-environment technology programmes into one R&D portfolio.","sector":"cross_cutting","quantified_change":"Three national technology programmes→1 integrated programme","reverses":null,"supersedes":"JP-0001","still_in_force":false,"end_date":"2002","years_in_force":9,"government_at_adoption":"Kiichi Miyazawa (Liberal Democratic Party (LDP))","governments_since_adoption":0,"source_title":"History of NEDO","source_publisher":"NEDO","source_date":"not published","source_url":"https://www.nedo.go.jp/english/introducing/history.html","confidence":"verified","notes":"The NEDO history gives year precision; it does not characterize the integration as caused by a change of government."},{"id":"JP-0007","country":"JP","date":"1993","date_precision":"year","date_basis":"in_force","title_original":"省エネ法改正（1993年）","title_en":"1993 amendment to the Energy Conservation Act","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The amendment added a statutory basic policy, periodic factory reporting and energy-efficiency duties for buildings.","sector":"cross_cutting","quantified_change":"not quantified","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":33,"government_at_adoption":"Kiichi Miyazawa (Liberal Democratic Party (LDP))","governments_since_adoption":17,"source_title":"省エネ法の概要と改正経緯","source_publisher":"Agency for Natural Resources and Energy","source_date":"2022-06-08","source_url":"https://www.meti.go.jp/shingikai/enecho/shoene_shinene/sho_energy/pdf/015_s01_00.pdf","confidence":"verified","notes":"The official chronology gives year precision.","title_en_source":"translated"},{"id":"JP-0008","country":"JP","date":"1998-10-09","date_precision":"day","date_basis":"enacted","title_original":"地球温暖化対策の推進に関する法律（平成十年法律第百十七号）","title_en":"Act on Promotion of Global Warming Countermeasures (Act No. 117 of 1998)","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The statute created national and local planning, government implementation-plan and emissions-reporting processes, but no numerical national emissions ceiling.","sector":"cross_cutting","quantified_change":"National statutory climate-governance framework 0→1; numerical national target in statute: none","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":28,"government_at_adoption":"Keizo Obuchi (Liberal Democratic Party-led coalition)","governments_since_adoption":12,"source_title":"地球温暖化対策の推進に関する法律","source_publisher":"e-Gov 法令検索","source_date":"1998-10-09","source_url":"https://laws.e-gov.go.jp/document?lawid=410AC0000000117","confidence":"verified","notes":"The operative 2050 principle was added in 2021, recorded separately."},{"id":"JP-0009","country":"JP","date":"1999-04-01","date_precision":"day","date_basis":"in_force","title_original":"省エネ法改正（トップランナー制度）","title_en":"Energy Conservation Act amendment introducing the Top Runner Program","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Efficiency standards shifted to performance based on the best product in each category and the designated-factory regime expanded.","sector":"cross_cutting","quantified_change":"Top Runner product categories 0→11 at introduction; covered designated-factory regime expanded","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":27,"government_at_adoption":"Keizo Obuchi (Liberal Democratic Party-led coalition)","governments_since_adoption":12,"source_title":"トップランナー制度について","source_publisher":"Agency for Natural Resources and Energy","source_date":"not published","source_url":"https://www.enecho.meti.go.jp/category/saving_and_new/saving/enterprise/equipment/","confidence":"verified","notes":"The amendment was enacted in 1998 and took effect on 1 April 1999; standards are category-specific rather than an economy-wide target.","title_en_source":"translated"},{"id":"JP-0010","country":"JP","date":"2002","date_precision":"year","date_basis":"enacted","title_original":"省エネ法改正（2002年）","title_en":"2002 amendment to the Energy Conservation Act","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The amendment expanded coverage to commercial-sector facilities and strengthened building energy-conservation measures.","sector":"cross_cutting","quantified_change":"not quantified","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":24,"government_at_adoption":"Junichiro Koizumi (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":10,"source_title":"省エネ法の概要と改正経緯","source_publisher":"Agency for Natural Resources and Energy","source_date":"2022-06-08","source_url":"https://www.meti.go.jp/shingikai/enecho/shoene_shinene/sho_energy/pdf/015_s01_00.pdf","confidence":"verified","notes":"The official chronology gives year precision.","title_en_source":"translated"},{"id":"JP-0011","country":"JP","date":"2002-06-14","date_precision":"day","date_basis":"enacted","title_original":"エネルギー政策基本法（平成十四年法律第七十一号）","title_en":"Basic Act on Energy Policy (Act No. 71 of 2002)","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"government","has_interim_targets":false,"has_independent_review_body":false,"direction":"neutral","direction_basis":"The Act imposed a recurring Basic Energy Plan process around energy security, environmental suitability and market mechanisms without prescribing a decarbonisation number.","sector":"cross_cutting","quantified_change":"Basic Energy Plan duty 0→at least one plan reviewed roughly every three years; statutory emissions target none","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":24,"government_at_adoption":"Junichiro Koizumi (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":10,"source_title":"エネルギー政策基本法","source_publisher":"e-Gov 法令検索","source_date":"2002-06-14","source_url":"https://laws.e-gov.go.jp/law/414AC1000000071/","confidence":"verified","notes":null},{"id":"JP-0012","country":"JP","date":"2003-10-07","date_precision":"day","date_basis":"cabinet_decision","title_original":"エネルギー基本計画（第一次）","title_en":"First Strategic Energy Plan","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":false,"has_independent_review_body":false,"direction":"neutral","direction_basis":"The first plan operationalized the Basic Act's three principles but published no single economy-wide decarbonisation target.","sector":"cross_cutting","quantified_change":"Basic Energy Plans 0→1; no single generation-mix target","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2007-03-09","years_in_force":4,"government_at_adoption":"Junichiro Koizumi (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"過去のエネルギー基本計画","source_publisher":"Agency for Natural Resources and Energy","source_date":"not published","source_url":"https://www.enecho.meti.go.jp/category/others/basic_plan/past.html","confidence":"verified","notes":null},{"id":"JP-0013","country":"JP","date":"2005","date_precision":"year","date_basis":"enacted","title_original":"省エネ法改正（2005年）","title_en":"2005 amendment to the Energy Conservation Act","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The amendment integrated heat and electricity management and added transport-sector and residential-building measures.","sector":"cross_cutting","quantified_change":"not quantified","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":21,"government_at_adoption":"Junichiro Koizumi (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":10,"source_title":"省エネ法の概要と改正経緯","source_publisher":"Agency for Natural Resources and Energy","source_date":"2022-06-08","source_url":"https://www.meti.go.jp/shingikai/enecho/shoene_shinene/sho_energy/pdf/015_s01_00.pdf","confidence":"verified","notes":"The official chronology gives year precision.","title_en_source":"translated"},{"id":"JP-0014","country":"JP","date":"2007-03-09","date_precision":"day","date_basis":"cabinet_decision","title_original":"エネルギー基本計画（第二次）","title_en":"Second Strategic Energy Plan","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The plan added 2030 goals including reducing oil dependence in transport and improving energy efficiency.","sector":"cross_cutting","quantified_change":"By 2030: oil dependence in transport approximately 100%→80%; energy-efficiency improvement target at least 30%","reverses":null,"supersedes":"JP-0012","still_in_force":false,"end_date":"2010-06-18","years_in_force":3,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"過去のエネルギー基本計画","source_publisher":"Agency for Natural Resources and Energy","source_date":"not published","source_url":"https://www.enecho.meti.go.jp/category/others/basic_plan/past.html","confidence":"verified","notes":null},{"id":"JP-0015","country":"JP","date":"2008","date_precision":"year","date_basis":"enacted","title_original":"省エネ法改正（2008年）","title_en":"2008 amendment to the Energy Conservation Act","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The amendment shifted factory regulation to business-wide energy management, covered franchise chains and introduced sector benchmarks.","sector":"cross_cutting","quantified_change":"Regulatory unit individual facility→business operator; franchise chains newly covered; sector benchmark system 0→1","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":18,"government_at_adoption":"Yasuo Fukuda (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":9,"source_title":"省エネ法の概要と改正経緯","source_publisher":"Agency for Natural Resources and Energy","source_date":"2022-06-08","source_url":"https://www.meti.go.jp/shingikai/enecho/shoene_shinene/sho_energy/pdf/015_s01_00.pdf","confidence":"verified","notes":"The official chronology gives year precision; principal provisions took effect in 2009.","title_en_source":"translated"},{"id":"JP-0016","country":"JP","date":"2010-06-18","date_precision":"day","date_basis":"cabinet_decision","title_original":"エネルギー基本計画（第三次）","title_en":"Third Strategic Energy Plan","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The plan targeted a roughly 70% zero-emission electricity share by 2030, including more than 50% nuclear generation.","sector":"cross_cutting","quantified_change":"2030 zero-emission power target approximately 70%; nuclear share target >50%; 14+ new reactors envisaged","reverses":null,"supersedes":"JP-0014","still_in_force":false,"end_date":"2014-04-11","years_in_force":4,"government_at_adoption":"Naoto Kan (Democratic Party of Japan–People's New Party coalition)","governments_since_adoption":0,"source_title":"我が国の原子力政策の変遷と現状","source_publisher":"Agency for Natural Resources and Energy","source_date":"2018-03-06","source_url":"https://www.enecho.meti.go.jp/about/special/tokushu/nuclear/nihonnonuclear.html","confidence":"verified","notes":"Fukushima made the nuclear build-out assumptions inoperative before formal supersession."},{"id":"JP-0017","country":"JP","date":"2012-07-01","date_precision":"day","date_basis":"in_force","title_original":"電気事業者による再生可能エネルギー電気の調達に関する特別措置法","title_en":"Act on Special Measures Concerning Procurement of Renewable Energy Electricity by Electricity Utilities (FIT Act)","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"A nationwide feed-in tariff replaced limited support with guaranteed long-term purchase of certified renewable electricity.","sector":"electricity","quantified_change":"Nationwide FIT coverage 0→5 renewable categories; FY2012 non-residential solar tariff JPY 40/kWh plus tax for 20 years","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":14,"government_at_adoption":"Yoshihiko Noda (Democratic Party of Japan–People's New Party coalition)","governments_since_adoption":5,"source_title":"平成28年度エネルギーに関する年次報告（エネルギー白書2017）","source_publisher":"Agency for Natural Resources and Energy","source_date":"2017-06-02","source_url":"https://www.enecho.meti.go.jp/about/whitepaper/2017html/3-3-1.html","confidence":"verified","notes":"The Act was promulgated on 30 August 2011; this event uses the system's operative start date."},{"id":"JP-0018","country":"JP","date":"2012-10-01","date_precision":"day","date_basis":"in_force","title_original":"地球温暖化対策のための税","title_en":"Tax for Climate Change Mitigation","instrument_type":"tax_rate_change","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Japan added a CO2-linked surcharge on all fossil fuels, phased to JPY 289/tCO2 by 2016.","sector":"carbon_pricing","quantified_change":"Climate surcharge JPY 0→289/tCO2 in stages on 2012-10-01, 2014-04-01 and 2016-04-01; final additions: crude oil JPY 760/kL, gas JPY 780/t, coal JPY 670/t","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":14,"government_at_adoption":"Yoshihiko Noda (Democratic Party of Japan–People's New Party coalition)","governments_since_adoption":5,"source_title":"Details on the Carbon Tax (Tax for Climate Change Mitigation)","source_publisher":"Ministry of the Environment","source_date":"2012-08-14","source_url":"https://www.env.go.jp/en/policy/tax/env-tax/20120814b_ct.pdf","confidence":"verified","notes":"This is an upstream fossil-fuel tax, not an emissions-trading cap."},{"id":"JP-0019","country":"JP","date":"2012-09-14","date_precision":"day","date_basis":"announced","title_original":"革新的エネルギー・環境戦略","title_en":"Innovative Strategy for Energy and the Environment","instrument_type":"target_adoption","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"restructuring","direction_basis":"The strategy aimed to make zero operating nuclear power possible in the 2030s while expanding renewables and efficiency after Fukushima.","sector":"nuclear","quantified_change":"Nuclear operating share target: non-zero→zero in the 2030s; no new or expanded reactors","reverses":"JP-0016","supersedes":null,"still_in_force":false,"end_date":"2014-04-11","years_in_force":2,"government_at_adoption":"Yoshihiko Noda (Democratic Party of Japan–People's New Party coalition)","governments_since_adoption":0,"source_title":"革新的エネルギー・環境戦略","source_publisher":"Cabinet Secretariat","source_date":"2012-09-14","source_url":"https://www.cas.go.jp/jp/seisaku/npu/policy09/index.html","confidence":"verified","notes":"On 19 September 2012 the Cabinet decided to implement the strategy flexibly and continuously review it; the 2014 plan superseded the zero-nuclear direction.","title_en_source":"translated"},{"id":"JP-0020","country":"JP","date":"2012-09-19","date_precision":"day","date_basis":"in_force","title_original":"原子力規制委員会設置法","title_en":"Act for Establishment of the Nuclear Regulation Authority","instrument_type":"agency_creation","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":false,"has_independent_review_body":true,"direction":"strengthening","direction_basis":"The Act separated nuclear safety regulation from the promoting ministry and created an independent commission with binding licensing powers.","sector":"nuclear","quantified_change":"Independent nuclear regulatory commissions 0→1; five commissioners","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":14,"government_at_adoption":"Yoshihiko Noda (Democratic Party of Japan–People's New Party coalition)","governments_since_adoption":5,"source_title":"Outline of the Nuclear Regulation Authority","source_publisher":"Nuclear Regulation Authority","source_date":"2012-09-19","source_url":"https://www.nra.go.jp/data/000067231.pdf","confidence":"verified","notes":"Independent review here concerns nuclear safety, not annual assessment of climate-policy sufficiency."},{"id":"JP-0021","country":"JP","date":"2013-07-08","date_precision":"day","date_basis":"in_force","title_original":"実用発電用原子炉に係る新規制基準","title_en":"New Regulatory Requirements for Commercial Nuclear Power Reactors","instrument_type":"regulatory_standard","legal_status":"binding_secondary_legislation","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":true,"direction":"restructuring","direction_basis":"Mandatory backfit, severe-accident, earthquake and tsunami standards increased safety stringency while creating the approval route for post-Fukushima restarts.","sector":"nuclear","quantified_change":"Existing-reactor backfit requirement 0→all operating reactors; restart possible only after NRA conformity review","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":13,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":4,"source_title":"FY2013 Annual Report","source_publisher":"Nuclear Regulation Authority","source_date":"2014-06-01","source_url":"https://www.nra.go.jp/data/000067054.pdf","confidence":"verified","notes":"Direction is restructuring because the rules raise safety requirements and also enable low-carbon reactor restarts."},{"id":"JP-0022","country":"JP","date":"2013","date_precision":"year","date_basis":"enacted","title_original":"省エネ法改正（2013年）","title_en":"2013 amendment to the Energy Conservation Act","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The amendment added electricity-demand peak shifting and expanded Top Runner coverage to building materials.","sector":"cross_cutting","quantified_change":"not quantified","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":13,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":4,"source_title":"省エネ法の概要と改正経緯","source_publisher":"Agency for Natural Resources and Energy","source_date":"2022-06-08","source_url":"https://www.meti.go.jp/shingikai/enecho/shoene_shinene/sho_energy/pdf/015_s01_00.pdf","confidence":"verified","notes":"The official chronology gives year precision; principal provisions took effect in 2014.","title_en_source":"translated"},{"id":"JP-0023","country":"JP","date":"2014-04-11","date_precision":"day","date_basis":"cabinet_decision","title_original":"エネルギー基本計画（第四次）","title_en":"Fourth Strategic Energy Plan","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":false,"has_independent_review_body":false,"direction":"restructuring","direction_basis":"The plan restored nuclear power as an important base-load source while pledging to reduce dependence as far as possible, reversing the 2030s zero-nuclear direction.","sector":"cross_cutting","quantified_change":"Nuclear policy zero operating reactors in the 2030s→restart reactors meeting NRA standards and reduce dependence as far as possible; no generation mix number in the plan","reverses":"JP-0019","supersedes":"JP-0016","still_in_force":false,"end_date":"2018-07-03","years_in_force":4,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"我が国の原子力政策の変遷と現状","source_publisher":"Agency for Natural Resources and Energy","source_date":"2018-03-06","source_url":"https://www.enecho.meti.go.jp/about/special/tokushu/nuclear/nihonnonuclear.html","confidence":"verified","notes":null},{"id":"JP-0024","country":"JP","date":"2015-08-11","date_precision":"day","date_basis":"in_force","title_original":"新規制基準下の原子炉再稼働（2015年）","title_en":"Reactor restarts under the new regulatory requirements (2015)","instrument_type":"regulatory_standard","legal_status":"administratively_binding","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":true,"direction":"strengthening","direction_basis":"Two zero-carbon reactors restarted after NRA conformity review, ending the post-Fukushima zero-nuclear operating period.","sector":"nuclear","quantified_change":"2015 first reactor starts: Sendai 1 on 2015-08-11 and Sendai 2 on 2015-10-15; annual count 0→2","reverses":"JP-0019","supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":11,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":4,"source_title":"平成29年度エネルギーに関する年次報告（エネルギー白書2018）","source_publisher":"Agency for Natural Resources and Energy","source_date":"2018-06-08","source_url":"https://www.enecho.meti.go.jp/about/whitepaper/2018html/3-4-5.html","confidence":"verified","notes":"Dates use reactor start (原子炉起動), not grid connection or commercial-operation dates.","title_en_source":"translated"},{"id":"JP-0025","country":"JP","date":"2016-01-29","date_precision":"day","date_basis":"in_force","title_original":"新規制基準下の原子炉再稼働（2016年）","title_en":"Reactor restarts under the new regulatory requirements (2016)","instrument_type":"regulatory_standard","legal_status":"administratively_binding","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":true,"direction":"strengthening","direction_basis":"Three additional reactors started under the new standards, raising the cumulative restarted fleet from two to five.","sector":"nuclear","quantified_change":"2016 first reactor starts: Takahama 3 on 2016-01-29, Takahama 4 on 2016-02-26, Ikata 3 on 2016-08-12; annual count 0→3; cumulative 2→5","reverses":"JP-0019","supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":10,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":4,"source_title":"平成29年度エネルギーに関する年次報告（エネルギー白書2018）","source_publisher":"Agency for Natural Resources and Energy","source_date":"2018-06-08","source_url":"https://www.enecho.meti.go.jp/about/whitepaper/2018html/3-4-5.html","confidence":"verified","notes":"Dates use reactor start; Takahama 4 shut automatically before commercial operation and later restarted in 2017, but it is counted once by unit.","title_en_source":"translated"},{"id":"JP-0026","country":"JP","date":"2016-05-13","date_precision":"day","date_basis":"cabinet_decision","title_original":"地球温暖化対策計画","title_en":"Plan for Global Warming Countermeasures","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Cabinet adopted a 26% reduction target for FY2030 and an 80% long-term reduction for 2050.","sector":"cross_cutting","quantified_change":"FY2030 target 0→-26% versus FY2013; 2050 long-term goal 0→-80%","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2021-10-22","years_in_force":5,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"Cabinet Decision on the Plan for Global Warming Countermeasures","source_publisher":"Ministry of the Environment","source_date":"2016-05-13","source_url":"https://www.env.go.jp/en/headline/2238.html","confidence":"verified","notes":"Targets were Cabinet policy, not inserted as numerical duties in statute."},{"id":"JP-0027","country":"JP","date":"2017-04-01","date_precision":"day","date_basis":"in_force","title_original":"改正FIT法","title_en":"Amended FIT Act","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"restructuring","direction_basis":"Certification shifted from equipment to complete business plans and added auctions, operating deadlines and maintenance duties, improving delivery while reducing automatic tariff access.","sector":"electricity","quantified_change":"Certification unit equipment→business plan; competitive auctions 0→1 mechanism; maintenance and operation-start deadlines added","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":9,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":4,"source_title":"2017年4月1日から固定価格買取制度が変わります","source_publisher":"Agency for Natural Resources and Energy","source_date":"2017-03-01","source_url":"https://www.enecho.meti.go.jp/about/special/johoteikyo/fitkaisei.html","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"JP-0028","country":"JP","date":"2017-12-26","date_precision":"day","date_basis":"cabinet_decision","title_original":"水素基本戦略","title_en":"Basic Hydrogen Strategy","instrument_type":"target_adoption","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Japan's first hydrogen strategy set quantified cost-reduction milestones to build a low-carbon hydrogen market.","sector":"hydrogen","quantified_change":"Hydrogen supply cost target: about JPY 100/Nm3→JPY 30/Nm3 by 2030 and JPY 20/Nm3 or less by 2050","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2023-06-06","years_in_force":6,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"水素基本戦略","source_publisher":"Agency for Natural Resources and Energy","source_date":"2017-12-26","source_url":"https://www.enecho.meti.go.jp/about/special/johoteikyo/suisokihonsenryaku.html","confidence":"verified","notes":"Cabinet-level strategy, not a statutory emissions obligation."},{"id":"JP-0029","country":"JP","date":"2018-07-03","date_precision":"day","date_basis":"cabinet_decision","title_original":"エネルギー基本計画（第五次）","title_en":"Fifth Strategic Energy Plan","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The plan retained the 2030 generation mix and for the first time framed renewables as the main power source toward 2050.","sector":"cross_cutting","quantified_change":"2030 power mix retained: renewables 22–24%, nuclear 20–22%, LNG 27%, coal 26%, oil 3%","reverses":null,"supersedes":"JP-0023","still_in_force":false,"end_date":"2021-10-22","years_in_force":3,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"The 5th Strategic Energy Plan","source_publisher":"Agency for Natural Resources and Energy","source_date":"2018-07-03","source_url":"https://www.enecho.meti.go.jp/en/category/others/basic_plan/5th/","confidence":"verified","notes":null},{"id":"JP-0030","country":"JP","date":"2018","date_precision":"year","date_basis":"in_force","title_original":"省エネ法改正（2018年）","title_en":"2018 amendment to the Energy Conservation Act","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The amendment enabled certified integrated and collaborative energy management and placed duties on e-commerce consignors.","sector":"cross_cutting","quantified_change":"Certified integrated-management and inter-company collaboration schemes 0→2; e-commerce consignors newly covered","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":8,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":4,"source_title":"省エネ法改正で変わる省エネのカタチ","source_publisher":"Agency for Natural Resources and Energy","source_date":"2018-11-29","source_url":"https://www.enecho.meti.go.jp/about/special/johoteikyo/shoene_jirei.html","confidence":"verified","notes":"Principal provisions took effect on 1 December 2018.","title_en_source":"translated"},{"id":"JP-0031","country":"JP","date":"2018-04-01","date_precision":"day","date_basis":"in_force","title_original":"FIT制度におけるバイオマス発電の入札制及び持続可能性要件","title_en":"FIT biomass auctions and sustainability requirements","instrument_type":"regulatory_standard","legal_status":"binding_secondary_legislation","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"restructuring","direction_basis":"Large general-wood and all liquid-biomass projects moved from fixed tariffs to auctions while palm-oil projects acquired third-party sustainability certification.","sector":"electricity","quantified_change":"Auction threshold: general wood biomass at least 10 MW and all liquid biomass; first auction volumes 180 MW and 20 MW respectively; new palm-oil certification required","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2026-04-01","years_in_force":8,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"平成29年度エネルギーに関する年次報告（エネルギー白書2018）","source_publisher":"Agency for Natural Resources and Energy","source_date":"2018-06-08","source_url":"https://www.enecho.meti.go.jp/about/whitepaper/2018html/3-3-1.html","confidence":"verified","notes":"The eligibility framework was further tightened in 2023 and 2026.","title_en_source":"translated"},{"id":"JP-0032","country":"JP","date":"2018-03-14","date_precision":"day","date_basis":"in_force","title_original":"新規制基準下の原子炉再稼働（2018年）","title_en":"Reactor restarts under the new regulatory requirements (2018)","instrument_type":"regulatory_standard","legal_status":"administratively_binding","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":true,"direction":"strengthening","direction_basis":"Four additional reactors started under the new standards, raising the cumulative restarted fleet from five to nine units.","sector":"nuclear","quantified_change":"2018 first reactor starts: Ohi 3 on 2018-03-14, Genkai 3 on 2018-03-23, Ohi 4 on 2018-05-09, Genkai 4 on 2018-06-16; annual count 0→4; cumulative 5→9","reverses":"JP-0019","supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":8,"government_at_adoption":"Shinzo Abe (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":4,"source_title":"発電コスト検証ワーキンググループ資料","source_publisher":"Agency for Natural Resources and Energy","source_date":"2024-09-03","source_url":"https://www.enecho.meti.go.jp/committee/council/basic_policy_subcommittee/mitoshi/cost_wg/2024/data/03_07.pdf","confidence":"verified","notes":"Dates use reactor start, not grid connection or commercial operation.","title_en_source":"translated"},{"id":"JP-0033","country":"JP","date":"2020-10-26","date_precision":"day","date_basis":"announced","title_original":"2050年カーボンニュートラル宣言","title_en":"Declaration of carbon neutrality by 2050","instrument_type":"target_adoption","legal_status":"political_declaration","binds_whom":"none","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Prime Minister replaced the previous 80% reduction ambition with an economy-wide net-zero objective for 2050.","sector":"cross_cutting","quantified_change":"2050 goal -80% GHG→net zero GHG","reverses":null,"supersedes":"JP-0026","still_in_force":true,"end_date":null,"years_in_force":6,"government_at_adoption":"Yoshihide Suga (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":3,"source_title":"令和2年度エネルギーに関する年次報告（エネルギー白書2021）","source_publisher":"Agency for Natural Resources and Energy","source_date":"2021","source_url":"https://www.enecho.meti.go.jp/about/whitepaper/2021/html/1-2-0.html","confidence":"verified","notes":"The official Energy White Paper records the Prime Minister's 26 October 2020 declaration; it was later reflected in Article 2-2 of the climate statute as a guiding principle.","title_en_source":"translated"},{"id":"JP-0034","country":"JP","date":"2020-12-25","date_precision":"day","date_basis":"announced","title_original":"2050年カーボンニュートラルに伴うグリーン成長戦略","title_en":"Green Growth Strategy Through Achieving Carbon Neutrality in 2050","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The strategy organized decarbonisation support and regulatory reform around 14 growth sectors and the 2050 net-zero objective.","sector":"cross_cutting","quantified_change":"Target sectors 0→14; revised strategy estimated JPY 290 trillion annual economic effects and 18 million jobs by 2050","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2021-06-18","years_in_force":1,"government_at_adoption":"Yoshihide Suga (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"Green Growth Strategy Through Achieving Carbon Neutrality in 2050","source_publisher":"Ministry of Economy, Trade and Industry","source_date":"2020-12-25","source_url":"https://www.meti.go.jp/english/policy/energy_environment/global_warming/ggs2050/index.html","confidence":"verified","notes":"Superseded by the revised strategy on 18 June 2021; the revision retained 14 sectors."},{"id":"JP-0035","country":"JP","date":"2021-06-18","date_precision":"day","date_basis":"announced","title_original":"2050年カーボンニュートラルに伴うグリーン成長戦略（改訂）","title_en":"Green Growth Strategy Through Achieving Carbon Neutrality in 2050 (revised)","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The revision added sector road maps and quantified potential 2050 economic and employment effects while retaining 14 priority sectors.","sector":"cross_cutting","quantified_change":"Priority sectors remained 14; estimated 2050 annual economic effect JPY 290 trillion and employment effect 18 million","reverses":null,"supersedes":"JP-0034","still_in_force":true,"end_date":null,"years_in_force":5,"government_at_adoption":"Yoshihide Suga (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":3,"source_title":"Green Growth Strategy Through Achieving Carbon Neutrality in 2050","source_publisher":"Ministry of Economy, Trade and Industry","source_date":"2021-06-18","source_url":"https://www.meti.go.jp/english/policy/energy_environment/global_warming/ggs2050/index.html","confidence":"verified","notes":null},{"id":"JP-0036","country":"JP","date":"2021-03","date_precision":"month","date_basis":"announced","title_original":"グリーンイノベーション基金","title_en":"Green Innovation Fund","instrument_type":"programme_launch","legal_status":"administratively_binding","binds_whom":"both","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"A ten-year NEDO fund committed JPY 2 trillion initially to projects aligned with 2050 carbon neutrality and later received JPY 756.4 billion in additions.","sector":"cross_cutting","quantified_change":"Dedicated fund JPY 0→2.0 trillion initially; +JPY 300 billion FY2022 supplementary budget and +JPY 456.4 billion FY2023 initial budget, total JPY 2.7564 trillion","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":5,"government_at_adoption":"Yoshihide Suga (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":3,"source_title":"Green Innovation Fund","source_publisher":"Ministry of Economy, Trade and Industry","source_date":"not published","source_url":"https://www.meti.go.jp/english/policy/energy_environment/global_warming/gifund/index.html","confidence":"verified","notes":"The official overview identifies March 2021 establishment but not a day."},{"id":"JP-0037","country":"JP","date":"2021-06-02","date_precision":"day","date_basis":"enacted","title_original":"地球温暖化対策の推進に関する法律の一部を改正する法律（令和三年法律第五十四号）","title_en":"Act Partially Amending the Act on Promotion of Global Warming Countermeasures (Act No. 54 of 2021)","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The amendment put realization of a decarbonized society by 2050 into the Act's basic principle and strengthened local renewable-energy planning, but created no numerical compliance ceiling.","sector":"cross_cutting","quantified_change":"Statutory 2050 guiding principle absent→realization of a decarbonized society by 2050; statutory interim targets 0; independent annual review bodies 0","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":5,"government_at_adoption":"Yoshihide Suga (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":3,"source_title":"地球温暖化対策の推進に関する法律","source_publisher":"e-Gov 法令検索","source_date":"2021-06-02","source_url":"https://laws.e-gov.go.jp/document?lawid=410AC0000000117_20220401_503AC0000000054","confidence":"verified","notes":"Core provisions took effect 2022-04-01. Article 2-2 is mandatory in form for how measures 'must be carried out' but phrases 2050 realization as the guiding principle (旨として); it does not create an enforceable quantified outcome duty.","title_en_source":"translated"},{"id":"JP-0038","country":"JP","date":"2021-10-22","date_precision":"day","date_basis":"cabinet_decision","title_original":"地球温暖化対策計画（2021年）","title_en":"Plan for Global Warming Countermeasures (2021)","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Cabinet raised the FY2030 target from 26% to 46% below FY2013 and committed to continue challenging 50%.","sector":"cross_cutting","quantified_change":"FY2030 target -26%→-46% versus FY2013, with an aspiration to -50%","reverses":null,"supersedes":"JP-0026","still_in_force":false,"end_date":"2025-02-18","years_in_force":4,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"Cabinet decision on the Plan for Global Warming Countermeasures","source_publisher":"Ministry of the Environment","source_date":"2021-10-22","source_url":"https://www.env.go.jp/en/headline/2551.html","confidence":"verified","notes":"The Cabinet plan is monitored annually by the inter-ministerial Global Warming Prevention Headquarters; that is governmental self-review, not independent review."},{"id":"JP-0039","country":"JP","date":"2021-10-22","date_precision":"day","date_basis":"announced","title_original":"日本のNDC（国が決定する貢献）","title_en":"Japan's Nationally Determined Contribution","instrument_type":"target_adoption","legal_status":"political_declaration","binds_whom":"none","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Japan's international 2030 contribution rose from a 26% to a 46% GHG reduction from FY2013.","sector":"cross_cutting","quantified_change":"FY2030 NDC -26%→-46% versus FY2013, with continued efforts toward -50%","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2025-02-18","years_in_force":4,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"Japan's NDC (Nationally Determined Contribution)","source_publisher":"Ministry of the Environment","source_date":"2021-10-22","source_url":"https://www.env.go.jp/en/headline/2551.html","confidence":"verified","notes":"The NDC is an international political commitment, not a domestic statutory emissions ceiling."},{"id":"JP-0040","country":"JP","date":"2021-10-22","date_precision":"day","date_basis":"cabinet_decision","title_original":"エネルギー基本計画（第六次）","title_en":"Sixth Strategic Energy Plan","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The 2030 renewable share rose from 22–24% to 36–38% while nuclear remained 20–22%, aligning the energy plan with the stronger NDC.","sector":"cross_cutting","quantified_change":"2030 power mix: renewables 22–24%→36–38%; nuclear 20–22%→20–22%; thermal approximately 56%→41%; hydrogen/ammonia 0→1%","reverses":null,"supersedes":"JP-0029","still_in_force":false,"end_date":"2025-02-18","years_in_force":4,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"The 6th Strategic Energy Plan","source_publisher":"Agency for Natural Resources and Energy","source_date":"2021-10-22","source_url":"https://www.enecho.meti.go.jp/en/category/others/basic_plan/","confidence":"verified","notes":null},{"id":"JP-0041","country":"JP","date":"2021-06-23","date_precision":"day","date_basis":"in_force","title_original":"新規制基準下の原子炉再稼働（2021年）","title_en":"Reactor restarts under the new regulatory requirements (2021)","instrument_type":"regulatory_standard","legal_status":"administratively_binding","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":true,"direction":"strengthening","direction_basis":"Mihama 3 became the tenth distinct unit restarted under the new standards and the first over 40 years old to do so.","sector":"nuclear","quantified_change":"2021 first reactor start: Mihama 3 on 2021-06-23; annual count 0→1; cumulative 9→10","reverses":"JP-0019","supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":5,"government_at_adoption":"Yoshihide Suga (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":3,"source_title":"発電コスト検証ワーキンググループ資料","source_publisher":"Agency for Natural Resources and Energy","source_date":"2024-09-03","source_url":"https://www.enecho.meti.go.jp/committee/council/basic_policy_subcommittee/mitoshi/cost_wg/2024/data/03_07.pdf","confidence":"verified","notes":"Date uses reactor start; grid connection occurred on 2021-06-29 and commercial operation on 2021-07-27.","title_en_source":"translated"},{"id":"JP-0042","country":"JP","date":"2022-04-01","date_precision":"day","date_basis":"in_force","title_original":"FIP制度","title_en":"Feed-in Premium (FIP) scheme","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"restructuring","direction_basis":"Market-linked premiums supplemented fixed tariffs and shifted larger renewable projects toward wholesale-market participation.","sector":"electricity","quantified_change":"not quantified","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":4,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":2,"source_title":"FIP制度の詳細設計とアグリゲーションビジネスの更なる活性化","source_publisher":"Agency for Natural Resources and Energy","source_date":"2022-02-14","source_url":"https://www.enecho.meti.go.jp/category/saving_and_new/saiene/kaitori/FIP_r2.html","confidence":"verified","notes":"FIP coexists with FIT; it did not repeal the FIT Act."},{"id":"JP-0043","country":"JP","date":"2023-04-01","date_precision":"day","date_basis":"in_force","title_original":"安定的なエネルギー需給構造の確立を図るためのエネルギーの使用の合理化等に関する法律等の一部を改正する法律","title_en":"2022 amendment to the Energy Conservation Act for a stable energy supply-demand structure","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"Regulation expanded from fossil-energy conservation to all energy and added large users' non-fossil transition plans and reporting.","sector":"cross_cutting","quantified_change":"Energy accounting fossil energy only→all energy; large-user non-fossil transition plans and periodic reporting 0→required","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":3,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":2,"source_title":"改正省エネ法の概要","source_publisher":"Agency for Natural Resources and Energy","source_date":"2023-03-17","source_url":"https://www.meti.go.jp/press/2022/03/20230317005/20230317005.html","confidence":"verified","notes":"Act No. 46 was promulgated on 20 May 2022; this event uses principal entry into force.","title_en_source":"translated"},{"id":"JP-0044","country":"JP","date":"2023-02-10","date_precision":"day","date_basis":"cabinet_decision","title_original":"GX実現に向けた基本方針","title_en":"Basic Policy for the Realization of GX","instrument_type":"cabinet_decision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The policy paired JPY 20 trillion of transition bonds with future carbon pricing to mobilize more than JPY 150 trillion of investment over ten years.","sector":"cross_cutting","quantified_change":"GX transition bonds JPY 0→20 trillion; public-private GX investment objective JPY 0→more than 150 trillion over 10 years","reverses":null,"supersedes":null,"still_in_force":false,"end_date":"2025-02-18","years_in_force":2,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":0,"source_title":"GX実現に向けた基本方針","source_publisher":"Cabinet Secretariat","source_date":"2023-02-10","source_url":"https://www.cas.go.jp/jp/seisaku/gx_jikkou_kaigi/index.html","confidence":"verified","notes":"The financing and carbon-pricing dates received statutory form in the GX Promotion Act.","title_en_source":"translated"},{"id":"JP-0045","country":"JP","date":"2023-05-19","date_precision":"day","date_basis":"enacted","title_original":"脱炭素成長型経済構造への円滑な移行の推進に関する法律（令和五年法律第三十二号）","title_en":"Act on Promotion of a Smooth Transition to a Decarbonized Growth-Oriented Economic Structure (GX Promotion Act, Act No. 32 of 2023)","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Act gave legal authority for ten years of GX bonds and future carbon-pricing charges and auctions, moving GX finance from policy to statute.","sector":"carbon_pricing","quantified_change":"GX Economy Transition Bonds authorized FY2023–FY2032 up to approximately JPY 20 trillion; fossil-fuel surcharge start FY2028; paid power-sector allowance auctions start FY2033","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":3,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":2,"source_title":"脱炭素成長型経済構造への円滑な移行の推進に関する法律","source_publisher":"e-Gov 法令検索","source_date":"2023-05-19","source_url":"https://laws.e-gov.go.jp/law/505AC0000000032","confidence":"verified","notes":"The original Act did not itself make the GX-ETS mandatory for large emitters; that came in the 2025 amendment.","title_en_source":"translated"},{"id":"JP-0046","country":"JP","date":"2023-06-06","date_precision":"day","date_basis":"announced","title_original":"水素基本戦略（改定）","title_en":"Basic Strategy for Hydrogen (revised)","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The revision added quantified hydrogen supply milestones and an approximately JPY 15 trillion public-private investment objective.","sector":"hydrogen","quantified_change":"Hydrogen supply targets 3 Mt by 2030, 12 Mt by 2040, 20 Mt by 2050; investment objective approximately JPY 15 trillion over 15 years; cost targets JPY 30/Nm3 by 2030 and JPY 20/Nm3 by 2050 retained","reverses":null,"supersedes":"JP-0028","still_in_force":true,"end_date":null,"years_in_force":3,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":2,"source_title":"Basic Strategy for Hydrogen","source_publisher":"Ministry of Economy, Trade and Industry","source_date":"2023-06-06","source_url":"https://www.meti.go.jp/shingikai/enecho/shoene_shinene/suiso_seisaku/pdf/20230606_5.pdf","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"JP-0047","country":"JP","date":"2023-04-01","date_precision":"day","date_basis":"in_force","title_original":"FIT・FIP制度におけるバイオマス燃料のライフサイクルGHG基準","title_en":"Life-cycle GHG criteria for biomass fuels under FIT/FIP","instrument_type":"regulatory_standard","legal_status":"binding_secondary_legislation","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"New biomass projects became subject to explicit life-cycle GHG savings thresholds of 50%, rising to 70% in 2030.","sector":"electricity","quantified_change":"New biomass projects at least 1 MW certified from FY2022: required life-cycle GHG saving 0→at least 50% in FY2023–FY2029 and at least 70% from FY2030; waste-biomass projects certified from FY2024 added","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":3,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":2,"source_title":"FIT/FIP制度におけるバイオマス燃料のライフサイクルGHG排出量基準","source_publisher":"Agency for Natural Resources and Energy","source_date":"2024-04-01","source_url":"https://www.enecho.meti.go.jp/category/saving_and_new/saiene/data/kaitori/lifecycleGHG.pdf","confidence":"verified","notes":"The standard applies by certification date, fuel category and project size; the summary gives the principal threshold.","title_en_source":"translated"},{"id":"JP-0048","country":"JP","date":"2023-07-28","date_precision":"day","date_basis":"in_force","title_original":"新規制基準下の原子炉再稼働（2023年）","title_en":"Reactor restarts under the new regulatory requirements (2023)","instrument_type":"regulatory_standard","legal_status":"administratively_binding","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":true,"direction":"strengthening","direction_basis":"Two additional reactors started under the new standards, raising the cumulative restarted fleet from ten to twelve units.","sector":"nuclear","quantified_change":"2023 first reactor starts: Takahama 1 on 2023-07-28 and Takahama 2 on 2023-09-15; annual count 0→2; cumulative 10→12","reverses":"JP-0019","supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":3,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":2,"source_title":"発電用原子炉の運転期間（電気事業法）","source_publisher":"Agency for Natural Resources and Energy","source_date":"2025-09-01","source_url":"https://www.enecho.meti.go.jp/category/electricity_and_gas/electric/summary/operational_period/0000001.pdf","confidence":"verified","notes":"Dates use reactor start; grid connection occurred on 2023-08-02 and 2023-09-20, respectively.","title_en_source":"translated"},{"id":"JP-0049","country":"JP","date":"2024-04-01","date_precision":"day","date_basis":"in_force","title_original":"改正再エネ特措法（説明会等の事前周知）","title_en":"Amended Renewable Energy Special Measures Act: advance community notification","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"FIT/FIP certification for specified projects acquired advance community-explanation requirements, strengthening social and siting safeguards without changing tariffs.","sector":"electricity","quantified_change":"Advance community explanation requirement 0→1 for covered projects; tariff level unchanged","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":2,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":2,"source_title":"改正再エネ特措法に基づく説明会及び事前周知措置について","source_publisher":"Agency for Natural Resources and Energy","source_date":"2024-02-20","source_url":"https://www.enecho.meti.go.jp/category/saving_and_new/saiene/kaitori/FIP_r5.html","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"JP-0050","country":"JP","date":"2024-05-24","date_precision":"day","date_basis":"enacted","title_original":"脱炭素成長型経済構造への円滑な移行のための低炭素水素等の供給及び利用の促進に関する法律（令和六年法律第三十七号）","title_en":"Act on Promotion of Supply and Utilization of Low-Carbon Hydrogen and Its Derivatives for a Smooth Transition to a Decarbonized Growth-Oriented Economic Structure (Act No. 37 of 2024)","instrument_type":"statute","legal_status":"legally_binding_statute","binds_whom":"both","has_interim_targets":false,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Act created approved-project price-gap and hub support plus low-carbon hydrogen standards, converting strategy into an investment-support regime.","sector":"hydrogen","quantified_change":"Approved low-carbon hydrogen support schemes 0→2 principal forms: price-gap support and infrastructure/hub support; statutory support total not fixed in the Act","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":2,"government_at_adoption":"Fumio Kishida (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":2,"source_title":"水素社会推進法について","source_publisher":"Agency for Natural Resources and Energy","source_date":"2024-10-23","source_url":"https://www.enecho.meti.go.jp/category/saving_and_new/advanced_systems/hydrogen_society/carbon_neutral/index.html","confidence":"verified","notes":"The Act entered into force on 23 October 2024.","title_en_source":"translated"},{"id":"JP-0051","country":"JP","date":"2024-10-29","date_precision":"day","date_basis":"in_force","title_original":"新規制基準下の原子炉再稼働（2024年）","title_en":"Reactor restarts under the new regulatory requirements (2024)","instrument_type":"regulatory_standard","legal_status":"administratively_binding","binds_whom":"regulated_entities","has_interim_targets":null,"has_independent_review_body":true,"direction":"strengthening","direction_basis":"Two BWR units restarted, taking the post-Fukushima cumulative count from twelve to fourteen and extending restarts to eastern Japan.","sector":"nuclear","quantified_change":"2024 first reactor starts: Onagawa 2 on 2024-10-29 and Shimane 2 on 2024-12-07; annual count 0→2; cumulative 12→14. Annual counts with zero first-time unit restarts: 2017 0, 2019 0, 2020 0, 2022 0, 2025 0, 2026 through 2026-08-16 0","reverses":"JP-0019","supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":2,"government_at_adoption":"Shigeru Ishiba (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":1,"source_title":"令和6年度エネルギーに関する年次報告（エネルギー白書2025）","source_publisher":"Agency for Natural Resources and Energy","source_date":"2025-06-13","source_url":"https://www.enecho.meti.go.jp/about/whitepaper/2025/html/2-4-1.html","confidence":"verified","notes":"Dates use reactor start. The official White Paper describes Onagawa 2 as restarted in November because power generation resumed then; this dataset uses the NRA-authorized reactor start on 29 October. No unit is counted more than once.","title_en_source":"translated"},{"id":"JP-0052","country":"JP","date":"2025-02-18","date_precision":"day","date_basis":"cabinet_decision","title_original":"地球温暖化対策計画（2025年）","title_en":"Plan for Global Warming Countermeasures (2025)","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Cabinet added FY2035 and FY2040 milestones of 60% and 73% below FY2013 on a path to net zero.","sector":"cross_cutting","quantified_change":"New FY2035 target -60% and FY2040 target -73% versus FY2013; FY2030 target retained at -46%","reverses":null,"supersedes":"JP-0038","still_in_force":true,"end_date":null,"years_in_force":1,"government_at_adoption":"Shigeru Ishiba (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":1,"source_title":"地球温暖化対策計画等の閣議決定について","source_publisher":"Ministry of the Environment","source_date":"2025-02-18","source_url":"https://www.env.go.jp/annai/kaiken/kaiken_00285.html","confidence":"verified","notes":"The same numbers were submitted in Japan's 2025 NDC; they remain Cabinet/NDC targets, not statutory quantitative ceilings."},{"id":"JP-0053","country":"JP","date":"2025-02-18","date_precision":"day","date_basis":"announced","title_original":"日本のNDC（2025年）","title_en":"Japan's Nationally Determined Contribution (2025)","instrument_type":"target_adoption","legal_status":"political_declaration","binds_whom":"none","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The updated NDC extended the target path beyond 2030 with 60% and 73% reductions in FY2035 and FY2040.","sector":"cross_cutting","quantified_change":"FY2030 -46% retained; FY2035 0→-60%; FY2040 0→-73%, all versus FY2013","reverses":null,"supersedes":"JP-0039","still_in_force":true,"end_date":null,"years_in_force":1,"government_at_adoption":"Shigeru Ishiba (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":1,"source_title":"日本のNDC（国が決定する貢献）","source_publisher":"Ministry of the Environment","source_date":"2025-02-18","source_url":"https://www.env.go.jp/earth/earth/ondanka/ndc.html","confidence":"verified","notes":"NDC status is international and political; domestic implementation rests on plans and legislation."},{"id":"JP-0054","country":"JP","date":"2025-02-18","date_precision":"day","date_basis":"cabinet_decision","title_original":"エネルギー基本計画（第七次）","title_en":"Seventh Strategic Energy Plan","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"restructuring","direction_basis":"The 2040 outlook raises the renewable share to 40–50% and targets about 20% nuclear while directing maximum use of both, replacing the earlier nuclear-dependence-reduction wording.","sector":"cross_cutting","quantified_change":"2040 power outlook: renewables 40–50%, nuclear approximately 20%, thermal 30–40%; policy changed from reducing nuclear dependence as far as possible to maximizing use of both renewables and nuclear","reverses":null,"supersedes":"JP-0040","still_in_force":true,"end_date":null,"years_in_force":1,"government_at_adoption":"Shigeru Ishiba (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":1,"source_title":"Cabinet Decision on the Seventh Strategic Energy Plan","source_publisher":"Ministry of Economy, Trade and Industry","source_date":"2025-02-18","source_url":"https://www.meti.go.jp/english/press/2025/0218_001.html","confidence":"verified","notes":"The plan is Cabinet policy, not a binding generation quota."},{"id":"JP-0055","country":"JP","date":"2025-02-18","date_precision":"day","date_basis":"cabinet_decision","title_original":"GX2040ビジョン","title_en":"GX2040 Vision","instrument_type":"plan_revision","legal_status":"non_binding_plan","binds_whom":"government","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The Vision extended GX investment and industrial-location policy through 2040 while retaining more than JPY 150 trillion of ten-year public-private investment.","sector":"cross_cutting","quantified_change":"GX planning horizon 2033→2040; public-private investment objective remains more than JPY 150 trillion over 10 years","reverses":null,"supersedes":"JP-0044","still_in_force":true,"end_date":null,"years_in_force":1,"government_at_adoption":"Shigeru Ishiba (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":1,"source_title":"GX2040ビジョン","source_publisher":"Cabinet Secretariat","source_date":"2025-02-18","source_url":"https://www.meti.go.jp/policy/energy_environment/global_warming/","confidence":"verified","notes":null,"title_en_source":"translated"},{"id":"JP-0056","country":"JP","date":"2025-06-04","date_precision":"day","date_basis":"enacted","title_original":"脱炭素成長型経済構造への円滑な移行の推進に関する法律及び資源の有効な利用の促進に関する法律の一部を改正する法律（令和七年法律第五十二号）","title_en":"Act Partially Amending the GX Promotion Act and the Act on Promotion of Effective Utilization of Resources (Act No. 52 of 2025)","instrument_type":"statutory_amendment","legal_status":"legally_binding_statute","binds_whom":"regulated_entities","has_interim_targets":true,"has_independent_review_body":false,"direction":"strengthening","direction_basis":"The amendment makes emissions trading mandatory from FY2026 for firms averaging at least 100,000 tCO2 of direct annual emissions, replacing voluntary participation for covered firms.","sector":"carbon_pricing","quantified_change":"Mandatory GX-ETS coverage from FY2026: direct emitters averaging at least 100,000 tCO2/year over the preceding 3 years; covered firms voluntary→mandatory; verified reporting and allowance surrender required; price floor/ceiling mechanisms added","reverses":null,"supersedes":null,"still_in_force":true,"end_date":null,"years_in_force":1,"government_at_adoption":"Shigeru Ishiba (Liberal Democratic Party–Komeito coalition)","governments_since_adoption":1,"source_title":"Cabinet Decision on the Bill for Partially Amending the GX Promotion Act","source_publisher":"Ministry of Economy, Trade and Industry","source_date":"2025-02-25","source_url":"https://www.meti.go.jp/english/press/2025/0225_001.html","confidence":"verified","notes":"Promulgated 4 June 2025; the mandatory ETS provisions take effect 1 April 2026. The fossil-fuel surcharge remains scheduled for FY2028 and paid power-sector auctions for FY2033 under the 2023 Act.","title_en_source":"translated"},{"id":"JP-0057","country":"JP","date":"2026-04-01","date_precision":"day","date_basis":"in_force","title_original":"2026年度以降のFIT・FIP制度における大規模バイオマスの新規支援対象除外","title_en":"Exclusion of large biomass from new FIT/FIP support from FY2026","instrument_type":"regulatory_standard","legal_status":"binding_secondary_legislation","binds_whom":"regulated_entities","has_interim_targets":false,"has_independent_review_body":false,"direction":"restructuring","direction_basis":"New FIT/FIP eligibility ended for general-wood biomass of at least 10 MW and all liquid-biomass projects, reducing subsidy exposure to import-dependent large biomass while leaving smaller categories eligible.","sector":"electricity","quantified_change":"New support eligibility: general wood biomass at least 10,000 kW eligible by auction→ineligible; liquid biomass all sizes eligible by auction→ineligible; previously certified projects generally retain support unless a price-changing modification is approved","reverses":null,"supersedes":"JP-0031","still_in_force":true,"end_date":null,"years_in_force":0,"government_at_adoption":"Sanae Takaichi (Liberal Democratic Party–Japan Innovation Party coalition)","governments_since_adoption":0,"source_title":"買取価格・期間等｜FIT・FIP制度","source_publisher":"Agency for Natural Resources and Energy","source_date":"2026-04-01","source_url":"https://www.enecho.meti.go.jp/category/saving_and_new/saiene/kaitori/fit_kakaku.html","confidence":"verified","notes":"This is the requested FY2026 biomass eligibility change; it is not a blanket end to biomass FIT/FIP support.","title_en_source":"translated"}];
+const GOVERNMENTS = [{"country":"SE","pm_name":"Olof Palme","party_or_coalition":"Swedish Social Democratic Party (S)","start_date":"1969-10-14","end_date":"1976-10-08","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Thorbjörn Fälldin","party_or_coalition":"Centre Party–Moderate Party–Liberal People's Party coalition","start_date":"1976-10-08","end_date":"1978-10-18","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Ola Ullsten","party_or_coalition":"Liberal People's Party minority government","start_date":"1978-10-18","end_date":"1979-10-12","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Thorbjörn Fälldin","party_or_coalition":"Centre Party-led non-socialist coalition","start_date":"1979-10-12","end_date":"1982-10-08","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Olof Palme","party_or_coalition":"Swedish Social Democratic Party (S)","start_date":"1982-10-08","end_date":"1986-02-28","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Ingvar Carlsson","party_or_coalition":"Swedish Social Democratic Party (S)","start_date":"1986-03-01","end_date":"1991-10-04","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Carl Bildt","party_or_coalition":"Moderate Party–Liberal People's Party–Centre Party–Christian Democrats coalition","start_date":"1991-10-04","end_date":"1994-10-07","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Ingvar Carlsson","party_or_coalition":"Swedish Social Democratic Party (S)","start_date":"1994-10-07","end_date":"1996-03-22","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Göran Persson","party_or_coalition":"Swedish Social Democratic Party (S)","start_date":"1996-03-22","end_date":"2006-10-06","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Fredrik Reinfeldt","party_or_coalition":"Moderate Party–Liberal People's Party–Centre Party–Christian Democrats coalition","start_date":"2006-10-06","end_date":"2014-10-03","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Stefan Löfven","party_or_coalition":"Swedish Social Democratic Party–Green Party coalition","start_date":"2014-10-03","end_date":"2021-11-30","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Magdalena Andersson","party_or_coalition":"Swedish Social Democratic Party (S) minority government","start_date":"2021-11-30","end_date":"2022-10-18","source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"SE","pm_name":"Ulf Kristersson","party_or_coalition":"Moderate Party–Christian Democrats–Liberals coalition, supported by Sweden Democrats","start_date":"2022-10-18","end_date":null,"source_url":"https://www.government.se/how-sweden-is-governed/the-office-of-prime-minister-in-sweden/"},{"country":"JP","pm_name":"Eisaku Sato","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1964-11-09","end_date":"1972-07-07","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Kakuei Tanaka","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1972-07-07","end_date":"1974-12-09","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Takeo Miki","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1974-12-09","end_date":"1976-12-24","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Takeo Fukuda","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1976-12-24","end_date":"1978-12-07","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Masayoshi Ohira","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1978-12-07","end_date":"1980-06-12","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Zenko Suzuki","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1980-07-17","end_date":"1982-11-27","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Yasuhiro Nakasone","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1982-11-27","end_date":"1987-11-06","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Noboru Takeshita","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1987-11-06","end_date":"1989-06-03","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Sosuke Uno","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1989-06-03","end_date":"1989-08-10","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Toshiki Kaifu","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1989-08-10","end_date":"1991-11-05","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Kiichi Miyazawa","party_or_coalition":"Liberal Democratic Party (LDP)","start_date":"1991-11-05","end_date":"1993-08-09","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Morihiro Hosokawa","party_or_coalition":"Japan New Party-led eight-party coalition","start_date":"1993-08-09","end_date":"1994-04-28","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Tsutomu Hata","party_or_coalition":"Japan Renewal Party-led coalition","start_date":"1994-04-28","end_date":"1994-06-30","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Tomiichi Murayama","party_or_coalition":"Japan Socialist Party–LDP–New Party Sakigake coalition","start_date":"1994-06-30","end_date":"1996-01-11","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Ryutaro Hashimoto","party_or_coalition":"Liberal Democratic Party-led coalition","start_date":"1996-01-11","end_date":"1998-07-30","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Keizo Obuchi","party_or_coalition":"Liberal Democratic Party-led coalition","start_date":"1998-07-30","end_date":"2000-04-05","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Yoshiro Mori","party_or_coalition":"Liberal Democratic Party–Komeito-led coalition","start_date":"2000-04-05","end_date":"2001-04-26","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Junichiro Koizumi","party_or_coalition":"Liberal Democratic Party–Komeito coalition","start_date":"2001-04-26","end_date":"2006-09-26","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Shinzo Abe","party_or_coalition":"Liberal Democratic Party–Komeito coalition","start_date":"2006-09-26","end_date":"2007-09-26","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Yasuo Fukuda","party_or_coalition":"Liberal Democratic Party–Komeito coalition","start_date":"2007-09-26","end_date":"2008-09-24","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Taro Aso","party_or_coalition":"Liberal Democratic Party–Komeito coalition","start_date":"2008-09-24","end_date":"2009-09-16","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Yukio Hatoyama","party_or_coalition":"Democratic Party of Japan–Social Democratic Party–People's New Party coalition","start_date":"2009-09-16","end_date":"2010-06-08","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Naoto Kan","party_or_coalition":"Democratic Party of Japan–People's New Party coalition","start_date":"2010-06-08","end_date":"2011-09-02","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Yoshihiko Noda","party_or_coalition":"Democratic Party of Japan–People's New Party coalition","start_date":"2011-09-02","end_date":"2012-12-26","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Shinzo Abe","party_or_coalition":"Liberal Democratic Party–Komeito coalition","start_date":"2012-12-26","end_date":"2020-09-16","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Yoshihide Suga","party_or_coalition":"Liberal Democratic Party–Komeito coalition","start_date":"2020-09-16","end_date":"2021-10-04","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Fumio Kishida","party_or_coalition":"Liberal Democratic Party–Komeito coalition","start_date":"2021-10-04","end_date":"2024-10-01","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Shigeru Ishiba","party_or_coalition":"Liberal Democratic Party–Komeito coalition","start_date":"2024-10-01","end_date":"2025-10-21","source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"},{"country":"JP","pm_name":"Sanae Takaichi","party_or_coalition":"Liberal Democratic Party–Japan Innovation Party coalition","start_date":"2025-10-21","end_date":null,"source_url":"https://www.kantei.go.jp/jp/rekidainaikaku/"}];
+const OPEN_QUESTIONS = "## open_questions\n\n1. **Does Japan have a legally binding climate target in statute?** Article 2-2 of the Act on Promotion of Global Warming Countermeasures, as amended in 2021, states: 「地球温暖化対策の推進は、パリ協定第二条１（ａ）において世界全体の平均気温の上昇を工業化以前よりも摂氏二度高い水準を十分に下回るものに抑えること及び世界全体の平均気温の上昇を工業化以前よりも摂氏一・五度高い水準までのものに制限するための努力を継続することとされていることを踏まえ、環境の保全と経済及び社会の発展を統合的に推進しつつ、我が国における二千五十年までの脱炭素社会（人の活動に伴って発生する温室効果ガスの排出量と吸収作用の保全及び強化により吸収される温室効果ガスの吸収量との間の均衡が保たれた社会をいう。第三十六条の二において同じ。）の実現を旨として、国民並びに国、地方公共団体、事業者及び民間の団体等の密接な連携の下に行われなければならない。」 ([e-Gov operative text](https://laws.e-gov.go.jp/document?lawid=410AC0000000117_20220401_503AC0000000054)). The statute is binding as law and the final phrase says promotion measures “must be carried out” through close coordination, but “2050” appears in 「実現を旨として」—“with realization as the guiding principle.” It sets no quantified national emissions ceiling, compliance test, remedy, or sanction for missing net zero. It therefore binds the framework and conduct of government and regulated actors, not achievement of a judicially enforceable numerical outcome. The unqualified claim “Japan has no binding climate law” is false; the narrower claim “Japan has no legally enforceable quantified national climate target or carbon budget” is defensible. The -46% (2030), -60% (2035), and -73% (2040) targets are Cabinet-plan/NDC targets, not numbers enacted in the statute.\n\n2. **Legally binding interim carbon budgets.** Neither country has UK-style legally binding multi-year carbon budgets. Sweden has binding Climate Act process duties and political interim targets (-63% in 2030, -75% in 2040, and -70% transport in 2030), but those numbers are outside the Act. Japan has statutory planning duties and Cabinet/NDC milestones, but no statutory interim emissions budget. EU annual allocations under the ESR and the 2026–2029 LULUCF budget bind Sweden as an EU Member State; they are EU compliance trajectories, not national Climate Act carbon budgets.\n\n3. **Japanese equivalent of Klimatpolitiska rådet.** None located. The closest candidates do not perform the same institutional function. The Global Warming Prevention Headquarters approves the Government's annual progress review, so it is executive self-review ([MOE progress series](https://www.env.go.jp/earth/ondanka/kptap/progress_00002.html)). The Central Environment Council can review and advise, but it is located within the environmental administration, its current members are appointed by the Environment Minister for two-year terms, and it answers consultations or submits opinions to ministers; it has no statutory duty to publish an independent annual assessment of whether total policy is sufficient ([appointment notice](https://www.env.go.jp/press/109110_00002.html), [Basic Environment Law, Articles 41–42](https://www.env.go.jp/en/laws/policy/basic/ch3.html)). Klimatpolitiska rådet, by contrast, is instructed by ordinance to independently assess policy compatibility every year; the Swedish Government appoints members after a nomination proposal from the Council itself.\n\n4. **Durability.** Counting explicit weakening/repeal within ten years, and excluding planned sunsets and ordinary plan succession: Sweden—Klimatklivet (SE-0012) was budgetarily put into phase-out after four years by SE-0013, then restored; reduktionsplikten (SE-0018) had its scheduled 2023 increase paused after four years (SE-0022) and was sharply cut after 5.5 years (SE-0023); the bonus side of bonus–malus (SE-0025) ended after 4.4 years (SE-0026). Japan—the Third Strategic Energy Plan's nuclear build-out (JP-0016) was reversed after about two years by JP-0019; the 2030s zero-nuclear strategy (JP-0019) was reversed after about 1.6 years by JP-0023; the 2018 large-biomass FIT/FIP auction eligibility (JP-0031) was ended for new projects after eight years by JP-0057. Continuously in force for more than twenty years: Sweden—the carbon tax (SE-0003, 35 years) and the completed Barsebäck closure states (SE-0009, 27 years; SE-0010, 21 years). Japan—the Energy Conservation Act (JP-0003, 47 years), NEDO (JP-0004, 46 years), still-incorporated 1983/1993/1999/2002/2005 Energy Conservation Act amendments (JP-0005, JP-0007, JP-0009, JP-0010, JP-0013), the Global Warming Countermeasures Act (JP-0008, 28 years), and the Basic Act on Energy Policy (JP-0011, 24 years). The Energy Conservation Act has survived the most subsequent distinct PM names (23), followed by NEDO (22); Sweden's carbon tax has survived seven subsequently taking-office distinct PM names.\n\n5. **Cross-government reversals and programme termination.** Yes in Sweden: the Fälldin-era 1980 phase-out was reversed in law by the Reinfeldt government in 2010; the Löfven-era reduction obligation was weakened by the Kristersson government from 2024; and the Löfven-era climate bonus was terminated by the Kristersson government in November 2022. The temporary 2026 CO2-tax cut also weakened the Carlsson-era carbon-pricing instrument without repealing it. For Japan, no source checked attributes termination of the Sunshine, Moonlight, New Sunshine, or Green Innovation programmes to a change of government. Sunshine/Moonlight were administratively integrated before the 1993 alternation. A policy plan, rather than an R&D programme, did change on alternation: the Noda government's 2012 zero-nuclear strategy was reversed by the Abe government's 2014 Basic Energy Plan.\n\n6. **Residual source-bound limits.** Official chronologies publish only year precision for the Sunshine and Moonlight projects and for several early Energy Conservation Act amendments; no day was inferred. Industriklivet's official 2018–2024 appropriation chart publishes rounded millions and the current Energy Agency page publishes a rounded 2026 total, so the dataset preserves those stated precisions. Japanese reactor dates use first reactor start (原子炉起動); grid-connection and commercial-operation dates differ, and the 2024 White Paper counts 14 distinct restarted units. No first-time unit restart was found for 2017, 2019, 2020, 2022, 2025, or through 16 August 2026.";
+
+/* ── encoding ──────────────────────────────────────────────────────────────
+   Two independent channels. legal_status is drawn as shape, direction as
+   colour, from the Okabe–Ito colourblind-safe palette; neither distinction is
+   ever carried by colour alone. Both maps are keyed on the vocabulary the
+   dataset declares, and an unlisted value falls back to something visible
+   rather than vanishing. */
+const PAL = {
+  strengthening:  "#0072B2",   // Okabe–Ito blue
+  weakening:      "#D55E00",   // Okabe–Ito vermillion
+  restructuring:  "#CC79A7",   // Okabe–Ito reddish purple
+  neutral:        "#999999",   // neutral grey
+};
+const SHAPE = {
+  legally_binding_statute:        "square",
+  binding_secondary_legislation:  "disc",
+  administratively_binding:       "ring",
+  non_binding_plan:               "diamond",
+  political_declaration:          "triangle",
+};
+/* Sweden above Japan, and sublanes in the order the manuscript discusses them:
+   the cross-cutting frameworks first, then the instruments underneath them.
+   Any country or sector the dataset gains that is not listed is appended rather
+   than dropped. */
+const LANE_ORDER = ["SE", "JP"];
+const SECTOR_ORDER = ["cross_cutting", "carbon_pricing", "electricity", "nuclear",
+                      "transport", "industry", "heat", "hydrogen", "forestry_landuse"];
+
+const L = {
+  W: 1240, ML: 176, MR: 18,          // left gutter holds the sublane labels
+  axisH: 34, footH: 86,
+  rowH: 11, barH: 5, r: 4,           // one packed row per event, kept tight
+  sublaneGap: 8, bandH: 15, bandGap: 5, laneGap: 26, laneHeadH: 20, arcH: 34,
+};
+
+/* ── dates ─────────────────────────────────────────────────────────────────
+   Dates arrive at three precisions — a bare year, a year and month, or a full
+   day — and the precision is data, not sloppiness, so a partial date is kept as
+   the interval it denotes rather than silently pinned to 1 January. */
+const iso = d => d.length === 10 ? d : d.length === 7 ? d + "-01" : d + "-01-01";
+const t = d => Date.parse(iso(d) + "T00:00:00Z");
+const YEAR = 365.2425 * 864e5;
+
+function extent(d, precision){
+  const a = t(d);
+  if (precision === "year"  && d.length === 4) return [a, Date.UTC(+d + 1, 0, 1)];
+  if (precision === "month" && d.length === 7){
+    const [y, m] = d.split("-").map(Number);
+    return [a, Date.UTC(y + (m === 12 ? 1 : 0), m % 12, 1)];
+  }
+  return [a, a];
+}
+const mid = e => { const [a, b] = extent(e.date, e.date_precision); return (a + b) / 2; };
+
+/* labels are derived from the vocabulary, never transcribed */
+const label = s => String(s).replace(/_/g, " ").replace(/^./, c => c.toUpperCase());
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+
+/* ── layout ────────────────────────────────────────────────────────────────
+   The axis spans whole years from the earliest event to the end of the current
+   one, so both lanes share one scale and the right edge means "now" without any
+   date being written down. */
+const now = new Date();
+const T0 = Date.UTC(new Date(Math.min.apply(null, EVENTS.map(e => t(e.date)))).getUTCFullYear(), 0, 1);
+const T1 = Math.max(
+  Date.UTC(now.getUTCFullYear() + 1, 0, 1),
+  ...EVENTS.map(e => e.end_date ? extent(e.end_date, e.end_date.length === 4 ? "year" : "day")[1] : 0));
+const PW = L.W - L.ML - L.MR;
+const X = ms => L.ML + PW * (ms - T0) / (T1 - T0);
+
+/* An instrument occupies its sublane for as long as it is in force, so two that
+   overlap in time cannot share a row. Rows are filled greedily, earliest first;
+   Japan's cross-cutting sublane needs two dozen of them, and that thickness is
+   the durability comparison rather than an accident of layout. */
+function barSpan(e){
+  const a = extent(e.date, e.date_precision)[0];
+  // an end_date is the more specific fact even when still_in_force is also set:
+  // the two temporary Swedish fuel-tax measures are in force now and already
+  // legislated to expire, and the bar should stop where the statute says.
+  if (e.end_date) return [a, extent(e.end_date, e.end_date.length === 4 ? "year" : "day")[1]];
+  if (e.still_in_force) return [a, T1];
+  return [a, extent(e.date, e.date_precision)[1]];
+}
+
+function pack(events){
+  const rows = [];
+  events.slice().sort((p, q) => t(p.date) - t(q.date) || p.id.localeCompare(q.id)).forEach(e => {
+    const [a, b] = barSpan(e);
+    // leave a marker's width of clearance so two markers never touch
+    const need = a - (L.r + 2) * (T1 - T0) / PW;
+    let i = rows.findIndex(rw => rw.end < need);
+    if (i < 0){ i = rows.length; rows.push({end: -Infinity, events: []}); }
+    rows[i].end = Math.max(b, mid(e) + (L.r + 2) * (T1 - T0) / PW);
+    rows[i].events.push(e);
+    e._row = i;
+  });
+  return rows;
+}
+
+function layout(events){
+  let y = L.axisH;
+  const lanes = [];
+  // the lane list comes from the whole dataset, not from the filtered set: a
+  // country the filters empty out keeps its lane and its government band, so
+  // "no Japanese decision is a weakening" is visible as an empty lane rather
+  // than as a missing one
+  const countries = LANE_ORDER.concat(
+    [...new Set(EVENTS.map(e => e.country))].filter(c => !LANE_ORDER.includes(c)));
+  countries.forEach(c => {
+    const mine = events.filter(e => e.country === c);
+    const present = [...new Set(mine.map(e => e.sector))];
+    const sectors = SECTOR_ORDER.filter(s => present.includes(s))
+      .concat(present.filter(s => !SECTOR_ORDER.includes(s)));
+    const lane = {country: c, head: y + L.laneHeadH, top: y + L.laneHeadH + L.arcH,
+                  sublanes: [], events: mine};
+    let sy = lane.top;
+    sectors.forEach(s => {
+      const rows = pack(mine.filter(e => e.sector === s));
+      lane.sublanes.push({sector: s, top: sy, rows, h: rows.length * L.rowH});
+      sy += rows.length * L.rowH + L.sublaneGap;
+    });
+    lane.bottom = sectors.length ? sy - L.sublaneGap : sy + L.rowH;
+    lane.bandTop = lane.bottom + L.bandGap;
+    lanes.push(lane);
+    y = lane.bandTop + L.bandH + L.laneGap;
+  });
+  return {lanes, H: y - L.laneGap + L.footH};
+}
+
+/* ── marker shapes ─────────────────────────────────────────────────────── */
+function marker(e, x, y){
+  const c = PAL[e.direction] || "#000000";
+  const r = L.r, sh = SHAPE[e.legal_status] || "disc";
+  // a verified marker is drawn solid with a white halo so it reads on top of the
+  // bars; an uncertain one keeps its shape and colour but is outlined in a dash,
+  // so the doubt is visible without becoming a fourth colour or a sixth shape
+  const un = e.confidence === "uncertain";
+  const skin = un ? ` fill-opacity="0.35" stroke="${c}" stroke-width="1.2" stroke-dasharray="2 1.6"`
+                  : ` stroke="#ffffff" stroke-width="0.9"`;
+  if (sh === "square")   return `<rect x="${(x-r).toFixed(1)}" y="${(y-r).toFixed(1)}" width="${2*r}" height="${2*r}" fill="${c}"${skin}/>`;
+  if (sh === "disc")     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${c}"${skin}/>`;
+  if (sh === "ring")     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r-0.6}" fill="#ffffff" stroke="${c}" stroke-width="1.8"${un ? ` stroke-dasharray="2 1.6"` : ``}/>`;
+  if (sh === "diamond")  return `<path d="M${x.toFixed(1)} ${(y-r).toFixed(1)}L${(x+r*0.82).toFixed(1)} ${y.toFixed(1)}L${x.toFixed(1)} ${(y+r).toFixed(1)}L${(x-r*0.82).toFixed(1)} ${y.toFixed(1)}Z" fill="${c}"${skin}/>`;
+  return `<path d="M${x.toFixed(1)} ${(y-r*1.1).toFixed(1)}L${(x+r).toFixed(1)} ${(y+r*0.8).toFixed(1)}L${(x-r).toFixed(1)} ${(y+r*0.8).toFixed(1)}Z" fill="${c}"${skin}/>`;
+}
+
+/* ── whisker for an imprecise date ─────────────────────────────────────────
+   A year-precision event is known to have happened inside its year and no more
+   finely than that. Drawing it as a point would claim a day the source does not
+   give, so it is drawn as a whisker spanning the interval with the marker at the
+   middle — the reader sees the uncertainty rather than being told about it. */
+function whisker(e, y){
+  const [a, b] = extent(e.date, e.date_precision);
+  if (b <= a) return "";
+  const c = PAL[e.direction] || "#000000", x1 = X(a), x2 = X(b), cap = 3;
+  return `<path d="M${x1.toFixed(1)} ${(y-cap).toFixed(1)}V${(y+cap).toFixed(1)}M${x1.toFixed(1)} ${y.toFixed(1)}H${x2.toFixed(1)}M${x2.toFixed(1)} ${(y-cap).toFixed(1)}V${(y+cap).toFixed(1)}"`
+       + ` stroke="${c}" stroke-width="1.1" fill="none" opacity="0.85"/>`;
+}
+
+/* ── reversal arcs and succession ticks ────────────────────────────────────
+   Two relationships, drawn as two deliberately different marks. A reversal is a
+   break: vermillion, curved, with an arrowhead pointing back at what was undone.
+   A succession is continuity: grey, dotted, flat, no arrowhead — the Japanese
+   plan-revision chain should read as one instrument being re-issued, not as a
+   series of changes of mind.
+
+   The arc bows upward, over the markers rather than through them, rising into
+   the reserved band above the lane when the two events sit far apart vertically.
+   A strict band-only route would need long vertical legs cutting through
+   twenty-four rows of Japanese cross-cutting instruments to reach it. */
+function arc(from, to, aid, bid){
+  const dx = Math.abs(to.x - from.x);
+  const lift = Math.max(16, Math.min(dx * 0.22, 62));
+  const apex = Math.max(from.laneArcTop, Math.min(from.y, to.y) - lift);
+  const c1x = from.x + (to.x - from.x) * 0.22, c2x = from.x + (to.x - from.x) * 0.78;
+  // stop short of the target marker so the arrowhead lands on its edge
+  const ang = Math.atan2(to.y - apex, to.x - c2x);
+  const gap = L.r + 3.2;
+  const ex = to.x - Math.cos(ang) * gap, ey = to.y - Math.sin(ang) * gap;
+  const h = 4.6, w = 3.0, ux = Math.cos(ang), uy = Math.sin(ang);
+  const bx = ex - ux * h, by = ey - uy * h;            // base of the arrowhead
+  const head = `M${ex.toFixed(1)} ${ey.toFixed(1)}`
+    + `L${(bx - uy*w).toFixed(1)} ${(by + ux*w).toFixed(1)}`
+    + `L${(bx + uy*w).toFixed(1)} ${(by - ux*w).toFixed(1)}Z`;
+  const tag = aid ? ` class="arc" data-a="${esc(aid)}" data-b="${esc(bid)}"` : ` class="arc"`;
+  return `<path${tag} d="M${from.x.toFixed(1)} ${(from.y - L.r - 1).toFixed(1)} C${c1x.toFixed(1)} ${apex.toFixed(1)} ${c2x.toFixed(1)} ${apex.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}"`
+       + ` fill="none" stroke="${PAL.weakening}" stroke-width="1.3" opacity="0.85"/>`
+       + `<path${tag} d="${head}" fill="${PAL.weakening}" opacity="0.85"/>`;
+}
+
+function tick(from, to, aid, bid){
+  return `<path class="tick"${aid ? ` data-a="${esc(aid)}" data-b="${esc(bid)}"` : ``}`
+       + ` d="M${from.x.toFixed(1)} ${from.y.toFixed(1)}L${to.x.toFixed(1)} ${to.y.toFixed(1)}"`
+       + ` fill="none" stroke="#9aa0a8" stroke-width="1" stroke-dasharray="1.5 2.5" opacity="0.9"/>`;
+}
+
+/* ── the plot ──────────────────────────────────────────────────────────────
+   Groups are named by lane and by channel so the exported SVG opens in
+   Illustrator as an editable figure rather than one flat soup of paths. */
+const POS = {};   // event id -> where its marker landed, for arcs and ticks
+
+function plot(events){
+  const {lanes, H} = layout(events);
+  for (const k in POS) delete POS[k];
+  lanes.forEach(lane => lane.sublanes.forEach(sl => sl.rows.forEach((row, ri) => row.events.forEach(e => {
+    POS[e.id] = {x: X(mid(e)), y: sl.top + ri * L.rowH + L.rowH / 2,
+                 laneArcTop: lane.head + 4, country: lane.country};
+  }))));
+  const p = [`<svg class="fig" id="timeline" viewBox="0 0 ${L.W} ${H.toFixed(0)}" width="${L.W}" height="${H.toFixed(0)}"`
+           + ` xmlns="http://www.w3.org/2000/svg" font-family='"Helvetica Neue", Helvetica, Arial, sans-serif'>`];
+  p.push(`<rect x="0" y="0" width="${L.W}" height="${H.toFixed(0)}" fill="#ffffff"/>`);
+
+  const y0 = L.axisH - 8, y1 = H - L.footH + 4;
+
+  /* decade gridlines, drawn once behind both lanes because the scale is shared */
+  p.push(`<g id="axis">`);
+  const first = Math.ceil(new Date(T0).getUTCFullYear() / 10) * 10;
+  for (let yr = first; Date.UTC(yr, 0, 1) <= T1; yr += 10){
+    const x = X(Date.UTC(yr, 0, 1));
+    p.push(`<line x1="${x.toFixed(1)}" y1="${y0}" x2="${x.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#e8e5dc" stroke-width="1"/>`);
+    p.push(`<text x="${x.toFixed(1)}" y="${L.axisH-14}" font-size="10.5" fill="#9aa0a8" text-anchor="middle">${yr}</text>`);
+    p.push(`<text x="${x.toFixed(1)}" y="${(y1+16).toFixed(1)}" font-size="10.5" fill="#9aa0a8" text-anchor="middle">${yr}</text>`);
+  }
+  // the right edge is the present, and says so rather than carrying a typed date
+  p.push(`<line x1="${X(t(nowISO())).toFixed(1)}" y1="${y0}" x2="${X(t(nowISO())).toFixed(1)}" y2="${y1.toFixed(1)}" stroke="#9aa0a8" stroke-width="1" stroke-dasharray="2 3"/>`);
+  p.push(`<text x="${(X(t(nowISO()))-4).toFixed(1)}" y="${L.axisH-14}" font-size="10" font-style="italic" fill="#9aa0a8" text-anchor="end">today</text>`);
+  p.push(`</g>`);
+
+  lanes.forEach(lane => {
+    p.push(`<g id="lane-${esc(lane.country)}">`);
+    p.push(`<text x="${L.ML}" y="${(lane.head-7).toFixed(1)}" font-size="13" font-weight="700" fill="#1d232a">${esc(lane.country)}</text>`);
+    p.push(`<text x="${(L.ML+26).toFixed(1)}" y="${(lane.head-7).toFixed(1)}" font-size="11" fill="#9aa0a8">${lane.events.length} decisions</text>`);
+    p.push(`<line x1="${L.ML}" y1="${(lane.head-3).toFixed(1)}" x2="${L.W-L.MR}" y2="${(lane.head-3).toFixed(1)}" stroke="#e4e1d8" stroke-width="1"/>`);
+
+    if (!lane.events.length)
+      p.push(`<text x="${L.ML}" y="${(lane.top+L.rowH).toFixed(1)}" font-size="11.5" font-style="italic" fill="#9aa0a8">no decision in this lane matches the filters</text>`);
+
+    /* sublane labels and their separators */
+    p.push(`<g id="lane-${esc(lane.country)}-sublane-labels">`);
+    lane.sublanes.forEach((sl, i) => {
+      const cy = sl.top + sl.h / 2;
+      p.push(`<text x="${L.ML-10}" y="${(cy+3.5).toFixed(1)}" font-size="11" fill="#5a636e" text-anchor="end">${esc(label(sl.sector))}`
+           + ` <tspan fill="#b3b8bd">${sl.rows.reduce((a, r) => a + r.events.length, 0)}</tspan></text>`);
+      if (i) p.push(`<line x1="${L.ML}" y1="${(sl.top-L.sublaneGap/2).toFixed(1)}" x2="${L.W-L.MR}" y2="${(sl.top-L.sublaneGap/2).toFixed(1)}" stroke="#f1efe8" stroke-width="1"/>`);
+    });
+    p.push(`</g>`);
+
+    /* duration bars first, so markers sit on top of them */
+    p.push(`<g id="lane-${esc(lane.country)}-duration-bars">`);
+    lane.sublanes.forEach(sl => sl.rows.forEach((row, ri) => row.events.forEach(e => {
+      const [a, b] = barSpan(e), y = sl.top + ri * L.rowH + L.rowH / 2;
+      const x = X(a), w = Math.max(1.5, X(b) - X(a));
+      p.push(`<rect class="bar" data-id="${esc(e.id)}" x="${x.toFixed(1)}" y="${(y-L.barH/2).toFixed(1)}"`
+           + ` width="${w.toFixed(1)}" height="${L.barH}"`
+           + ` rx="1.5" fill="${PAL[e.direction] || "#000000"}" opacity="0.2"/>`);
+    })));
+    p.push(`</g>`);
+
+    /* succession ticks sit under the markers: they are context, not a mark */
+    p.push(`<g id="lane-${esc(lane.country)}-successions">`);
+    lane.events.filter(e => e.supersedes && POS[e.supersedes]).forEach(e =>
+      p.push(tick(POS[e.id], POS[e.supersedes], e.id, e.supersedes)));
+    p.push(`</g>`);
+
+    p.push(`<g id="lane-${esc(lane.country)}-markers">`);
+    lane.sublanes.forEach(sl => sl.rows.forEach((row, ri) => row.events.forEach(e => {
+      const y = sl.top + ri * L.rowH + L.rowH / 2;
+      p.push(`<g class="mk" data-id="${esc(e.id)}">${whisker(e, y)}${marker(e, X(mid(e)), y)}</g>`);
+    })));
+    p.push(`</g>`);
+
+    p.push(`<g id="lane-${esc(lane.country)}-reversals">`);
+    lane.events.filter(e => e.reverses && POS[e.reverses]).forEach(e =>
+      p.push(arc(POS[e.id], POS[e.reverses], e.id, e.reverses)));
+    p.push(`</g>`);
+
+    /* the government band, directly under its own lane. Tint flips whenever the
+       party or coalition changes, so a bar crossing a tint boundary is a bar
+       that outlived a change of government. */
+    p.push(`<g id="lane-${esc(lane.country)}-governments">`);
+    const segs = GOVERNMENTS.filter(g => g.country === lane.country)
+                            .sort((a, b) => t(a.start_date) - t(b.start_date));
+    let tint = 0, prev = null;
+    segs.forEach(g => {
+      if (prev !== null && g.party_or_coalition !== prev) tint ^= 1;
+      prev = g.party_or_coalition;
+      const a = Math.max(t(g.start_date), T0), b = Math.min(g.end_date ? t(g.end_date) : T1, T1);
+      if (b <= a) return;
+      const x = X(a), w = X(b) - X(a);
+      p.push(`<rect x="${x.toFixed(1)}" y="${lane.bandTop.toFixed(1)}" width="${w.toFixed(1)}" height="${L.bandH}"`
+           + ` fill="${tint ? "#d7d3c8" : "#eceae2"}" stroke="#ffffff" stroke-width="0.6"`
+           + ` data-tip="${esc(g.pm_name)}|${esc(g.party_or_coalition)}<br>${esc(g.start_date)} — ${esc(g.end_date || "still in office")}"/>`);
+      // the surname is written in wherever it fits, so the band still reads on
+      // paper and in the exported figure, where there is no hover
+      const sur = g.pm_name.split(" ").pop();
+      if (w > sur.length * 5.6 + 8)
+        p.push(`<text x="${(x+w/2).toFixed(1)}" y="${(lane.bandTop+L.bandH/2+3.5).toFixed(1)}" font-size="9.5" fill="#5a636e" text-anchor="middle" pointer-events="none">${esc(sur)}</text>`);
+    });
+    p.push(`<text x="${L.ML-10}" y="${(lane.bandTop+L.bandH/2+3.5).toFixed(1)}" font-size="10" fill="#9aa0a8" text-anchor="end">government</text>`);
+    p.push(`</g>`);
+
+    p.push(`</g>`);
+  });
+
+  p.push(legend(events, H));
+  p.push(`</svg>`);
+  return p.join("");
+}
+
+const nowISO = () => new Date().toISOString().slice(0, 10);
+
+/* The key is drawn inside the figure, from the values actually present, so it
+   travels with the exported SVG. */
+function legend(events, H){
+  const y = H - L.footH + 40;
+  const p = [`<g id="key">`];
+  let x = L.ML;
+  p.push(`<text x="${L.ML-10}" y="${(y+3.5).toFixed(1)}" font-size="10" fill="#9aa0a8" text-anchor="end">key</text>`);
+  const statuses = Object.keys(SHAPE).filter(s => events.some(e => e.legal_status === s));
+  statuses.forEach(s => {
+    p.push(marker({direction: "neutral", legal_status: s}, x + L.r, y));
+    p.push(`<text x="${(x+2*L.r+5).toFixed(1)}" y="${(y+3.5).toFixed(1)}" font-size="10" fill="#5a636e">${esc(label(s))}</text>`);
+    x += 2 * L.r + 9 + label(s).length * 5.4 + 14;
+  });
+  x = L.ML;
+  const dirs = Object.keys(PAL).filter(d => events.some(e => e.direction === d));
+  dirs.forEach(d => {
+    p.push(`<rect x="${x.toFixed(1)}" y="${(y+14).toFixed(1)}" width="16" height="7" rx="1.5" fill="${PAL[d]}" opacity="0.2"/>`);
+    p.push(`<circle cx="${(x+8).toFixed(1)}" cy="${(y+17.5).toFixed(1)}" r="${L.r}" fill="${PAL[d]}" stroke="#ffffff" stroke-width="0.9"/>`);
+    p.push(`<text x="${(x+22).toFixed(1)}" y="${(y+21).toFixed(1)}" font-size="10" fill="#5a636e">${esc(label(d))}</text>`);
+    x += 22 + label(d).length * 5.4 + 16;
+  });
+  x = L.ML;
+  const item = (mark, text) => {
+    p.push(mark);
+    p.push(`<text x="${(x+30).toFixed(1)}" y="${(y+38).toFixed(1)}" font-size="10" fill="#5a636e">${esc(text)}</text>`);
+    x += 30 + text.length * 5.4 + 16;
+  };
+  const ky = y + 34.5;
+  if (events.some(e => e.reverses))
+    item(arc({x: x + 2, y: ky + 4, laneArcTop: ky - 6}, {x: x + 24, y: ky + 4, laneArcTop: ky - 6}),
+         "reverses an earlier decision");
+  if (events.some(e => e.supersedes))
+    item(tick({x: x + 2, y: ky + 3}, {x: x + 24, y: ky + 3}), "supersedes it (same instrument, re-issued)");
+  if (events.some(e => e.date_precision !== "day"))
+    item(`<path d="M${x+2} ${ky-3}V${ky+3}M${x+2} ${ky}H${x+24}M${x+24} ${ky-3}V${ky+3}"`
+       + ` stroke="${PAL.neutral}" stroke-width="1.1" fill="none"/>`,
+         "date known only to the year or month");
+  if (events.some(e => e.confidence === "uncertain"))
+    item(marker({direction: "neutral", legal_status: "binding_secondary_legislation", confidence: "uncertain"}, x + 12, ky),
+         "uncertain");
+  p.push(`<text x="${L.W-L.MR}" y="${(y+21).toFixed(1)}" font-size="9.5" fill="#b3b8bd" text-anchor="end">shape = legal status · colour = direction · bar = time in force</text>`);
+  p.push(`</g>`);
+  return p.join("");
+}
+
+/* ── detail cards ───────────────────────────────────────────────────────────
+   One card per plotted event, carrying every field the dataset populates for it.
+   A field that is null is left out rather than printed as an em dash: null means
+   the question does not apply to that instrument, and inventing a row for it
+   would suggest the answer is missing.
+
+   The anchor is the event id and nothing else, so a citation survives the plot
+   being re-sorted, re-filtered or re-ordered. */
+const FIELDS = [
+  "date", "date_precision", "date_basis", "instrument_type", "legal_status", "binds_whom",
+  "has_interim_targets", "has_independent_review_body", "sector", "direction",
+  "still_in_force", "end_date", "years_in_force", "government_at_adoption",
+  "governments_since_adoption", "reverses", "supersedes", "confidence", "title_en_source",
+];
+const ENUMS = ["country", "date_precision", "date_basis", "instrument_type", "legal_status",
+               "binds_whom", "direction", "sector", "confidence", "title_en_source"];
+const byId = Object.fromEntries(EVENTS.map(e => [e.id, e]));
+
+function value(e, k){
+  const v = e[k];
+  if (v === null || v === undefined || v === "") return null;
+  if (typeof v === "boolean") return v ? "yes" : "no";
+  if (k === "reverses" || k === "supersedes")
+    return `<a href="#${esc(v)}">${esc(v)}</a> — ${esc(byId[v] ? (byId[v].title_en || byId[v].title_original) : "not in this dataset")}`;
+  if (ENUMS.includes(k)) return esc(label(v));
+  return esc(v);
+}
+
+function card(e){
+  const rows = FIELDS.map(k => [k, value(e, k)]).filter(([, v]) => v !== null);
+  const dated = e.date_precision === "day" ? e.date : e.date;   // shown at its own precision
+  return `<details class="card" id="${esc(e.id)}">
+    <summary><span class="eid">${esc(e.id)}</span>
+      <h2>${esc(e.title_en || e.title_original)}${
+        e.title_original && e.title_original !== e.title_en
+          ? `<span class="orig">${esc(e.title_original)}</span>` : ""}</h2>
+      <span class="when">${esc(dated)}</span>
+      <span class="dir" style="background:${PAL[e.direction] || "#000"}">${esc(label(e.direction))}</span>
+    </summary>
+    <div class="body">
+      <table class="kv"><tbody>
+        ${rows.map(([k, v]) => `<tr><th>${esc(label(k))}</th><td>${v}</td></tr>`).join("")}
+      </tbody></table>
+
+      <h3 class="sec">Why it is classed ${esc(label(e.direction).toLowerCase())}</h3>
+      <p class="prose">${esc(e.direction_basis)}</p>
+
+      <h3 class="sec">What changed</h3>
+      <p class="prose">${esc(e.quantified_change)}</p>
+
+      ${e.notes ? `<h3 class="sec">Notes</h3><p class="prose">${esc(e.notes)}</p>` : ""}
+
+      <h3 class="sec">Source</h3>
+      <div class="cite"><b>${esc(e.source_title)}</b>
+        <div class="d">${esc(e.source_publisher)} · ${esc(e.source_date)}</div>
+        <a href="${esc(e.source_url)}" target="_blank" rel="noopener">${esc(e.source_url)}</a></div>
+
+      <p class="permalink">Cite this decision: <code>policy_timeline.html#${esc(e.id)}</code></p>
+    </div></details>`;
+}
+
+/* ── the text equivalent ───────────────────────────────────────────────────
+   The same rows the figure draws, in the same order and under the same filters.
+   A timeline is a picture of a table; anyone who cannot use the picture, or
+   would rather not, should not be reading a worse version of the data. */
+const COLS = ["id", "country", "date", "title_en", "title_original", "sector", "instrument_type",
+              "legal_status", "direction", "still_in_force", "end_date", "years_in_force",
+              "government_at_adoption", "governments_since_adoption", "reverses", "supersedes"];
+
+function table(events){
+  const cell = (e, k) => {
+    const v = e[k], cls = `c-${k}`;
+    if (k === "id") return `<td class="id ${cls}"><a href="#${esc(e.id)}">${esc(e.id)}</a></td>`;
+    if (v === null || v === undefined || v === "") return `<td class="${cls}"></td>`;
+    if (typeof v === "boolean") return `<td class="${cls}">${v ? "yes" : "no"}</td>`;
+    if (typeof v === "number") return `<td class="num ${cls}">${v}</td>`;
+    return `<td class="${cls}">${ENUMS.includes(k) ? esc(label(v)) : esc(v)}</td>`;
+  };
+  return `<table><caption>${events.length} plotted decisions, ${
+    LANE_ORDER.map(c => `${c} ${events.filter(e => e.country === c).length}`).join(" · ")}</caption>
+    <thead><tr>${COLS.map(k => `<th scope="col" class="c-${esc(k)}">${esc(label(k))}</th>`).join("")}</tr></thead>
+    <tbody>${sortRows(events).map(e =>
+      `<tr>${COLS.map(k => cell(e, k)).join("")}</tr>`).join("")}</tbody></table>`;
+}
+
+const sortRows = evs => evs.slice().sort(
+  (a, b) => LANE_ORDER.indexOf(a.country) - LANE_ORDER.indexOf(b.country)
+         || t(a.date) - t(b.date) || a.id.localeCompare(b.id));
+
+/* ── filters ───────────────────────────────────────────────────────────────
+   Four independent facets, each offering only the values the data actually
+   contains. Filtering changes which events are drawn and which rows the table
+   carries; it never touches T0 or T1, so the axis does not move under the
+   reader and two filter states stay comparable. The cards below are the citable
+   register and are always complete, so a filter can never break a citation. */
+const FACETS = ["country", "sector", "direction", "legal_status"];
+const VALUES = {};
+FACETS.forEach(f => {
+  const order = f === "country" ? LANE_ORDER : f === "sector" ? SECTOR_ORDER
+              : f === "direction" ? Object.keys(PAL) : Object.keys(SHAPE);
+  const present = [...new Set(EVENTS.map(e => e[f]))];
+  VALUES[f] = order.filter(v => present.includes(v)).concat(present.filter(v => !order.includes(v)));
+});
+const FILTER = {};
+FACETS.forEach(f => { FILTER[f] = new Set(VALUES[f]); });
+
+const passes = e => FACETS.every(f => FILTER[f].has(e[f]));
+
+function filterUI(){
+  return FACETS.map(f => {
+    const swatch = v => f === "direction" ? ` style="--c:${PAL[v]}"` : "";
+    const dot = v => f === "direction" ? "<i></i>" : "";
+    return `<div class="frow"><span class="flab">${esc(label(f))}</span>`
+      + VALUES[f].map(v =>
+          `<button class="chip${FILTER[f].has(v) ? " on" : ""}" data-facet="${esc(f)}" data-value="${esc(v)}"`
+          + `${swatch(v)} aria-pressed="${FILTER[f].has(v)}">${dot(v)}${esc(label(v))}</button>`).join("")
+      + `<button class="chip" data-facet="${esc(f)}" data-value="*">All</button></div>`;
+  }).join("");
+}
+
+/* ── hit targets ───────────────────────────────────────────────────────────
+   A transparent circle, one per marker, so a 4 px diamond is as easy to hit as
+   a square. It is what carries the click, the hover, the tab stop and the
+   accessible name, and it is stripped from the SVG export the same way the
+   evidence page strips its hover rectangles. */
+function hitLayer(events){
+  return `<g id="hits">` + events.filter(e => POS[e.id]).map(e => {
+    const name = `${e.id}. ${e.title_en || e.title_original}. ${e.date}. `
+      + `${label(e.direction)}, ${label(e.legal_status)}, ${label(e.sector)}.`;
+    const tip = `${esc(e.title_en || e.title_original)} (${esc(e.id)})|${esc(e.date)} · `
+      + `${esc(label(e.direction))} · ${esc(label(e.legal_status))}<br>${esc(label(e.sector))} · `
+      + `${e.still_in_force ? "still in force" : "ended " + esc(e.end_date || "—")}`;
+    return `<circle class="hit" tabindex="0" role="button" cx="${POS[e.id].x.toFixed(1)}"`
+      + ` cy="${POS[e.id].y.toFixed(1)}" r="6.5" fill="transparent" data-id="${esc(e.id)}"`
+      + ` aria-label="${esc(name)}" data-tip="${tip}"/>`;
+  }).join("") + `</g>`;
+}
+
+/* ── paint ─────────────────────────────────────────────────────────────────
+   One function rebuilds the figure, its hit layer, the caption and the table
+   from the current filter state. The cards are built once and left alone. */
+function paint(){
+  const shown = PLOTTED.filter(passes);
+  const wrap = document.getElementById("plotwrap");
+  if (!shown.length){
+    wrap.innerHTML = `<p class="blocknote">No decision matches this combination of filters.</p>`;
+  } else {
+    wrap.innerHTML = plot(shown);
+    document.getElementById("timeline").insertAdjacentHTML("beforeend", hitLayer(shown));
+  }
+  document.getElementById("filters").innerHTML = filterUI();
+  document.getElementById("cap").textContent =
+    `${shown.length} of ${PLOTTED.length} decisions · ${new Date(T0).getUTCFullYear()}–`
+    + `${new Date(T1-1).getUTCFullYear()} · `
+    + LANE_ORDER.map(c => `${c} ${shown.filter(e => e.country === c).length}`).join(" · ");
+  document.getElementById("plotnote").innerHTML =
+    `The axis is fixed to the full range of the dataset and does not rescale when the filters change, `
+    + `so two filter states can be compared directly.`
+    + `<span class="onscreen"> Click or tab to a marker for its card.</span>`;
+  document.getElementById("tablewrap").innerHTML = table(shown);
+}
+
+/* ── derived figures ───────────────────────────────────────────────────────
+   Four measures the manuscript leans on, each computed here and each stating
+   its own rule, because "durable" and "weakened" are definitions before they
+   are numbers and a reader is entitled to argue with the definition. */
+const years = (a, b) => (t(b) - t(a)) / YEAR;
+const SUPERSEDED = new Set(EVENTS.filter(e => e.supersedes).map(e => e.supersedes));
+
+function derivedRows(){
+  const per = fn => LANE_ORDER.map(c => fn(PLOTTED.filter(e => e.country === c), c));
+
+  const longLived = per(evs => evs.filter(e => e.still_in_force && e.years_in_force > 20));
+  // Only an explicit reversal counts. Counting every instrument that simply
+  // stopped inside ten years would sweep in the temporary Swedish fuel-tax
+  // measures, which expire on a date fixed when they were adopted, and the 1980
+  // referendum, which ended when it was decided: that would inflate Sweden's
+  // count with planned sunsets and flatter the argument the page is making.
+  // The dataset marks no field for "temporary", so the rule stays narrow.
+  const undone = per(evs => evs.filter(e =>
+    EVENTS.some(x => x.reverses === e.id && years(e.date, x.date) <= 10)));
+  const oldest = per(evs => evs.reduce((a, b) => b.years_in_force > a.years_in_force ? b : a));
+  const arcs = per(evs => evs.filter(e => e.reverses));
+
+  return [
+    ["Instruments continuously in force for more than twenty years",
+     longLived.map(g => `${g.length}`),
+     `still_in_force is true and years_in_force > 20`],
+    ["Instruments weakened or repealed within ten years of adoption",
+     undone.map(g => `${g.length}`),
+     `a later decision's reverses field names it, within ten years of its adoption; planned `
+     + `expiries and ordinary plan succession are excluded, since the dataset does not mark them`],
+    ["Longest-lived instrument, and the governments it has crossed",
+     oldest.map(e => `${e.id} <span>· ${e.years_in_force} years · ${e.governments_since_adoption} governments</span>`),
+     `the largest years_in_force in the lane; governments_since_adoption counts distinct prime `
+     + `ministers taking office after it was adopted`],
+    ["Reversal arcs drawn",
+     arcs.map(g => `${g.length}`),
+     `decisions whose reverses field names an earlier decision`],
+  ];
+}
+
+function derivedTable(){
+  return `<table><thead><tr><th scope="col">Measure</th>`
+    + LANE_ORDER.map(c => `<th scope="col" class="lane">${esc(c)}</th>`).join("")
+    + `<th scope="col">How it is computed</th></tr></thead><tbody>`
+    + derivedRows().map(([name, vals, how]) =>
+        `<tr><td class="m">${esc(name)}</td>${vals.map(v => `<td class="v">${v}</td>`).join("")}`
+        + `<td class="how">${esc(how)}</td></tr>`).join("")
+    + `</tbody></table>`;
+}
+
+/* ── SVG export ────────────────────────────────────────────────────────────
+   The figure is the source of a manuscript figure, so the export has to open in
+   Illustrator as an editable drawing: text stays as text, and the groups keep
+   their names (lane-SE-markers, lane-JP-duration-bars, axis, key) so a lane can
+   be restyled or switched off without hunting through anonymous paths. The hit
+   layer and any hover state go, since neither means anything on paper. */
+function svgStringOf(el){
+  const s = el.cloneNode(true);
+  s.removeAttribute("class");
+  s.classList && s.classList.remove("focusing");
+  const hits = s.querySelector("#hits");
+  if (hits) hits.remove();
+  s.querySelectorAll(".hi").forEach(n => n.classList.remove("hi"));
+  s.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(s);
+}
+
+document.getElementById("export-svg").addEventListener("click", () => {
+  const el = document.getElementById("timeline");
+  if (!el) return;
+  const shown = PLOTTED.filter(passes).length;
+  const url = URL.createObjectURL(new Blob([svgStringOf(el)], {type: "image/svg+xml;charset=utf-8"}));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `policy_timeline_${shown}of${PLOTTED.length}.svg`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+});
+
+/* ── render ── */
+const PLOTTED = EVENTS.filter(e => e.confidence !== "not_found");
+document.getElementById("cards").innerHTML = sortRows(PLOTTED).map(card).join("");
+document.getElementById("cardnote").textContent =
+  `${PLOTTED.length} cards, one per plotted decision, in lane order and then by date. Each carries every `
+  + `field the dataset populates for that decision and a link to the source it was read from. The `
+  + `register is always complete: the filters above change the figure and the table, never this list. `
+  + `Card order and marker position can change as the dataset grows — the anchor, which is the `
+  + `decision's id, does not, so cite the anchor.`;
+paint();
+document.getElementById("derived").innerHTML = derivedTable();
+
+/* ── what was looked for and not found ─────────────────────────────────────
+   An absence has to be as visible as a finding, or the page quietly asserts
+   that everything asked was answered. Two things are shown: any event the
+   dataset marks confidence "not_found", which is plotted nowhere and would
+   otherwise vanish, and the open questions the dataset carries in prose —
+   where a Japanese counterpart to the Swedish climate policy council was
+   looked for and none was located, and where official chronologies publish
+   only a year. Both are read from the dataset file, not written here. */
+const NOT_FOUND = EVENTS.filter(e => e.confidence === "not_found");
+document.getElementById("soughtnote").textContent =
+  `${PLOTTED.length} of ${EVENTS.length} decisions are plotted and ${NOT_FOUND.length} `
+  + `${NOT_FOUND.length === 1 ? "is" : "are"} listed here as sought but not verified — the two sum to `
+  + `${PLOTTED.length + NOT_FOUND.length}, the size of the dataset. `
+  + (NOT_FOUND.length
+      ? `Each is shown with what was looked for and the source that was checked.`
+      : `No decision in the dataset is marked not_found, so nothing is missing from the figure for `
+        + `that reason. The open questions the dataset records — where something was sought and not `
+        + `located, and where a source publishes only a year — are reproduced below verbatim.`);
+document.getElementById("sought").innerHTML =
+  NOT_FOUND.map(e => `<div class="cite"><b>${esc(e.title_en || e.title_original)} (${esc(e.id)})</b>
+    <div class="d">${esc(e.notes)}</div>
+    <a href="${esc(e.source_url)}" target="_blank" rel="noopener">${esc(e.source_url)}</a></div>`).join("")
+  + `<pre>${esc(OPEN_QUESTIONS)}</pre>`;
+
+document.getElementById("filters").addEventListener("click", ev => {
+  const chip = ev.target.closest(".chip");
+  if (!chip) return;
+  const {facet, value} = chip.dataset;
+  if (value === "*") FILTER[facet] = new Set(VALUES[facet]);
+  else if (FILTER[facet].has(value)) FILTER[facet].delete(value);
+  else FILTER[facet].add(value);
+  // emptying a facet would blank the figure with no way back, so the last chip
+  // turned off restores the whole facet instead
+  if (!FILTER[facet].size) FILTER[facet] = new Set(VALUES[facet]);
+  paint();
+});
+
+/* ── click and keyboard ────────────────────────────────────────────────────
+   Every marker is a tab stop carrying its own accessible name, and Enter or
+   Space opens its card — the same thing a click does. */
+document.addEventListener("click", ev => {
+  const hit = ev.target.closest && ev.target.closest("svg.fig .hit");
+  if (hit) goTo(hit.dataset.id);
+});
+document.addEventListener("keydown", ev => {
+  const hit = ev.target.closest && ev.target.closest("svg.fig .hit");
+  if (!hit || (ev.key !== "Enter" && ev.key !== " ")) return;
+  ev.preventDefault();
+  goTo(hit.dataset.id);
+});
+
+/* ── hovering an event brings out what it is connected to ──────────────────
+   The partners of an event are the ones it reverses or supersedes and the ones
+   that reverse or supersede it, so the relation reads in both directions. */
+function partners(id){
+  const e = byId[id], set = new Set([id]);
+  if (e && e.reverses) set.add(e.reverses);
+  if (e && e.supersedes) set.add(e.supersedes);
+  EVENTS.forEach(x => { if (x.reverses === id || x.supersedes === id) set.add(x.id); });
+  return set;
+}
+
+function highlight(id){
+  const svg = document.getElementById("timeline");
+  if (!svg) return;
+  svg.querySelectorAll(".hi").forEach(n => n.classList.remove("hi"));
+  if (!id){ svg.classList.remove("focusing"); return; }
+  const set = partners(id);
+  svg.classList.add("focusing");
+  svg.querySelectorAll(".mk,.bar").forEach(n => { if (set.has(n.dataset.id)) n.classList.add("hi"); });
+  svg.querySelectorAll(".arc,.tick").forEach(n => {
+    if (n.dataset.a === id || n.dataset.b === id) n.classList.add("hi");
+  });
+}
+
+document.addEventListener("mouseover", ev => {
+  const hit = ev.target.closest && ev.target.closest("svg.fig .hit");
+  highlight(hit ? hit.dataset.id : null);
+});
+document.addEventListener("focusin", ev => {
+  const hit = ev.target.closest && ev.target.closest("svg.fig .hit");
+  if (hit) highlight(hit.dataset.id);
+});
+document.addEventListener("focusout", ev => {
+  if (ev.target.closest && ev.target.closest("svg.fig .hit")) highlight(null);
+});
+
+/* ── tooltips, same mechanism as the other two pages ── */
+const tip = document.getElementById("tip");
+document.addEventListener("mousemove", ev => {
+  const el = ev.target.closest && ev.target.closest("[data-tip]");
+  if (!el){ tip.style.display = "none"; return; }
+  const parts = el.getAttribute("data-tip").split("|");
+  tip.innerHTML = `<b>${parts[0]}</b><br>${parts[1]}`;
+  tip.style.display = "block";
+  tip.style.left = Math.min(ev.clientX + 14, window.innerWidth - 350) + "px";
+  tip.style.top = (ev.clientY + 16) + "px";
+});
+window.addEventListener("scroll", () => { tip.style.display = "none"; }, {passive: true});
+
+/* a card addressed by its anchor opens itself and scrolls into view, so a
+   citation link lands on an open card rather than a closed one */
+const cards = () => document.querySelectorAll("details.card");
+const setAll = open => cards().forEach(d => { d.open = open; });
+document.getElementById("expand-all").addEventListener("click", () => setAll(true));
+document.getElementById("collapse-all").addEventListener("click", () => setAll(false));
+
+/* Open a card and put it on screen. The scroll offset is computed rather than
+   left to scrollIntoView, which picks its own scroll container and lands far off
+   when the target is deep in a page of ninety-four cards. The address bar is
+   updated so the card can be copied as a citation, but a sandbox that refuses
+   history writes must not stop the card from opening. */
+function goTo(id){
+  const el = document.getElementById(id);
+  if (!el || el.tagName !== "DETAILS") return;
+  el.open = true;
+  requestAnimationFrame(() => {
+    window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 14);
+  });
+  try { history.replaceState(null, "", "#" + encodeURIComponent(id)); } catch (err){ /* file:// */ }
+}
+
+function openHash(){
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (id) goTo(id);
+}
+window.addEventListener("hashchange", openHash);
+openHash();
+
+/* The evidence page expands its cards before printing; this page does the
+   opposite and leaves them out of the printout altogether. Ninety-four expanded
+   cards would be fifty sheets of paper wrapped around the one figure the print
+   stylesheet exists to produce. */
+document.getElementById("cap").textContent =
+  `${plotted.length} decisions · ${new Date(T0).getUTCFullYear()}–${new Date(T1-1).getUTCFullYear()} · `
+  + LANE_ORDER.map(c => `${c} ${plotted.filter(e => e.country === c).length}`).join(" \u00b7 ");
+</script>
+</body>
+</html>
